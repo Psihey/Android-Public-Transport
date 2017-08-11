@@ -25,7 +25,11 @@
             android:name="com.google.android.geo.API_KEY"
             android:value="@string/google_maps_key" />
 
-        <activity android:name=".MainActivity">
+        <meta-data
+            android:name="io.fabric.ApiKey"
+            android:value="3ee38ffb7243c815e67fba8e096ef05824fb6962" />
+
+        <activity android:name=".view.activity.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -33,9 +37,6 @@
             </intent-filter>
         </activity>
 
-        <meta-data
-            android:name="io.fabric.ApiKey"
-            android:value="3ee38ffb7243c815e67fba8e096ef05824fb6962" />
     </application>
 
 </manifest>

@@ -1,4 +1,4 @@
-package com.provectus.public_transport;
+package com.provectus.public_transport.view.fragment.mapfragment.impl;
 
 import android.app.Activity;
 import android.content.Context;
@@ -10,6 +10,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.provectus.public_transport.R;
+import com.provectus.public_transport.view.fragment.mapfragment.MapsFragment;
+
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
 
@@ -17,13 +20,11 @@ import butterknife.Unbinder;
  * Created by Evgeniy on 8/10/2017.
  */
 
-public class MapsFragmentImpl extends Fragment implements Maps.View {
+public class MapsFragmentImpl extends Fragment implements MapsFragment {
 
-    private View mView;
     private Context mContext;
-    private MapsPresenterImpl mapsPresenter;
+    private MapsFragmentPresenterImpl mapsPresenter;
     private Unbinder mUnbinder;
-
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -31,21 +32,14 @@ public class MapsFragmentImpl extends Fragment implements Maps.View {
 
     }
 
-
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        mView = inflater.inflate(R.layout.fragment_maps, container, false);
-        mUnbinder = ButterKnife.bind(mContext, mView);
-        mapsPresenter = new MapsPresenterImpl();
-        mapsPresenter.onBind(this);
+       View view = inflater.inflate(R.layout.fragment_maps, container, false);
+        mUnbinder = ButterKnife.bind(mContext, view);
+        mapsPresenter = new MapsFragmentPresenterImpl();
+        mapsPresenter.bindView(this);
 
-        return mView;
-    }
-
-    @Override
-    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
-
+        return view;
     }
 
     @Override
@@ -72,7 +66,7 @@ public class MapsFragmentImpl extends Fragment implements Maps.View {
     @Override
     public void onStop() {
         super.onStop();
-        mapsPresenter.unBind();
+        mapsPresenter.unbindView();
     }
 
     @Override

@@ -1,8 +1,12 @@
-package com.provectus.public_transport;
+package com.provectus.public_transport.view.activity;
 
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import com.crashlytics.android.Crashlytics;
+import com.provectus.public_transport.view.fragment.mapfragment.impl.MapsFragmentImpl;
+import com.provectus.public_transport.R;
+import com.provectus.public_transport.view.util.consts.TagFragmentConst;
+
 import io.fabric.sdk.android.Fabric;
 
 public class MainActivity extends AppCompatActivity {
@@ -15,7 +19,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         getSupportFragmentManager().beginTransaction().replace(R.id.container,
-                new MapsFragmentImpl(), Constants.MAP_FRAGMENT).commit();
+                new MapsFragmentImpl(), TagFragmentConst.MAP_FRAGMENT).commit();
 
     }
 
