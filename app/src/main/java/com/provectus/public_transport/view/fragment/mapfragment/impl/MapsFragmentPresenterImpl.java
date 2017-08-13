@@ -12,12 +12,8 @@ import com.provectus.public_transport.view.fragment.mapfragment.MapsFragmentPres
 public class MapsFragmentPresenterImpl implements MapsFragmentPresenter {
 
     @Override
-    public void bindView(MapsFragment mapsFragment) {
-
-    }
+    public void bindView(MapsFragment mapsFragment) {}
 
     @Override
-    public void unbindView() {
-
-    }
+    public void unbindView() {}
 }

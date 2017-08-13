@@ -5,4 +5,5 @@ package com.provectus.public_transport.service;
  */
 
 public interface RetrofitQueries {
+    // TODO : Add queries when server will be available
 }

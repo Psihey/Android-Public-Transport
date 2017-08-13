@@ -9,6 +9,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
  */
 
 public class RetrofitProvider {
+    //TODO : Set BASE_URL when server will be available
     private final static String BASE_URl = "";
     private static RetrofitQueries sRetrofitQueries;
 
@@ -16,7 +17,7 @@ public class RetrofitProvider {
 
     }
 
-    public static RetrofitQueries getRetrofut(){
+    public static RetrofitQueries getRetrofit(){
         if(sRetrofitQueries == null){
             setUpRetrofit();
         }

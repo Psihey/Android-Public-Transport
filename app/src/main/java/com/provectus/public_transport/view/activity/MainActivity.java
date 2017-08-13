@@ -20,7 +20,12 @@ public class MainActivity extends AppCompatActivity {
 
         getSupportFragmentManager().beginTransaction().replace(R.id.container,
                 new MapsFragmentImpl(), TagFragmentConst.MAP_FRAGMENT).commit();
+        setUpToolbar();
 
+    }
+
+    private void setUpToolbar() {
+        if (getSupportActionBar()!= null) getSupportActionBar().hide();
     }
 
 }
