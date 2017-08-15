@@ -50,6 +50,15 @@
         android:id="@+id/container_transport"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@+id/buttons_group"/>
+        android:layout_below="@+id/buttons_group">
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/recycler_view_routes"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:scrollbars="vertical"
+            android:paddingTop="8dp" />
+
+    </android.support.design.widget.CoordinatorLayout>
 
 </RelativeLayout>

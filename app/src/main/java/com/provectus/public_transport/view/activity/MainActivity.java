@@ -17,15 +17,13 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         Fabric.with(this, new Crashlytics());
         setContentView(R.layout.activity_main);
-
+        setUpToolbar();
         getSupportFragmentManager().beginTransaction().replace(R.id.container,
                 new MapsFragmentImpl(), TagFragmentConst.MAP_FRAGMENT).commit();
-        setUpToolbar();
-
     }
 
     private void setUpToolbar() {
-        if (getSupportActionBar()!= null) getSupportActionBar().hide();
+        if (getSupportActionBar()!= null && getSupportActionBar().isShowing()) getSupportActionBar().hide();
     }
 
 }

@@ -8,10 +8,10 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.provectus.public_transport.R;
-import com.provectus.public_transport.model.ModelJson;
+import com.provectus.public_transport.model.TransportRoutes;
 
-import java.util.ArrayList;
 import java.util.List;
+
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -20,28 +20,32 @@ import butterknife.ButterKnife;
  * Created by Psihey on 11.08.2017.
  */
 
-public class TramsAndTrolleyAdapter extends RecyclerView.Adapter<TramsAndTrolleyAdapter.TramsTrolleybusViewHolder> {
-    //TODO : Change after implement correct JSON model
-    private List<ModelJson> data;
+public class TramsAndTrolleyAdapter extends RecyclerView.Adapter<TramsAndTrolleyAdapter.TramsAndTrolleyViewHolder> {
+    private List<TransportRoutes> data;
+    private final static String TRAM_TYPE = "tram";
+    private final static String TROLLEYBUSES_TYPE = "trolleybuses";
 
-    public TramsAndTrolleyAdapter(List<ModelJson> data) {
+    public TramsAndTrolleyAdapter(List<TransportRoutes> data) {
         this.data = data;
     }
 
     @Override
-    public TramsTrolleybusViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public TramsAndTrolleyViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View rootView = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_bundle_tram_trolleybus, parent, false);
 
-        return new TramsTrolleybusViewHolder(rootView);
+        return new TramsAndTrolleyViewHolder(rootView);
     }
 
     @Override
-    public void onBindViewHolder(TramsTrolleybusViewHolder holder, int position) {
-        if (data.get(position).getType().equals("tram")) {
+    public void onBindViewHolder(TramsAndTrolleyViewHolder holder, int position) {
+       final TransportRoutes transportRoutes = data.get(position);
+
+        if (transportRoutes.getType().equals(TRAM_TYPE)) {
             holder.ivLogoTransport.setImageResource(R.drawable.ic_train_public_gray);
-        } else {
+        } else if (transportRoutes.getType().equals(TROLLEYBUSES_TYPE)){
             holder.ivLogoTransport.setImageResource(R.drawable.ic_front_bus_gray);
         }
+
         holder.tvRoutesNumber.setText(String.valueOf(data.get(position).getNumber()));
 
     }
@@ -51,18 +55,16 @@ public class TramsAndTrolleyAdapter extends RecyclerView.Adapter<TramsAndTrolley
         return data.size();
     }
 
-
-    class TramsTrolleybusViewHolder extends RecyclerView.ViewHolder {
+    class TramsAndTrolleyViewHolder extends RecyclerView.ViewHolder {
         @BindView(R.id.text_view_number_routes)
         TextView tvRoutesNumber;
         @BindView(R.id.image_view_logo_transport)
         ImageView ivLogoTransport;
 
-        TramsTrolleybusViewHolder(View itemView) {
+        TramsAndTrolleyViewHolder(View itemView) {
             super(itemView);
             ButterKnife.bind(this, itemView);
         }
     }
-
 
 }
