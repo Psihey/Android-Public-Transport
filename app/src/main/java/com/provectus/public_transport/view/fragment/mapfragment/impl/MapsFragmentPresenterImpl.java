@@ -14,6 +14,8 @@ import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.schedulers.Schedulers;
 
+import static com.provectus.public_transport.model.TransportType.TAXI_TYPE;
+
 
 /**
  * Created by Evgeniy on 8/10/2017.
@@ -23,7 +25,6 @@ public class MapsFragmentPresenterImpl implements MapsFragmentPresenter {
 
     private MapsFragment mMapsFragment;
     private CompositeDisposable mCompositeDisposable;
-    private final static String TAXI_TYPE = "taxi";
 
     @Override
     public void bindView(MapsFragment mapsFragment) {
@@ -55,8 +56,9 @@ public class MapsFragmentPresenterImpl implements MapsFragmentPresenter {
         List<TransportRoutes> routes = new ArrayList<>();
         for (TransportRoutes currentRoutes : transportRoutes) {
             //TODO : Think about it! How we can improve this!
-            if (!currentRoutes.getType().equals(TAXI_TYPE) && currentRoutes.getId() > 2) {
+            if ((currentRoutes.getType()!= TAXI_TYPE) && currentRoutes.getId() > 2) {
                 routes.add(currentRoutes);
+                System.out.println(currentRoutes.getType());
             }
         }
         mMapsFragment.initRecyclerView(routes);
