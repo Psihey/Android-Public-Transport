@@ -16,17 +16,31 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
+import static com.provectus.public_transport.view.adapter.TramsAndTrolleyAdapter.TransportType.TRAM_TYPE;
+import static com.provectus.public_transport.view.adapter.TramsAndTrolleyAdapter.TransportType.TROLLEYBUSES_TYPE;
+
+
 /**
  * Created by Psihey on 11.08.2017.
  */
 
 public class TramsAndTrolleyAdapter extends RecyclerView.Adapter<TramsAndTrolleyAdapter.TramsAndTrolleyViewHolder> {
-    private List<TransportRoutes> data;
-    private final static String TRAM_TYPE = "tram";
-    private final static String TROLLEYBUSES_TYPE = "trolleybuses";
+    private List<TransportRoutes> mTransportRoutesData;
+
+    enum TransportType {
+        TRAM_TYPE("tram"),
+        TROLLEYBUSES_TYPE("trolleybuses");
+
+        private final String transportName;
+
+        TransportType(String transportName) {
+            this.transportName = transportName;
+        }
+    }
+
 
     public TramsAndTrolleyAdapter(List<TransportRoutes> data) {
-        this.data = data;
+        this.mTransportRoutesData = data;
     }
 
     @Override
@@ -38,21 +52,21 @@ public class TramsAndTrolleyAdapter extends RecyclerView.Adapter<TramsAndTrolley
 
     @Override
     public void onBindViewHolder(TramsAndTrolleyViewHolder holder, int position) {
-       final TransportRoutes transportRoutes = data.get(position);
+        final TransportRoutes transportRoutes = mTransportRoutesData.get(position);
 
-        if (transportRoutes.getType().equals(TRAM_TYPE)) {
+        if (transportRoutes.getType().equals(TRAM_TYPE.transportName)) {
             holder.ivLogoTransport.setImageResource(R.drawable.ic_train_public_gray);
-        } else if (transportRoutes.getType().equals(TROLLEYBUSES_TYPE)){
+        } else if (transportRoutes.getType().equals(TROLLEYBUSES_TYPE.transportName)) {
             holder.ivLogoTransport.setImageResource(R.drawable.ic_front_bus_gray);
         }
 
-        holder.tvRoutesNumber.setText(String.valueOf(data.get(position).getNumber()));
+        holder.tvRoutesNumber.setText(String.valueOf(mTransportRoutesData.get(position).getNumber()));
 
     }
 
     @Override
     public int getItemCount() {
-        return data.size();
+        return mTransportRoutesData.size();
     }
 
     class TramsAndTrolleyViewHolder extends RecyclerView.ViewHolder {

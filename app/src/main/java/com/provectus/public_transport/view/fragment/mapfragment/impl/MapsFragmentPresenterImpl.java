@@ -21,13 +21,13 @@ import io.reactivex.schedulers.Schedulers;
 
 public class MapsFragmentPresenterImpl implements MapsFragmentPresenter {
 
-    private MapsFragment mapsFragment;
+    private MapsFragment mMapsFragment;
     private CompositeDisposable mCompositeDisposable;
     private final static String TAXI_TYPE = "taxi";
 
     @Override
     public void bindView(MapsFragment mapsFragment) {
-        this.mapsFragment = mapsFragment;
+        this.mMapsFragment = mapsFragment;
         mCompositeDisposable = new CompositeDisposable();
         getRoutesFromServer();
         Logger.d("Maps is binded to its presenter.");
@@ -35,7 +35,7 @@ public class MapsFragmentPresenterImpl implements MapsFragmentPresenter {
 
     @Override
     public void unbindView() {
-        this.mapsFragment = null;
+        this.mMapsFragment = null;
         if (!mCompositeDisposable.isDisposed()) {
             mCompositeDisposable.dispose();
         }
@@ -53,18 +53,18 @@ public class MapsFragmentPresenterImpl implements MapsFragmentPresenter {
 
     private void handleResponse(List<TransportRoutes> transportRoutes) {
         List<TransportRoutes> routes = new ArrayList<>();
-        for (TransportRoutes transportRoutes1 : transportRoutes) {
+        for (TransportRoutes currentRoutes : transportRoutes) {
             //TODO : Think about it! How we can improve this!
-            if (!transportRoutes1.getType().equals(TAXI_TYPE) && transportRoutes1.getId() > 2) {
-                routes.add(transportRoutes1);
+            if (!currentRoutes.getType().equals(TAXI_TYPE) && currentRoutes.getId() > 2) {
+                routes.add(currentRoutes);
             }
         }
-        mapsFragment.initRecyclerView(routes);
+        mMapsFragment.initRecyclerView(routes);
         Logger.d("All Ok, we got responce");
     }
 
     private void handleError(Throwable throwable) {
-        mapsFragment.showDialogError();
+        mMapsFragment.showDialogError();
         Logger.d("Handle Error from when fetching data");
     }
 
