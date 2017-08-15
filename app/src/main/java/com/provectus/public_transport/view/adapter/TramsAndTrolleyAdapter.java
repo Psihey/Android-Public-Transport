@@ -7,6 +7,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.orhanobut.logger.Logger;
 import com.provectus.public_transport.R;
 import com.provectus.public_transport.model.TransportRoutes;
 
@@ -50,6 +51,7 @@ public class TramsAndTrolleyAdapter extends RecyclerView.Adapter<TramsAndTrolley
                 holder.ivLogoTransport.setImageResource(R.drawable.ic_front_bus_gray);
             break;
             default:
+                Logger.d("Transport Type is Invalid");
                 break;
         }
 
