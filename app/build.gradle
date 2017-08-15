@@ -1,4 +1,19 @@
+buildscript {
+    repositories {
+        maven { url 'https://maven.fabric.io/public' }
+    }
+
+    dependencies {
+        classpath 'io.fabric.tools:gradle:1.+'
+    }
+}
 apply plugin: 'com.android.application'
+apply plugin: 'io.fabric'
+
+repositories {
+    maven { url 'https://maven.fabric.io/public' }
+}
+
 apply plugin: 'me.tatarka.retrolambda'
 
 android {
@@ -6,6 +21,7 @@ android {
     buildToolsVersion "26.0.1"
     defaultConfig {
         applicationId "com.provectus.public_transport"
+        vectorDrawables.useSupportLibrary = true
         minSdkVersion 19
         targetSdkVersion 25
         versionCode 1
@@ -48,7 +64,7 @@ dependencies {
     compile 'com.google.dagger:dagger:2.10'
     annotationProcessor 'com.google.dagger:dagger-compiler:2.10'
     //Logger
-    compile 'com.orhanobut:logger:2.1.1'
+    compile 'com.orhanobut:logger:1.15'
     //IcePick
     compile 'frankiesardo:icepick:3.2.0'
     provided 'frankiesardo:icepick-processor:3.2.0'
@@ -58,4 +74,7 @@ dependencies {
     compile "android.arch.persistence.room:rxjava2:1.0.0-alpha5"
 
     testCompile 'junit:junit:4.12'
+    compile('com.crashlytics.sdk.android:crashlytics:2.6.8@aar') {
+        transitive = true;
+    }
 }
