@@ -58,7 +58,6 @@ public class MapsFragmentPresenterImpl implements MapsFragmentPresenter {
             //TODO : Think about it! How we can improve this!
             if ((currentRoutes.getType()!= TAXI_TYPE) && currentRoutes.getId() > 2) {
                 routes.add(currentRoutes);
-                System.out.println(currentRoutes.getType());
             }
         }
         mMapsFragment.initRecyclerView(routes);

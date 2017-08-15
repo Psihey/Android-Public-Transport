@@ -42,14 +42,18 @@ public class TramsAndTrolleyAdapter extends RecyclerView.Adapter<TramsAndTrolley
     public void onBindViewHolder(TramsAndTrolleyViewHolder holder, int position) {
         final TransportRoutes transportRoutes = mTransportRoutesData.get(position);
 
-        if (transportRoutes.getType() == TRAM_TYPE) {
-            holder.ivLogoTransport.setImageResource(R.drawable.ic_train_public_gray);
-        } else if (transportRoutes.getType() == TROLLEYBUSES_TYPE) {
-            holder.ivLogoTransport.setImageResource(R.drawable.ic_front_bus_gray);
+        switch (transportRoutes.getType()){
+            case TRAM_TYPE:
+                holder.ivLogoTransport.setImageResource(R.drawable.ic_train_public_gray);
+                break;
+            case TROLLEYBUSES_TYPE:
+                holder.ivLogoTransport.setImageResource(R.drawable.ic_front_bus_gray);
+            break;
+            default:
+                break;
         }
 
         holder.tvRoutesNumber.setText(String.valueOf(mTransportRoutesData.get(position).getNumber()));
-
     }
 
     @Override
