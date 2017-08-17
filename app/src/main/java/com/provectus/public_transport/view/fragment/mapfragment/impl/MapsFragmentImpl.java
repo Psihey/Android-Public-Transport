@@ -15,14 +15,11 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-
 import com.provectus.public_transport.R;
 import com.provectus.public_transport.model.TransportRoutes;
 import com.provectus.public_transport.view.adapter.TramsAndTrolleyAdapter;
-
 import com.provectus.public_transport.view.fragment.mapfragment.MapsFragment;
 import com.provectus.public_transport.view.fragment.mapfragment.MapsFragmentPresenter;
-
 
 import java.util.List;
 
@@ -54,11 +51,18 @@ public class MapsFragmentImpl extends Fragment implements MapsFragment {
         View view = inflater.inflate(R.layout.fragment_maps, container, false);
         mUnbinder = ButterKnife.bind(this, view);
         View bottomSheet = view.findViewById(R.id.bottom_sheet);
-        mMapsPresenter = new MapsFragmentPresenterImpl();
+        BottomSheetBehavior.from(bottomSheet);
+        return view;
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        if (mMapsPresenter == null) {
+            mMapsPresenter = new MapsFragmentPresenterImpl();
+        }
         mMapsPresenter.bindView(this);
         initProgressDialog();
-        BottomSheetBehavior mBottomSheetBehavior = BottomSheetBehavior.from(bottomSheet);
-        return view;
     }
 
     @Override
@@ -79,8 +83,8 @@ public class MapsFragmentImpl extends Fragment implements MapsFragment {
     }
 
     @Override
-    public void onStop() {
-        super.onStop();
+    public void onPause() {
+        super.onPause();
         mMapsPresenter.unbindView();
     }
 
@@ -108,7 +112,7 @@ public class MapsFragmentImpl extends Fragment implements MapsFragment {
         builder.setTitle(R.string.dialog_error_internet_title);
         builder.setMessage(R.string.dialog_error_internet_message);
         builder.setIcon(R.drawable.common_google_signin_btn_icon_dark_focused);
-        builder.setPositiveButton(R.string.dialog_error_internet_positive_button,(dialog, which) -> {
+        builder.setPositiveButton(R.string.dialog_error_internet_positive_button, (dialog, which) -> {
             mProgressDialog.show();
             mMapsPresenter.getRoutesFromServer();
         });
