@@ -53,20 +53,20 @@ public class MapsFragmentPresenterImpl implements MapsFragmentPresenter {
     }
 
     private void handleResponse(List<TransportRoutes> transportRoutes) {
+        Logger.d("All Ok, we got responce");
         List<TransportRoutes> routes = new ArrayList<>();
-        for (TransportRoutes currentRoutes : transportRoutes) {
-            //TODO : Think about it! How we can improve this!
-            if ((currentRoutes.getType()!= TAXI_TYPE) && currentRoutes.getId() > 2) {
-                routes.add(currentRoutes);
+        for (TransportRoutes currentRout : transportRoutes) {
+            if ((currentRout.getType()!= TAXI_TYPE)) {
+                routes.add(currentRout);
             }
         }
+
         mMapsFragment.initRecyclerView(routes);
-        Logger.d("All Ok, we got responce");
     }
 
     private void handleError(Throwable throwable) {
         mMapsFragment.showDialogError();
-        Logger.d("Handle Error from when fetching data");
+        Logger.d("Handle Error from when fetching data" + throwable.getMessage());
     }
 
 }
