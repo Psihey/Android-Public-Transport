@@ -14,8 +14,6 @@ import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.schedulers.Schedulers;
 
-import static com.provectus.public_transport.model.TransportType.TAXI_TYPE;
-
 
 /**
  * Created by Evgeniy on 8/10/2017.
@@ -31,7 +29,7 @@ public class MapsFragmentPresenterImpl implements MapsFragmentPresenter {
         this.mMapsFragment = mapsFragment;
         mCompositeDisposable = new CompositeDisposable();
         getRoutesFromServer();
-        Logger.d("Maps is binded to its presenter.");
+        Logger.d("Maps is bind to its presenter.");
     }
 
     @Override
@@ -44,6 +42,11 @@ public class MapsFragmentPresenterImpl implements MapsFragmentPresenter {
     }
 
     @Override
+    public void changeViewPager(int newPosition) {
+        mMapsFragment.changeIconInTabLayout(newPosition);
+    }
+
+    @Override
     public void getRoutesFromServer() {
         mCompositeDisposable.add(RetrofitProvider
                 .getRetrofit().getAllRoutes()
@@ -53,15 +56,20 @@ public class MapsFragmentPresenterImpl implements MapsFragmentPresenter {
     }
 
     private void handleResponse(List<TransportRoutes> transportRoutes) {
-        List<TransportRoutes> routes = new ArrayList<>();
+        List<TransportRoutes> busRoutes = new ArrayList<>();
+        List<TransportRoutes> tramRoutes = new ArrayList<>();
         for (TransportRoutes currentRoutes : transportRoutes) {
-            //TODO : Think about it! How we can improve this!
-            if ((currentRoutes.getType()!= TAXI_TYPE) && currentRoutes.getId() > 2) {
-                routes.add(currentRoutes);
+            switch (currentRoutes.getType()) {
+                case TROLLEYBUSES_TYPE:
+                    busRoutes.add(currentRoutes);
+                    break;
+                case TRAM_TYPE:
+                    tramRoutes.add(currentRoutes);
+                    break;
             }
         }
-        mMapsFragment.initRecyclerView(routes);
-        Logger.d("All Ok, we got responce");
+        Logger.d("All Ok, we got response");
+        //TODO : Write data in DB!
     }
 
     private void handleError(Throwable throwable) {
