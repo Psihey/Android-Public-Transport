@@ -12,9 +12,9 @@ import com.provectus.public_transport.view.fragment.mapfragment.RoutesTabFragmen
 
 public class ViewPagerAdapter extends FragmentPagerAdapter {
 
-    public static final int BUS = 0;
-    public static final int TRAM = 1;
-    public static final int PARKING = 2;
+    public static final int POSITION_BUS = 0;
+    public static final int POSITION_TRAM = 1;
+    public static final int POSITION_PARKING = 2;
 
     private final Fragment[] fragments = new Fragment[3];
     private FragmentManager fragmentManager;
@@ -24,9 +24,9 @@ public class ViewPagerAdapter extends FragmentPagerAdapter {
         super(fm);
         fragmentManager = fm;
 
-        fragments[BUS] = RoutesTabFragment.newInstance(BUS);
-        fragments[TRAM] = RoutesTabFragment.newInstance(TRAM);
-        fragments[PARKING] = RoutesTabFragment.newInstance(PARKING);
+        fragments[POSITION_BUS] = RoutesTabFragment.newInstance(POSITION_BUS);
+        fragments[POSITION_TRAM] = RoutesTabFragment.newInstance(POSITION_TRAM);
+        fragments[POSITION_PARKING] = RoutesTabFragment.newInstance(POSITION_PARKING);
     }
 
     @Override

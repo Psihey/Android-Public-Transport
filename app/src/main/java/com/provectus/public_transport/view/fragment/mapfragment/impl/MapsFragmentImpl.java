@@ -103,25 +103,25 @@ public class MapsFragmentImpl extends Fragment implements MapsFragment {
 
     @Override
     public void setIconInTabLayout() {
-        tabLayout.getTabAt(ViewPagerAdapter.BUS).setIcon(R.drawable.ic_front_bus_blue);
-        tabLayout.getTabAt(ViewPagerAdapter.TRAM).setIcon(R.drawable.ic_tram_public_gray);
-        tabLayout.getTabAt(ViewPagerAdapter.PARKING).setIcon(R.drawable.ic_parking_gray);
+        tabLayout.getTabAt(ViewPagerAdapter.POSITION_BUS).setIcon(R.drawable.ic_front_bus_blue);
+        tabLayout.getTabAt(ViewPagerAdapter.POSITION_TRAM).setIcon(R.drawable.ic_tram_public_gray);
+        tabLayout.getTabAt(ViewPagerAdapter.POSITION_PARKING).setIcon(R.drawable.ic_parking_gray);
     }
 
     @Override
     public void changeIconInTabLayout(int position) {
-        tabLayout.getTabAt(ViewPagerAdapter.BUS).setIcon(R.drawable.ic_front_bus_gray);
-        tabLayout.getTabAt(ViewPagerAdapter.TRAM).setIcon(R.drawable.ic_tram_public_gray);
-        tabLayout.getTabAt(ViewPagerAdapter.PARKING).setIcon(R.drawable.ic_parking_gray);
+        tabLayout.getTabAt(ViewPagerAdapter.POSITION_BUS).setIcon(R.drawable.ic_front_bus_gray);
+        tabLayout.getTabAt(ViewPagerAdapter.POSITION_TRAM).setIcon(R.drawable.ic_tram_public_gray);
+        tabLayout.getTabAt(ViewPagerAdapter.POSITION_PARKING).setIcon(R.drawable.ic_parking_gray);
         switch (position) {
-            case ViewPagerAdapter.BUS:
-                tabLayout.getTabAt(ViewPagerAdapter.BUS).setIcon(R.drawable.ic_front_bus_blue);
+            case ViewPagerAdapter.POSITION_BUS:
+                tabLayout.getTabAt(ViewPagerAdapter.POSITION_BUS).setIcon(R.drawable.ic_front_bus_blue);
                 break;
-            case ViewPagerAdapter.TRAM:
-                tabLayout.getTabAt(ViewPagerAdapter.TRAM).setIcon(R.drawable.ic_tram_public_blue);
+            case ViewPagerAdapter.POSITION_TRAM:
+                tabLayout.getTabAt(ViewPagerAdapter.POSITION_TRAM).setIcon(R.drawable.ic_tram_public_blue);
                 break;
-            case ViewPagerAdapter.PARKING:
-                tabLayout.getTabAt(ViewPagerAdapter.PARKING).setIcon(R.drawable.ic_parking_blue);
+            case ViewPagerAdapter.POSITION_PARKING:
+                tabLayout.getTabAt(ViewPagerAdapter.POSITION_PARKING).setIcon(R.drawable.ic_parking_blue);
                 break;
         }
     }

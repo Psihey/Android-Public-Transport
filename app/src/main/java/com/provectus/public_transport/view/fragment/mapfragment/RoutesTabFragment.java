@@ -33,13 +33,13 @@ public class RoutesTabFragment extends Fragment {
 
     private Unbinder mUnbinder;
 
-    public static final String positionPar = "pos_par";
+    public static final String POSITION_PAR = "pos_par";
 
     public static RoutesTabFragment newInstance(int position) {
         RoutesTabFragment routesTabFragment = new RoutesTabFragment();
 
         Bundle bundle = new Bundle();
-        bundle.putInt(positionPar, position);
+        bundle.putInt(POSITION_PAR, position);
         routesTabFragment.setArguments(bundle);
 
         return routesTabFragment;
@@ -49,7 +49,7 @@ public class RoutesTabFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         view = inflater.inflate(R.layout.tab_fragment, container, false);
         mUnbinder = ButterKnife.bind(this, view);
-        mPosition = getArguments().getInt(positionPar);
+        mPosition = getArguments().getInt(POSITION_PAR);
         initRecyclerView();
         return view;
     }
