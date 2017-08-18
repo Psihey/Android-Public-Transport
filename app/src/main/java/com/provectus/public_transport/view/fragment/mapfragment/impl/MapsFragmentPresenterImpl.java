@@ -14,9 +14,6 @@ import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.schedulers.Schedulers;
 
-import static com.provectus.public_transport.model.TransportType.TRAM_TYPE;
-import static com.provectus.public_transport.model.TransportType.TROLLEYBUSES_TYPE;
-
 
 /**
  * Created by Evgeniy on 8/10/2017.
@@ -62,19 +59,20 @@ public class MapsFragmentPresenterImpl implements MapsFragmentPresenter {
         List<TransportRoutes> busRoutes = new ArrayList<>();
         List<TransportRoutes> tramRoutes = new ArrayList<>();
         for (TransportRoutes currentRoutes : transportRoutes) {
-            //TODO : Think about it! How we can improve this!
-            if ((currentRoutes.getType() == TROLLEYBUSES_TYPE)) {
-                busRoutes.add(currentRoutes);
-            } else if ((currentRoutes.getType() == TRAM_TYPE)) {
-                tramRoutes.add(currentRoutes);
+            switch (currentRoutes.getType()) {
+                case TROLLEYBUSES_TYPE:
+                    busRoutes.add(currentRoutes);
+                    break;
+                case TRAM_TYPE:
+                    tramRoutes.add(currentRoutes);
+                    break;
             }
-            Logger.d("All Ok, we got response");
         }
+        Logger.d("All Ok, we got response");
         //TODO : Write data in DB!
     }
 
     private void handleError(Throwable throwable) {
-        throwable.printStackTrace();
         mMapsFragment.showDialogError();
         Logger.d("Handle Error from when fetching data");
     }

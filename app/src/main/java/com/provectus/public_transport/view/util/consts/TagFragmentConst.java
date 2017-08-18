@@ -13,4 +13,5 @@ public final class TagFragmentConst {
     public final static String TAG_TRAMS_LIST_FRAGMENT = "trams_tram_fragment";
     public final static String TAG_PARKING_LIST_FRAGMENT = "trams_tram_fragment";
     public final static String TAG_LIST_TRANSPORT_FRAGMENT = "transport_fragment";
+
 }
