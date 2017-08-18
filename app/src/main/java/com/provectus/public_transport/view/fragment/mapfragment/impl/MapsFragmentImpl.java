@@ -18,7 +18,6 @@ import com.provectus.public_transport.R;
 import com.provectus.public_transport.view.adapter.ViewPagerAdapter;
 import com.provectus.public_transport.view.fragment.mapfragment.MapsFragment;
 import com.provectus.public_transport.view.fragment.mapfragment.MapsFragmentPresenter;
-import com.provectus.public_transport.view.util.consts.Constants;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -104,25 +103,25 @@ public class MapsFragmentImpl extends Fragment implements MapsFragment {
 
     @Override
     public void setIconInTabLayout() {
-        tabLayout.getTabAt(Constants.TabPosition.BUS).setIcon(R.drawable.ic_front_bus_blue);
-        tabLayout.getTabAt(Constants.TabPosition.TRAM).setIcon(R.drawable.ic_tram_public_gray);
-        tabLayout.getTabAt(Constants.TabPosition.PARKING).setIcon(R.drawable.ic_parking_gray);
+        tabLayout.getTabAt(ViewPagerAdapter.BUS).setIcon(R.drawable.ic_front_bus_blue);
+        tabLayout.getTabAt(ViewPagerAdapter.TRAM).setIcon(R.drawable.ic_tram_public_gray);
+        tabLayout.getTabAt(ViewPagerAdapter.PARKING).setIcon(R.drawable.ic_parking_gray);
     }
 
     @Override
     public void changeIconInTabLayout(int position) {
-        tabLayout.getTabAt(Constants.TabPosition.BUS).setIcon(R.drawable.ic_front_bus_gray);
-        tabLayout.getTabAt(Constants.TabPosition.TRAM).setIcon(R.drawable.ic_tram_public_gray);
-        tabLayout.getTabAt(Constants.TabPosition.PARKING).setIcon(R.drawable.ic_parking_gray);
+        tabLayout.getTabAt(ViewPagerAdapter.BUS).setIcon(R.drawable.ic_front_bus_gray);
+        tabLayout.getTabAt(ViewPagerAdapter.TRAM).setIcon(R.drawable.ic_tram_public_gray);
+        tabLayout.getTabAt(ViewPagerAdapter.PARKING).setIcon(R.drawable.ic_parking_gray);
         switch (position) {
-            case Constants.TabPosition.BUS:
-                tabLayout.getTabAt(Constants.TabPosition.BUS).setIcon(R.drawable.ic_front_bus_blue);
+            case ViewPagerAdapter.BUS:
+                tabLayout.getTabAt(ViewPagerAdapter.BUS).setIcon(R.drawable.ic_front_bus_blue);
                 break;
-            case Constants.TabPosition.TRAM:
-                tabLayout.getTabAt(Constants.TabPosition.TRAM).setIcon(R.drawable.ic_tram_public_blue);
+            case ViewPagerAdapter.TRAM:
+                tabLayout.getTabAt(ViewPagerAdapter.TRAM).setIcon(R.drawable.ic_tram_public_blue);
                 break;
-            case Constants.TabPosition.PARKING:
-                tabLayout.getTabAt(Constants.TabPosition.PARKING).setIcon(R.drawable.ic_parking_blue);
+            case ViewPagerAdapter.PARKING:
+                tabLayout.getTabAt(ViewPagerAdapter.PARKING).setIcon(R.drawable.ic_parking_blue);
                 break;
         }
     }
