@@ -15,14 +15,11 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-
 import com.provectus.public_transport.R;
 import com.provectus.public_transport.model.TransportRoutes;
 import com.provectus.public_transport.view.adapter.TramsAndTrolleyAdapter;
-
 import com.provectus.public_transport.view.fragment.mapfragment.MapsFragment;
 import com.provectus.public_transport.view.fragment.mapfragment.MapsFragmentPresenter;
-
 
 import java.util.List;
 
@@ -56,7 +53,6 @@ public class MapsFragmentImpl extends Fragment implements MapsFragment {
         View bottomSheet = view.findViewById(R.id.bottom_sheet);
         mMapsPresenter = new MapsFragmentPresenterImpl();
         mMapsPresenter.bindView(this);
-        initProgressDialog();
         BottomSheetBehavior mBottomSheetBehavior = BottomSheetBehavior.from(bottomSheet);
         return view;
     }
@@ -82,6 +78,7 @@ public class MapsFragmentImpl extends Fragment implements MapsFragment {
     public void onStop() {
         super.onStop();
         mMapsPresenter.unbindView();
+
     }
 
     @Override
@@ -94,7 +91,6 @@ public class MapsFragmentImpl extends Fragment implements MapsFragment {
 
     @Override
     public void initRecyclerView(List<TransportRoutes> transportRoutes) {
-        mProgressDialog.cancel();
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext());
         mRecyclerViewRoutes.setLayoutManager(linearLayoutManager);
         TramsAndTrolleyAdapter adapter = new TramsAndTrolleyAdapter(transportRoutes);
