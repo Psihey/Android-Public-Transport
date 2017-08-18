@@ -17,7 +17,7 @@ public class BusEvents {
             this.mTransportRoutes = routes;
         }
 
-        public List<TransportRoutes> getmTransportRoutes() {
+        public List<TransportRoutes> getTransportRoutes() {
             return mTransportRoutes;
         }
     }

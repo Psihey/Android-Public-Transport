@@ -3,7 +3,6 @@ package com.provectus.public_transport.view.fragment.mapfragment.impl;
 
 import com.orhanobut.logger.Logger;
 import com.provectus.public_transport.eventbus.BusEvents;
-import com.provectus.public_transport.eventbus.BusProvider;
 import com.provectus.public_transport.model.TransportRoutes;
 import com.provectus.public_transport.service.RetrofitProvider;
 import com.provectus.public_transport.view.fragment.mapfragment.MapsFragment;
@@ -34,14 +33,14 @@ public class MapsFragmentPresenterImpl implements MapsFragmentPresenter {
         this.mMapsFragment = mapsFragment;
         mCompositeDisposable = new CompositeDisposable();
         getRoutesFromServer();
-        BusProvider.getBus().register(this);
+        EventBus.getDefault().register(this);
         Logger.d("Maps is binded to its presenter.");
     }
 
     @Override
     public void unbindView() {
         this.mMapsFragment = null;
-        BusProvider.getBus().unregister(this);
+        EventBus.getDefault().unregister(this);
         if (!mCompositeDisposable.isDisposed()) {
             mCompositeDisposable.dispose();
         }
@@ -59,7 +58,7 @@ public class MapsFragmentPresenterImpl implements MapsFragmentPresenter {
 
     private void handleResponse(List<TransportRoutes> transportRoutes) {
         Logger.d("All Ok, we got responce");
-        EventBus.getDefault().postSticky(new BusEvents.SendRoutesEvent(transportRoutes));
+        EventBus.getDefault().post(new BusEvents.SendRoutesEvent(transportRoutes));
     }
 
     private void handleError(Throwable throwable) {
@@ -67,9 +66,9 @@ public class MapsFragmentPresenterImpl implements MapsFragmentPresenter {
         Logger.d("Handle Error from when fetching data" + throwable.getMessage());
     }
 
-    @Subscribe(threadMode = ThreadMode.MAIN)
+    @Subscribe(sticky = true,threadMode = ThreadMode.MAIN)
     public void getAllRoutes(BusEvents.SendRoutesEvent routesEvent){
-        // TODO : call routesEvent.getmTransportRoutes and you will get all routes
+        // TODO : call routesEvent.getTransportRoutes and you will get all routes
         Logger.d("We got message from Event Bus with all routes ");
     }
 }
