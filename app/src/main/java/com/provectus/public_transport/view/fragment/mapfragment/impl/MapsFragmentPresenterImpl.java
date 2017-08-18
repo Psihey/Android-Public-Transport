@@ -14,7 +14,8 @@ import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.schedulers.Schedulers;
 
-import static com.provectus.public_transport.model.TransportType.TAXI_TYPE;
+import static com.provectus.public_transport.model.TransportType.TRAM_TYPE;
+import static com.provectus.public_transport.model.TransportType.TROLLEYBUSES_TYPE;
 
 
 /**
@@ -31,7 +32,7 @@ public class MapsFragmentPresenterImpl implements MapsFragmentPresenter {
         this.mMapsFragment = mapsFragment;
         mCompositeDisposable = new CompositeDisposable();
         getRoutesFromServer();
-        Logger.d("Maps is binded to its presenter.");
+        Logger.d("Maps is bind to its presenter.");
     }
 
     @Override
@@ -44,6 +45,11 @@ public class MapsFragmentPresenterImpl implements MapsFragmentPresenter {
     }
 
     @Override
+    public void changeViewPager(int newPosition) {
+        mMapsFragment.changeIconInTabLayout(newPosition);
+    }
+
+    @Override
     public void getRoutesFromServer() {
         mCompositeDisposable.add(RetrofitProvider
                 .getRetrofit().getAllRoutes()
@@ -53,18 +59,22 @@ public class MapsFragmentPresenterImpl implements MapsFragmentPresenter {
     }
 
     private void handleResponse(List<TransportRoutes> transportRoutes) {
-        List<TransportRoutes> routes = new ArrayList<>();
+        List<TransportRoutes> busRoutes = new ArrayList<>();
+        List<TransportRoutes> tramRoutes = new ArrayList<>();
         for (TransportRoutes currentRoutes : transportRoutes) {
             //TODO : Think about it! How we can improve this!
-            if ((currentRoutes.getType()!= TAXI_TYPE) && currentRoutes.getId() > 2) {
-                routes.add(currentRoutes);
+            if ((currentRoutes.getType() == TROLLEYBUSES_TYPE)) {
+                busRoutes.add(currentRoutes);
+            } else if ((currentRoutes.getType() == TRAM_TYPE)) {
+                tramRoutes.add(currentRoutes);
             }
+            Logger.d("All Ok, we got response");
         }
-        mMapsFragment.initRecyclerView(routes);
-        Logger.d("All Ok, we got responce");
+        //TODO : Write data in DB!
     }
 
     private void handleError(Throwable throwable) {
+        throwable.printStackTrace();
         mMapsFragment.showDialogError();
         Logger.d("Handle Error from when fetching data");
     }

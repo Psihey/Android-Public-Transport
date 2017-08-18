@@ -9,4 +9,5 @@
     <string name="dialog_error_internet_negative_button">Close</string>
     <string name="progrees_dialog_network_title">Network Working</string>
     <string name="progrees_dialog_network_message">Please wait some seconds! fetching data from the server</string>
+    <string name="no_data">Данные загружаются..</string>
 </resources>

@@ -13,12 +13,8 @@ import com.provectus.public_transport.model.TransportRoutes;
 
 import java.util.List;
 
-
 import butterknife.BindView;
 import butterknife.ButterKnife;
-
-import static com.provectus.public_transport.model.TransportType.TRAM_TYPE;
-import static com.provectus.public_transport.model.TransportType.TROLLEYBUSES_TYPE;
 
 
 /**
@@ -43,13 +39,13 @@ public class TramsAndTrolleyAdapter extends RecyclerView.Adapter<TramsAndTrolley
     public void onBindViewHolder(TramsAndTrolleyViewHolder holder, int position) {
         final TransportRoutes transportRoutes = mTransportRoutesData.get(position);
 
-        switch (transportRoutes.getType()){
+        switch (transportRoutes.getType()) {
             case TRAM_TYPE:
-                holder.ivLogoTransport.setImageResource(R.drawable.ic_train_public_gray);
+                holder.ivLogoTransport.setImageResource(R.drawable.ic_tram_public_gray);
                 break;
             case TROLLEYBUSES_TYPE:
                 holder.ivLogoTransport.setImageResource(R.drawable.ic_front_bus_gray);
-            break;
+                break;
             default:
                 Logger.d("Transport Type is Invalid");
                 break;
