@@ -35,6 +35,7 @@ public class MapsFragmentPresenterImpl implements MapsFragmentPresenter {
         getRoutesFromServer();
         EventBus.getDefault().register(this);
         Logger.d("Maps is binded to its presenter.");
+
     }
 
     @Override
@@ -45,6 +46,11 @@ public class MapsFragmentPresenterImpl implements MapsFragmentPresenter {
             mCompositeDisposable.dispose();
         }
         Logger.d("Maps is unbind from presenter");
+    }
+
+    @Override
+    public void changeViewPager(int newPosition) {
+        mMapsFragment.changeIconInTabLayout(newPosition);
     }
 
     @Override
@@ -59,6 +65,19 @@ public class MapsFragmentPresenterImpl implements MapsFragmentPresenter {
     private void handleResponse(List<TransportRoutes> transportRoutes) {
         Logger.d("All Ok, we got responce");
         EventBus.getDefault().post(new BusEvents.SendRoutesEvent(transportRoutes));
+      
+        List<TransportRoutes> busRoutes = new ArrayList<>();
+        List<TransportRoutes> tramRoutes = new ArrayList<>();
+        for (TransportRoutes currentRoutes : transportRoutes) {
+            switch (currentRoutes.getType()) {
+                case TROLLEYBUSES_TYPE:
+                    busRoutes.add(currentRoutes);
+                    break;
+                case TRAM_TYPE:
+                    tramRoutes.add(currentRoutes);
+                    break;
+            }
+        }
     }
 
     private void handleError(Throwable throwable) {
@@ -66,7 +85,7 @@ public class MapsFragmentPresenterImpl implements MapsFragmentPresenter {
         Logger.d("Handle Error from when fetching data" + throwable.getMessage());
     }
 
-    @Subscribe(sticky = true,threadMode = ThreadMode.MAIN)
+    @Subscribe(threadMode = ThreadMode.MAIN)
     public void getAllRoutes(BusEvents.SendRoutesEvent routesEvent){
         // TODO : call routesEvent.getTransportRoutes and you will get all routes
         Logger.d("We got message from Event Bus with all routes ");

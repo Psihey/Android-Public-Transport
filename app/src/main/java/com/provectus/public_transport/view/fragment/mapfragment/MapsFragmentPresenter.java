@@ -19,5 +19,11 @@ public interface MapsFragmentPresenter {
      */
     void unbindView();
 
+    /**
+     * The method change icon in TabLayout
+     * @param newPosition new position in TabLayout
+     */
+    void changeViewPager (int newPosition);
+
     void getRoutesFromServer();
 }
