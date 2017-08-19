@@ -19,7 +19,6 @@ public class ViewPagerAdapter extends FragmentPagerAdapter {
     private final Fragment[] fragments = new Fragment[3];
     private FragmentManager fragmentManager;
 
-
     public ViewPagerAdapter(FragmentManager fm) {
         super(fm);
         fragmentManager = fm;

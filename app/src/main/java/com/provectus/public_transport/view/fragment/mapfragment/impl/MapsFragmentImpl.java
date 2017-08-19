@@ -15,11 +15,12 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.provectus.public_transport.R;
-
-
+import com.provectus.public_transport.model.TransportRoutes;
 import com.provectus.public_transport.view.adapter.ViewPagerAdapter;
 import com.provectus.public_transport.view.fragment.mapfragment.MapsFragment;
 import com.provectus.public_transport.view.fragment.mapfragment.MapsFragmentPresenter;
+
+import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -57,42 +58,51 @@ public class MapsFragmentImpl extends Fragment implements MapsFragment {
     }
 
     @Override
-    public void onStop() {
-        super.onStop();
-        mMapsPresenter.unbindView();
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        if (Build.VERSION.SDK_INT >= 23) {
+            onAttachToContext(context);
+        }
     }
 
+    @SuppressWarnings("deprecation")
+    @Override
+    public void onAttach(Activity activity) {
+        super.onAttach(activity);
+        if (Build.VERSION.SDK_INT < 23) {
+            onAttachToContext(activity);
+        }
+    }
+
+    @Override
     public void onResume() {
         super.onResume();
         initViewPager();
         setIconInTabLayout();
         if (mMapsPresenter == null) {
             mMapsPresenter = new MapsFragmentPresenterImpl();
-
         }
         mMapsPresenter.bindView(this);
     }
 
+    @Override
+    public void onPause() {
+        super.onPause();
+        mMapsPresenter.unbindView();
+    }
 
-    private void initViewPager() {
-        viewPagerAdapter = new ViewPagerAdapter(getFragmentManager());
-        viewPager.setAdapter(viewPagerAdapter);
-        viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
-            @Override
-            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-            }
+    @Override
+    public void onStop() {
+        super.onStop();
+        mMapsPresenter.unbindView();
+    }
 
-            @Override
-            public void onPageSelected(int position) {
-                mMapsPresenter.changeViewPager(position);
-            }
-
-            @Override
-            public void onPageScrollStateChanged(int state) {
-            }
-        });
-        tabLayout.setupWithViewPager(viewPager);
-
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        if (mUnbinder != null) {
+            mUnbinder.unbind();
+        }
     }
 
     @Override
@@ -137,37 +147,35 @@ public class MapsFragmentImpl extends Fragment implements MapsFragment {
     }
 
     @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-        if (Build.VERSION.SDK_INT >= 23) {
-            onAttachToContext(context);
-        }
+    public void drawRotes(List<TransportRoutes> routes) {
+
     }
 
-    @SuppressWarnings("deprecation")
-    @Override
-    public void onAttach(Activity activity) {
-        super.onAttach(activity);
-        if (Build.VERSION.SDK_INT < 23) {
-            onAttachToContext(activity);
-        }
+    private void initViewPager() {
+        viewPagerAdapter = new ViewPagerAdapter(getFragmentManager());
+        viewPager.setOffscreenPageLimit(3);
+        viewPager.setAdapter(viewPagerAdapter);
+        viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+            @Override
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+            }
+
+            @Override
+            public void onPageSelected(int position) {
+                mMapsPresenter.changeViewPager(position);
+            }
+
+            @Override
+            public void onPageScrollStateChanged(int state) {
+            }
+        });
+        tabLayout.setupWithViewPager(viewPager);
+
     }
+
 
     protected void onAttachToContext(Context context) {
         Context mContext = context;
     }
 
-    @Override
-    public void onPause() {
-        super.onPause();
-        mMapsPresenter.unbindView();
-    }
-
-    @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-        if (mUnbinder != null) {
-            mUnbinder.unbind();
-        }
-    }
 }

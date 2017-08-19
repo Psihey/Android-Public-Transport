@@ -5,6 +5,7 @@ import com.orhanobut.logger.Logger;
 import com.provectus.public_transport.eventbus.BusEvents;
 import com.provectus.public_transport.model.TransportRoutes;
 import com.provectus.public_transport.service.RetrofitProvider;
+import com.provectus.public_transport.view.adapter.ViewPagerAdapter;
 import com.provectus.public_transport.view.fragment.mapfragment.MapsFragment;
 import com.provectus.public_transport.view.fragment.mapfragment.MapsFragmentPresenter;
 
@@ -65,8 +66,6 @@ public class MapsFragmentPresenterImpl implements MapsFragmentPresenter {
 
     private void handleResponse(List<TransportRoutes> transportRoutes) {
         Logger.d("All Ok, we got responce");
-        EventBus.getDefault().post(new BusEvents.SendRoutesEvent(transportRoutes));
-      
         List<TransportRoutes> busRoutes = new ArrayList<>();
         List<TransportRoutes> tramRoutes = new ArrayList<>();
         for (TransportRoutes currentRoutes : transportRoutes) {
@@ -79,6 +78,8 @@ public class MapsFragmentPresenterImpl implements MapsFragmentPresenter {
                     break;
             }
         }
+        EventBus.getDefault().post(new BusEvents.SendRoutesEvent(busRoutes, ViewPagerAdapter.POSITION_BUS));
+        EventBus.getDefault().post(new BusEvents.SendRoutesEvent(tramRoutes, ViewPagerAdapter.POSITION_TRAM));
     }
 
     private void handleError(Throwable throwable) {
@@ -87,8 +88,9 @@ public class MapsFragmentPresenterImpl implements MapsFragmentPresenter {
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
-    public void getAllRoutes(BusEvents.SendRoutesEvent routesEvent){
-        // TODO : call routesEvent.getTransportRoutes and you will get all routes
-        Logger.d("We got message from Event Bus with all routes ");
+    public void getAllRoutes(BusEvents.SendRoutesEvent routesEvent) {
+        Logger.d("We got message from Event Bus with all routes");
+        mMapsFragment.drawRotes(routesEvent.getTransportRoutes());
     }
+
 }
