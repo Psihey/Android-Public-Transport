@@ -56,27 +56,11 @@ public class MapsFragmentImpl extends Fragment implements MapsFragment {
         return view;
     }
 
-    @SuppressWarnings("deprecation")
-    @Override
-    public void onAttach(Activity activity) {
-        super.onAttach(activity);
-        if (Build.VERSION.SDK_INT < 23) {
-            onAttachToContext(activity);
-        }
-    }
-
     @Override
     public void onStop() {
         super.onStop();
         mMapsPresenter.unbindView();
-
     }
-
-    @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-        if (mUnbinder != null) {
-            mUnbinder.unbind();
 
     public void onResume() {
         super.onResume();
