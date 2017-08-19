@@ -15,6 +15,8 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.provectus.public_transport.R;
+
+
 import com.provectus.public_transport.view.adapter.ViewPagerAdapter;
 import com.provectus.public_transport.view.fragment.mapfragment.MapsFragment;
 import com.provectus.public_transport.view.fragment.mapfragment.MapsFragmentPresenter;
@@ -54,16 +56,39 @@ public class MapsFragmentImpl extends Fragment implements MapsFragment {
         return view;
     }
 
+    @SuppressWarnings("deprecation")
     @Override
+    public void onAttach(Activity activity) {
+        super.onAttach(activity);
+        if (Build.VERSION.SDK_INT < 23) {
+            onAttachToContext(activity);
+        }
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        mMapsPresenter.unbindView();
+
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        if (mUnbinder != null) {
+            mUnbinder.unbind();
+
     public void onResume() {
         super.onResume();
         initViewPager();
         setIconInTabLayout();
         if (mMapsPresenter == null) {
             mMapsPresenter = new MapsFragmentPresenterImpl();
+
         }
         mMapsPresenter.bindView(this);
     }
+
 
     private void initViewPager() {
         viewPagerAdapter = new ViewPagerAdapter(getFragmentManager());
@@ -83,6 +108,7 @@ public class MapsFragmentImpl extends Fragment implements MapsFragment {
             }
         });
         tabLayout.setupWithViewPager(viewPager);
+
     }
 
     @Override

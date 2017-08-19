@@ -2,12 +2,16 @@ package com.provectus.public_transport.view.fragment.mapfragment.impl;
 
 
 import com.orhanobut.logger.Logger;
+import com.provectus.public_transport.eventbus.BusEvents;
 import com.provectus.public_transport.model.TransportRoutes;
 import com.provectus.public_transport.service.RetrofitProvider;
 import com.provectus.public_transport.view.fragment.mapfragment.MapsFragment;
 import com.provectus.public_transport.view.fragment.mapfragment.MapsFragmentPresenter;
 
-import java.util.ArrayList;
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
+
 import java.util.List;
 
 import io.reactivex.android.schedulers.AndroidSchedulers;
@@ -29,12 +33,15 @@ public class MapsFragmentPresenterImpl implements MapsFragmentPresenter {
         this.mMapsFragment = mapsFragment;
         mCompositeDisposable = new CompositeDisposable();
         getRoutesFromServer();
-        Logger.d("Maps is bind to its presenter.");
+        EventBus.getDefault().register(this);
+        Logger.d("Maps is binded to its presenter.");
+
     }
 
     @Override
     public void unbindView() {
         this.mMapsFragment = null;
+        EventBus.getDefault().unregister(this);
         if (!mCompositeDisposable.isDisposed()) {
             mCompositeDisposable.dispose();
         }
@@ -56,6 +63,9 @@ public class MapsFragmentPresenterImpl implements MapsFragmentPresenter {
     }
 
     private void handleResponse(List<TransportRoutes> transportRoutes) {
+        Logger.d("All Ok, we got responce");
+        EventBus.getDefault().post(new BusEvents.SendRoutesEvent(transportRoutes));
+      
         List<TransportRoutes> busRoutes = new ArrayList<>();
         List<TransportRoutes> tramRoutes = new ArrayList<>();
         for (TransportRoutes currentRoutes : transportRoutes) {
@@ -68,13 +78,16 @@ public class MapsFragmentPresenterImpl implements MapsFragmentPresenter {
                     break;
             }
         }
-        Logger.d("All Ok, we got response");
-        //TODO : Write data in DB!
     }
 
     private void handleError(Throwable throwable) {
         mMapsFragment.showDialogError();
-        Logger.d("Handle Error from when fetching data");
+        Logger.d("Handle Error from when fetching data" + throwable.getMessage());
     }
 
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void getAllRoutes(BusEvents.SendRoutesEvent routesEvent){
+        // TODO : call routesEvent.getTransportRoutes and you will get all routes
+        Logger.d("We got message from Event Bus with all routes ");
+    }
 }

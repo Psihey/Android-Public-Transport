@@ -1,9 +1,8 @@
 package com.provectus.public_transport.model;
 
 import com.google.gson.annotations.SerializedName;
-import com.provectus.public_transport.view.adapter.TramsAndTrolleyAdapter;
 
-import java.util.Objects;
+import java.util.List;
 
 /**
  * Created by Psihey on 11.08.2017.
@@ -18,7 +17,17 @@ public class TransportRoutes {
     @SerializedName("type")
     private TransportType type;
     @SerializedName("distance")
-    private String distance;
+    private Double distance;
+    @SerializedName("segments")
+    private List<Segment> segment;
+
+    public List<Segment> getSegment() {
+        return segment;
+    }
+
+    public void setSegment(List<Segment> segment) {
+        this.segment = segment;
+    }
 
     public long getId() {
         return id;
@@ -44,11 +53,11 @@ public class TransportRoutes {
         this.type = type;
     }
 
-    public String getDistance() {
+    public Double getDistance() {
         return distance;
     }
 
-    public void setDistance(String distance) {
+    public void setDistance(Double distance) {
         this.distance = distance;
     }
 
@@ -58,7 +67,8 @@ public class TransportRoutes {
                 "id=" + id +
                 ", number=" + number +
                 ", type=" + type +
-                ", distance='" + distance + '\'' +
+                ", distance=" + distance +
+                ", segment=" + segment +
                 '}';
     }
 }
