@@ -43,7 +43,7 @@ public class Point {
 
     @Override
     public String toString() {
-        return "Point{" +
+        return "PointEntity{" +
                 "latitude=" + latitude +
                 ", longitude=" + longitude +
                 ", position=" + position +

@@ -43,7 +43,7 @@ public class Segment {
 
     @Override
     public String toString() {
-        return "Segment{" +
+        return "SegmentEntity{" +
                 "direction=" + direction +
                 ", position=" + position +
                 ", points=" + points +

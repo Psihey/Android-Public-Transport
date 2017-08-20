@@ -47,7 +47,7 @@ public class TramsAndTrolleyAdapter extends RecyclerView.Adapter<TramsAndTrolley
                 holder.ivLogoTransport.setImageResource(R.drawable.ic_front_bus_gray);
                 break;
             default:
-                Logger.d("Transport Type is Invalid");
+                Logger.d("TransportEntity Type is Invalid");
                 break;
         }
 
