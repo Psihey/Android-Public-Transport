@@ -29,14 +29,10 @@ import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.provectus.public_transport.R;
-import com.provectus.public_transport.model.Point;
-import com.provectus.public_transport.model.Segment;
-import com.provectus.public_transport.model.TransportRoutes;
 import com.provectus.public_transport.view.adapter.ViewPagerAdapter;
 import com.provectus.public_transport.view.fragment.mapfragment.MapsFragment;
 import com.provectus.public_transport.view.fragment.mapfragment.MapsFragmentPresenter;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
@@ -184,52 +180,13 @@ public class MapsFragmentImpl extends Fragment implements MapsFragment, OnMapRea
     }
 
     @Override
-    public void drawRotes(List<TransportRoutes> routes) {
-        if (isMapReady == false || myMap == null) {
+    public void drawRotes(List<LatLng> sortedRoutes) {
+        if (isMapReady == false || myMap == null || sortedRoutes == null) {
             return;
         }
-        for (int i = 0; i < routes.size(); i++) {
-            List<LatLng> sortedRoutes = sortedRoutesSegment(routes.get(i));
-            setRoutesOnMap(sortedRoutes);
-        }
+        setRoutesOnMap(sortedRoutes);
     }
 
-    private List<LatLng> sortedRoutesSegment(TransportRoutes transportRoutes) {
-        List<LatLng> listDirection1 = new ArrayList<>();
-        List<LatLng> listDirection2 = new ArrayList<>();
-        LatLng first = null;
-        double lat = 0.0;
-        double lng = 0.0;
-        List<Segment> listSegment = transportRoutes.getSegment();
-        for (int j = 0; j < listSegment.size(); j++) {
-            List<Point> pointList = listSegment.get(j).getPoints();
-            for (int r = 0; r < pointList.size(); r++) {
-                lat = pointList.get(r).getLatitude();
-                lng = pointList.get(r).getLongitude();
-            }
-            if (lng == lat) {
-                continue;
-            }
-            if (listSegment.get(j).getDirection() == -1 && listSegment.get(j).getPosition() == -1) {
-                //This is the beginning of the segment route with direction "1"
-                first = new LatLng(lat, lng);
-                listDirection1.add(0, new LatLng(lat, lng));
-            } else if (listSegment.get(j).getDirection() == -1 && listSegment.get(j).getPosition() == 0) {
-                //This is the beginning of the segment route with direction "0"
-                listDirection2.add(0, new LatLng(lat, lng));
-            }
-            if (listSegment.get(j).getDirection() == 1) {
-                listDirection1.add(new LatLng(lat, lng));
-            } else if (listSegment.get(j).getDirection() == 0) {
-                listDirection2.add(new LatLng(lat, lng));
-            }
-        }
-        if (first != null) {
-            listDirection2.add(first);
-        }
-        listDirection1.addAll(listDirection2);
-        return listDirection1;
-    }
 
     private void setRoutesOnMap(List<LatLng> listDirection) {
         PolylineOptions polylineOptions = new PolylineOptions();

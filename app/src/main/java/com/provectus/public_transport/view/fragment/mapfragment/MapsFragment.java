@@ -1,5 +1,6 @@
 package com.provectus.public_transport.view.fragment.mapfragment;
 
+import com.google.android.gms.maps.model.LatLng;
 import com.provectus.public_transport.model.TransportRoutes;
 
 import java.util.List;
@@ -16,6 +17,6 @@ public interface MapsFragment {
 
     void changeIconInTabLayout(int position);
 
-    void drawRotes(List<TransportRoutes> routes);
+    void drawRotes(List<LatLng> routes);
 
 }
