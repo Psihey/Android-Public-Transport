@@ -36,7 +36,6 @@ public class MapsFragmentPresenterImpl implements MapsFragmentPresenter {
         getRoutesFromServer();
         EventBus.getDefault().register(this);
         Logger.d("Maps is binded to its presenter.");
-
     }
 
     @Override
@@ -63,6 +62,13 @@ public class MapsFragmentPresenterImpl implements MapsFragmentPresenter {
                 .subscribe(this::handleResponse, this::handleError));
     }
 
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void getAllRoutes(BusEvents.SendRoutesEvent routesEvent){
+        // TODO : call routesEvent.getTransportRoutes and you will get all routes
+        Logger.d("We got message from Event Bus with all routes ");
+        System.out.println(routesEvent.getTransportRoutes().toString());
+    }
+
     private void handleResponse(List<TransportRoutes> transportRoutes) {
         Logger.d("All Ok, we got responce");
         EventBus.getDefault().post(new BusEvents.SendRoutesEvent(transportRoutes));
@@ -86,9 +92,4 @@ public class MapsFragmentPresenterImpl implements MapsFragmentPresenter {
         Logger.d("Handle Error from when fetching data" + throwable.getMessage());
     }
 
-    @Subscribe(threadMode = ThreadMode.MAIN)
-    public void getAllRoutes(BusEvents.SendRoutesEvent routesEvent){
-        // TODO : call routesEvent.getTransportRoutes and you will get all routes
-        Logger.d("We got message from Event Bus with all routes ");
-    }
 }

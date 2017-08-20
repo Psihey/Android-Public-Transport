@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.content.Context;
 import android.os.Build;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
 import android.support.design.widget.BottomSheetBehavior;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
@@ -15,8 +14,6 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.provectus.public_transport.R;
-
-
 import com.provectus.public_transport.view.adapter.ViewPagerAdapter;
 import com.provectus.public_transport.view.fragment.mapfragment.MapsFragment;
 import com.provectus.public_transport.view.fragment.mapfragment.MapsFragmentPresenter;
@@ -43,8 +40,20 @@ public class MapsFragmentImpl extends Fragment implements MapsFragment {
 
 
     @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        if (Build.VERSION.SDK_INT >= 23) {
+            onAttachToContext(context);
+        }
+    }
+
+    @SuppressWarnings("deprecation")
+    @Override
+    public void onAttach(Activity activity) {
+        super.onAttach(activity);
+        if (Build.VERSION.SDK_INT < 23) {
+            onAttachToContext(activity);
+        }
     }
 
     @Override
@@ -57,11 +66,6 @@ public class MapsFragmentImpl extends Fragment implements MapsFragment {
     }
 
     @Override
-    public void onStop() {
-        super.onStop();
-        mMapsPresenter.unbindView();
-    }
-
     public void onResume() {
         super.onResume();
         initViewPager();
@@ -73,26 +77,24 @@ public class MapsFragmentImpl extends Fragment implements MapsFragment {
         mMapsPresenter.bindView(this);
     }
 
+    @Override
+    public void onPause() {
+        super.onPause();
+        mMapsPresenter.unbindView();
+    }
 
-    private void initViewPager() {
-        viewPagerAdapter = new ViewPagerAdapter(getFragmentManager());
-        viewPager.setAdapter(viewPagerAdapter);
-        viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
-            @Override
-            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-            }
+    @Override
+    public void onStop() {
+        super.onStop();
+        mMapsPresenter.unbindView();
+    }
 
-            @Override
-            public void onPageSelected(int position) {
-                mMapsPresenter.changeViewPager(position);
-            }
-
-            @Override
-            public void onPageScrollStateChanged(int state) {
-            }
-        });
-        tabLayout.setupWithViewPager(viewPager);
-
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        if (mUnbinder != null) {
+            mUnbinder.unbind();
+        }
     }
 
     @Override
@@ -136,38 +138,27 @@ public class MapsFragmentImpl extends Fragment implements MapsFragment {
         }
     }
 
-    @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-        if (Build.VERSION.SDK_INT >= 23) {
-            onAttachToContext(context);
-        }
-    }
-
-    @SuppressWarnings("deprecation")
-    @Override
-    public void onAttach(Activity activity) {
-        super.onAttach(activity);
-        if (Build.VERSION.SDK_INT < 23) {
-            onAttachToContext(activity);
-        }
-    }
-
     protected void onAttachToContext(Context context) {
         Context mContext = context;
     }
 
-    @Override
-    public void onPause() {
-        super.onPause();
-        mMapsPresenter.unbindView();
-    }
+    private void initViewPager() {
+        viewPagerAdapter = new ViewPagerAdapter(getFragmentManager());
+        viewPager.setAdapter(viewPagerAdapter);
+        viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+            @Override
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+            }
 
-    @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-        if (mUnbinder != null) {
-            mUnbinder.unbind();
-        }
+            @Override
+            public void onPageSelected(int position) {
+                mMapsPresenter.changeViewPager(position);
+            }
+
+            @Override
+            public void onPageScrollStateChanged(int state) {
+            }
+        });
+        tabLayout.setupWithViewPager(viewPager);
     }
 }
