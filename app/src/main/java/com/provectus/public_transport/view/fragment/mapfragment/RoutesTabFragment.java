@@ -69,6 +69,7 @@ public class RoutesTabFragment extends Fragment {
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void getAllRoutes(BusEvents.SendRoutesEvent routesEvent) {
+        //TODO: After caching delete the method and load data from the database
         if (mPosition == routesEvent.getTransportType()) {
             initRecyclerView(routesEvent.getTransportRoutes());
         }

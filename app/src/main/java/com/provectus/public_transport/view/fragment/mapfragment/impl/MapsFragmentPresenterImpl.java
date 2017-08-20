@@ -65,7 +65,7 @@ public class MapsFragmentPresenterImpl implements MapsFragmentPresenter {
     }
 
     private void handleResponse(List<TransportRoutes> transportRoutes) {
-        Logger.d("All Ok, we got responce");
+        Logger.d("All Ok, we got response");
         List<TransportRoutes> busRoutes = new ArrayList<>();
         List<TransportRoutes> tramRoutes = new ArrayList<>();
         for (TransportRoutes currentRoutes : transportRoutes) {

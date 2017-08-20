@@ -1,12 +1,16 @@
 package com.provectus.public_transport.view.fragment.mapfragment.impl;
 
+import android.Manifest;
 import android.app.Activity;
 import android.content.Context;
+import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.BottomSheetBehavior;
 import android.support.design.widget.TabLayout;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AlertDialog;
@@ -14,13 +18,27 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.google.android.gms.maps.CameraUpdate;
+import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.UiSettings;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.LatLngBounds;
+import com.google.android.gms.maps.model.Polyline;
+import com.google.android.gms.maps.model.PolylineOptions;
 import com.provectus.public_transport.R;
+import com.provectus.public_transport.model.Point;
+import com.provectus.public_transport.model.Segment;
 import com.provectus.public_transport.model.TransportRoutes;
 import com.provectus.public_transport.view.adapter.ViewPagerAdapter;
 import com.provectus.public_transport.view.fragment.mapfragment.MapsFragment;
 import com.provectus.public_transport.view.fragment.mapfragment.MapsFragmentPresenter;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -30,7 +48,13 @@ import butterknife.Unbinder;
  * Created by Evgeniy on 8/10/2017.
  */
 
-public class MapsFragmentImpl extends Fragment implements MapsFragment {
+public class MapsFragmentImpl extends Fragment implements MapsFragment, OnMapReadyCallback {
+
+    private static final Double LAT_1 = 46.348612;
+    private static final Double LNG_1 = 30.671341;
+    private static final Double LAT_2 = 46.499907;
+    private static final Double LNG_2 = 30.781572;
+    private static final Integer MERGE = 30;
 
     @BindView(R.id.view_pager)
     ViewPager viewPager;
@@ -41,7 +65,9 @@ public class MapsFragmentImpl extends Fragment implements MapsFragment {
     private MapsFragmentPresenter mMapsPresenter;
     private Unbinder mUnbinder;
     private ViewPagerAdapter viewPagerAdapter;
+    private GoogleMap myMap;
 
+    private boolean isMapReady;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -52,6 +78,9 @@ public class MapsFragmentImpl extends Fragment implements MapsFragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_maps, container, false);
         mUnbinder = ButterKnife.bind(this, view);
+        SupportMapFragment mapFragment = (SupportMapFragment) getChildFragmentManager()
+                .findFragmentById(R.id.map);
+        mapFragment.getMapAsync(this);
         View bottomSheet = view.findViewById(R.id.bottom_sheet);
         BottomSheetBehavior.from(bottomSheet);
         return view;
@@ -147,8 +176,72 @@ public class MapsFragmentImpl extends Fragment implements MapsFragment {
     }
 
     @Override
-    public void drawRotes(List<TransportRoutes> routes) {
+    public void onMapReady(GoogleMap googleMap) {
+        isMapReady = true;
+        myMap = googleMap;
+        defaultCameraPosition();
+        settingsUI();
+    }
 
+    @Override
+    public void drawRotes(List<TransportRoutes> routes) {
+        if (isMapReady == false || myMap == null) {
+            return;
+        }
+        for (int i = 0; i < routes.size(); i++) {
+            List<LatLng> sortedRoutes = sortedRoutesSegment(routes.get(i));
+            setRoutesOnMap(sortedRoutes);
+        }
+    }
+
+    private List<LatLng> sortedRoutesSegment(TransportRoutes transportRoutes) {
+        List<LatLng> listDirection1 = new ArrayList<>();
+        List<LatLng> listDirection2 = new ArrayList<>();
+        LatLng first = null;
+        double lat = 0.0;
+        double lng = 0.0;
+        List<Segment> listSegment = transportRoutes.getSegment();
+        for (int j = 0; j < listSegment.size(); j++) {
+            List<Point> pointList = listSegment.get(j).getPoints();
+            for (int r = 0; r < pointList.size(); r++) {
+                lat = pointList.get(r).getLatitude();
+                lng = pointList.get(r).getLongitude();
+            }
+            if (lng == lat) {
+                continue;
+            }
+            if (listSegment.get(j).getDirection() == -1 && listSegment.get(j).getPosition() == -1) {
+                //This is the beginning of the segment route with direction "1"
+                first = new LatLng(lat, lng);
+                listDirection1.add(0, new LatLng(lat, lng));
+            } else if (listSegment.get(j).getDirection() == -1 && listSegment.get(j).getPosition() == 0) {
+                //This is the beginning of the segment route with direction "0"
+                listDirection2.add(0, new LatLng(lat, lng));
+            }
+            if (listSegment.get(j).getDirection() == 1) {
+                listDirection1.add(new LatLng(lat, lng));
+            } else if (listSegment.get(j).getDirection() == 0) {
+                listDirection2.add(new LatLng(lat, lng));
+            }
+        }
+        if (first != null) {
+            listDirection2.add(first);
+        }
+        listDirection1.addAll(listDirection2);
+        return listDirection1;
+    }
+
+    private void setRoutesOnMap(List<LatLng> listDirection) {
+        PolylineOptions polylineOptions = new PolylineOptions();
+        polylineOptions.addAll(listDirection);
+        Polyline polyline = myMap.addPolyline(polylineOptions);
+        polyline.setColor(getRandomColor());
+        polyline.setWidth(3);
+    }
+
+    private int getRandomColor() {
+        Random rnd = new Random();
+        return Color.argb(255, rnd.nextInt(256), rnd.nextInt(256), rnd.nextInt(256));
     }
 
     private void initViewPager() {
@@ -173,9 +266,34 @@ public class MapsFragmentImpl extends Fragment implements MapsFragment {
 
     }
 
+    private void defaultCameraPosition() {
+        myMap.setOnMapLoadedCallback(() -> {
+            CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngBounds(new LatLngBounds
+                    (new LatLng(LAT_1, LNG_1), new LatLng(LAT_2, LNG_2)), MERGE);
+            myMap.animateCamera(cameraUpdate);
+        });
+    }
+
+    private void settingsUI() {
+        UiSettings settings = myMap.getUiSettings();
+        if (ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
+                && ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            // TODO: Consider calling
+            //    ActivityCompat#requestPermissions
+            // here to request the missing permissions, and then overriding
+            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+            //                                          int[] grantResults)
+            // to handle the case where the user grants the permission. See the documentation
+            // for ActivityCompat#requestPermissions for more details.
+            return;
+        }
+        myMap.setMyLocationEnabled(true);
+        settings.setMyLocationButtonEnabled(true);
+    }
 
     protected void onAttachToContext(Context context) {
         Context mContext = context;
     }
+
 
 }
