@@ -10,6 +10,8 @@ import com.provectus.public_transport.persistent.entity.SegmentEntity;
 
 import java.util.List;
 
+import io.reactivex.Flowable;
+
 /**
  * Created by Psihey on 20.08.2017.
  */
@@ -24,6 +26,6 @@ public interface SegmentDao {
     void delete(SegmentEntity segment);
 
     @Query("SELECT * FROM segment")
-    List<SegmentEntity> getAllTransport();
+    Flowable<List<SegmentEntity>> getAllTransport();
 
 }

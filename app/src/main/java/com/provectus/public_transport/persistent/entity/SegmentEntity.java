@@ -17,8 +17,6 @@ import android.support.annotation.NonNull;
 public class SegmentEntity {
 
     @PrimaryKey(autoGenerate = true)
-    @ColumnInfo(name = "id")
-    @NonNull
     private long id;
     @ColumnInfo(name = "segment_position")
     private int position;
@@ -27,19 +25,17 @@ public class SegmentEntity {
     @ColumnInfo(name = "transport_id")
     private long transportId;
 
-    public SegmentEntity(long id, int position, int direction, long transportId) {
-        this.id = id;
+    public SegmentEntity(int position, int direction, long transportId) {
         this.position = position;
         this.direction = direction;
         this.transportId = transportId;
     }
 
-    @NonNull
     public long getId() {
         return id;
     }
 
-    public void setId(@NonNull long id) {
+    public void setId(long id) {
         this.id = id;
     }
 

@@ -10,6 +10,8 @@ import com.provectus.public_transport.persistent.entity.PointEntity;
 
 import java.util.List;
 
+import io.reactivex.Flowable;
+
 /**
  * Created by Psihey on 20.08.2017.
  */
@@ -24,6 +26,6 @@ public interface PointDao {
     void delete(PointEntity point);
 
     @Query("SELECT * FROM point")
-    List<PointEntity> getAllTransport();
+    Flowable<List<PointEntity>> getAllTransport();
 
 }

@@ -9,6 +9,9 @@ import com.provectus.public_transport.persistent.entity.TransportEntity;
 
 import java.util.List;
 
+import io.reactivex.Flowable;
+import io.reactivex.Single;
+
 /**
  * Created by Psihey on 20.08.2017.
  */
@@ -23,6 +26,6 @@ public interface TransportDao {
     void delete(TransportEntity transport);
 
     @Query("SELECT * FROM transport")
-    List<TransportEntity> getAllTransport();
+    Flowable<List<TransportEntity>> getAllTransport();
 
 }

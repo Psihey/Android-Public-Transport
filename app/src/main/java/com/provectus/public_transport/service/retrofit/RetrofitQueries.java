@@ -1,4 +1,4 @@
-package com.provectus.public_transport.service;
+package com.provectus.public_transport.service.retrofit;
 
 import com.provectus.public_transport.model.TransportRoutes;
 

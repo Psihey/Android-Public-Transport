@@ -17,8 +17,6 @@ import android.support.annotation.NonNull;
 public class PointEntity  {
 
     @PrimaryKey(autoGenerate = true)
-    @ColumnInfo(name = "id")
-    @NonNull
     private long id;
     @ColumnInfo(name = "point_position")
     private int position;
@@ -29,20 +27,18 @@ public class PointEntity  {
     @ColumnInfo(name = "segment_id")
     private long segmentId;
 
-    public PointEntity(long id, int position, double latitude, double longitude, long segmentId) {
-        this.id = id;
+    public PointEntity( double latitude, double longitude, long segmentId) {
         this.position = position;
         this.latitude = latitude;
         this.longitude = longitude;
         this.segmentId = segmentId;
     }
 
-    @NonNull
     public long getId() {
         return id;
     }
 
-    public void setId(@NonNull long id) {
+    public void setId(long id) {
         this.id = id;
     }
 

@@ -2,6 +2,7 @@ package com.provectus.public_transport.view.fragment.mapfragment.impl;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.BottomSheetBehavior;
@@ -14,6 +15,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.provectus.public_transport.R;
+import com.provectus.public_transport.service.TransportRoutesService;
 import com.provectus.public_transport.view.adapter.ViewPagerAdapter;
 import com.provectus.public_transport.view.fragment.mapfragment.MapsFragment;
 import com.provectus.public_transport.view.fragment.mapfragment.MapsFragmentPresenter;
@@ -62,6 +64,7 @@ public class MapsFragmentImpl extends Fragment implements MapsFragment {
         mUnbinder = ButterKnife.bind(this, view);
         View bottomSheet = view.findViewById(R.id.bottom_sheet);
         BottomSheetBehavior.from(bottomSheet);
+        getActivity().startService(new Intent(getContext(), TransportRoutesService.class));
         return view;
     }
 
@@ -95,6 +98,7 @@ public class MapsFragmentImpl extends Fragment implements MapsFragment {
         if (mUnbinder != null) {
             mUnbinder.unbind();
         }
+        getActivity().stopService(new Intent(getContext(), TransportRoutesService.class));
     }
 
     @Override
@@ -104,7 +108,6 @@ public class MapsFragmentImpl extends Fragment implements MapsFragment {
         builder.setMessage(R.string.dialog_error_internet_message);
         builder.setIcon(R.drawable.common_google_signin_btn_icon_dark_focused);
         builder.setPositiveButton(R.string.dialog_error_internet_positive_button, (dialog, which) -> {
-            mMapsPresenter.getRoutesFromServer();
         });
         builder.setNegativeButton(R.string.dialog_error_internet_negative_button, (dialog, which) -> {
             getActivity().onBackPressed();
@@ -161,4 +164,5 @@ public class MapsFragmentImpl extends Fragment implements MapsFragment {
         });
         tabLayout.setupWithViewPager(viewPager);
     }
+
 }

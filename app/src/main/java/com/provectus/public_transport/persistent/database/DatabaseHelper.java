@@ -18,4 +18,8 @@ public class DatabaseHelper {
         }
         return sPublicTransportDatabase;
     }
+
+    public static PublicTransportDatabase getPublicTransportDatabase() {
+        return sPublicTransportDatabase;
+    }
 }

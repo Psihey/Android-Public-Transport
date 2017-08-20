@@ -14,8 +14,6 @@ import android.support.annotation.NonNull;
 public class TransportEntity {
 
     @PrimaryKey(autoGenerate = true)
-    @ColumnInfo(name = "id")
-    @NonNull
     private long id;
     @ColumnInfo(name = "transport_number")
     private int number;
@@ -25,19 +23,17 @@ public class TransportEntity {
     @ColumnInfo(name = "transport_distance")
     private String distance;
 
-    public TransportEntity(long id, int number, @NonNull String type, String distance) {
-        this.id = id;
+    public TransportEntity(int number, @NonNull String type, String distance) {
         this.number = number;
         this.type = type;
         this.distance = distance;
     }
 
-    @NonNull
     public long getId() {
         return id;
     }
 
-    public void setId(@NonNull long id) {
+    public void setId(long id) {
         this.id = id;
     }
 
