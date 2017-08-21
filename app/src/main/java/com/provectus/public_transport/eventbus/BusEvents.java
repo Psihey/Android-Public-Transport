@@ -5,6 +5,7 @@ import com.provectus.public_transport.model.TransportType;
 
 import java.util.List;
 
+
 /**
  * Created by Psihey on 18.08.2017.
  */
@@ -16,17 +17,17 @@ public class BusEvents {
         private List<TransportRoutes> mTransportRoutes;
         private TransportType mType;
 
-        public SendRoutesEvent(List<TransportRoutes> routes, TransportType type) {
-            this.mTransportRoutes = routes;
-            this.mType = type;
-        }
-
-        public List<TransportRoutes> getTransportRoutes() {
-            return mTransportRoutes;
+        public SendRoutesEvent(List<TransportRoutes> mTransportRoutes, TransportType mType) {
+            this.mTransportRoutes = mTransportRoutes;
+            this.mType = mType;
         }
 
         public TransportType getTransportType() {
             return mType;
+        }
+
+        public List<TransportRoutes> getTransportRoutes() {
+            return mTransportRoutes;
         }
     }
 

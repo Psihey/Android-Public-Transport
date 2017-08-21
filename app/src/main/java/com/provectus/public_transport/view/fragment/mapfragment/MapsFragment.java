@@ -1,7 +1,6 @@
 package com.provectus.public_transport.view.fragment.mapfragment;
 
 import com.google.android.gms.maps.model.LatLng;
-import com.provectus.public_transport.model.TransportRoutes;
 
 import java.util.List;
 

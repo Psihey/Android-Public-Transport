@@ -37,7 +37,7 @@ public class TransportRoutes {
         this.id = id;
     }
 
-    public long getNumber() {
+    public int getNumber() {
         return number;
     }
 

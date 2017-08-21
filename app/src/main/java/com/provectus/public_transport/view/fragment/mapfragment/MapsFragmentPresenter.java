@@ -25,5 +25,4 @@ public interface MapsFragmentPresenter {
      */
     void changeViewPager (int newPosition);
 
-    void getRoutesFromServer();
 }
