@@ -10,15 +10,14 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 public class RetrofitProvider {
 
-    private final static String BASE_URl = "http://188.166.95.36:8080/";
+    public final static String BASE_URl = "http://188.166.95.36:8080/";
     private static RetrofitQueries sRetrofitQueries;
 
-    private RetrofitProvider(){
-
+    private RetrofitProvider() {
     }
 
-    public static RetrofitQueries getRetrofit(){
-        if(sRetrofitQueries == null){
+    public static RetrofitQueries getRetrofit() {
+        if (sRetrofitQueries == null) {
             setUpRetrofit();
         }
         return sRetrofitQueries;

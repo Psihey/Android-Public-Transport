@@ -1,6 +1,8 @@
 package com.provectus.public_transport.view.fragment.mapfragment.impl;
 
 
+import android.util.Log;
+
 import com.google.android.gms.maps.model.LatLng;
 import com.orhanobut.logger.Logger;
 import com.provectus.public_transport.eventbus.BusEvents;
@@ -93,7 +95,7 @@ public class MapsFragmentPresenterImpl implements MapsFragmentPresenter {
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void getAllRoutes(BusEvents.SendRoutesEvent routesEvent) {
         Logger.d("We got message from Event Bus with all routes");
-        List<TransportRoutes> routes =routesEvent.getTransportRoutes();
+        List<TransportRoutes> routes = routesEvent.getTransportRoutes();
         for (int i = 0; i < routes.size(); i++) {
             List<LatLng> sortedRoutes = sortedRoutesSegment(routes.get(i));
             mMapsFragment.drawRotes(sortedRoutes);

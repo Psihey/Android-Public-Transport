@@ -5,6 +5,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
+import com.orhanobut.logger.Logger;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -50,7 +51,7 @@ public class MapsFragmentImpl extends Fragment implements MapsFragment, OnMapRea
     private static final Double LNG_1 = 30.671341;
     private static final Double LAT_2 = 46.499907;
     private static final Double LNG_2 = 30.781572;
-    private static final Integer MERGE = 30;
+    private static final Integer MARGE = 30;
 
     @BindView(R.id.view_pager)
     ViewPager viewPager;
@@ -61,7 +62,7 @@ public class MapsFragmentImpl extends Fragment implements MapsFragment, OnMapRea
     private MapsFragmentPresenter mMapsPresenter;
     private Unbinder mUnbinder;
     private ViewPagerAdapter viewPagerAdapter;
-    private GoogleMap myMap;
+    private GoogleMap mMap;
 
     private boolean isMapReady;
 
@@ -174,16 +175,17 @@ public class MapsFragmentImpl extends Fragment implements MapsFragment, OnMapRea
     @Override
     public void onMapReady(GoogleMap googleMap) {
         isMapReady = true;
-        myMap = googleMap;
+        mMap = googleMap;
         defaultCameraPosition();
         settingsUI();
     }
 
     @Override
     public void drawRotes(List<LatLng> sortedRoutes) {
-        if (isMapReady == false || myMap == null || sortedRoutes == null) {
+        if (isMapReady == false || mMap == null || sortedRoutes == null) {
             return;
         }
+        Logger.d("");
         setRoutesOnMap(sortedRoutes);
     }
 
@@ -191,7 +193,7 @@ public class MapsFragmentImpl extends Fragment implements MapsFragment, OnMapRea
     private void setRoutesOnMap(List<LatLng> listDirection) {
         PolylineOptions polylineOptions = new PolylineOptions();
         polylineOptions.addAll(listDirection);
-        Polyline polyline = myMap.addPolyline(polylineOptions);
+        Polyline polyline = mMap.addPolyline(polylineOptions);
         polyline.setColor(getRandomColor());
         polyline.setWidth(3);
     }
@@ -220,19 +222,18 @@ public class MapsFragmentImpl extends Fragment implements MapsFragment, OnMapRea
             }
         });
         tabLayout.setupWithViewPager(viewPager);
-
     }
 
     private void defaultCameraPosition() {
-        myMap.setOnMapLoadedCallback(() -> {
+        mMap.setOnMapLoadedCallback(() -> {
             CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngBounds(new LatLngBounds
-                    (new LatLng(LAT_1, LNG_1), new LatLng(LAT_2, LNG_2)), MERGE);
-            myMap.animateCamera(cameraUpdate);
+                    (new LatLng(LAT_1, LNG_1), new LatLng(LAT_2, LNG_2)), MARGE);
+            mMap.animateCamera(cameraUpdate);
         });
     }
 
     private void settingsUI() {
-        UiSettings settings = myMap.getUiSettings();
+        UiSettings settings = mMap.getUiSettings();
         if (ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
                 && ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             // TODO: Consider calling
@@ -244,7 +245,7 @@ public class MapsFragmentImpl extends Fragment implements MapsFragment, OnMapRea
             // for ActivityCompat#requestPermissions for more details.
             return;
         }
-        myMap.setMyLocationEnabled(true);
+        mMap.setMyLocationEnabled(true);
         settings.setMyLocationButtonEnabled(true);
     }
 
