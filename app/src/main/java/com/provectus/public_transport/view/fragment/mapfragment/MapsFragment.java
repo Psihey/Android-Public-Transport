@@ -6,8 +6,6 @@ package com.provectus.public_transport.view.fragment.mapfragment;
 
 public interface MapsFragment {
 
-    void showDialogError();
-
     void setIconInTabLayout();
 
     void changeIconInTabLayout(int position);

@@ -54,11 +54,11 @@ public class MapsFragmentPresenterImpl implements MapsFragmentPresenter {
         DatabaseHelper.getPublicTransportDatabase().transportDao().getAllTransport()
                 .subscribeOn(Schedulers.io()).
                 observeOn(AndroidSchedulers.mainThread())
-                .subscribe(this::getFromDb);
+                .subscribe(this::getTransportFromDB);
         DatabaseHelper.getPublicTransportDatabase().segmentDao().getAllSegment()
                 .subscribeOn(Schedulers.io()).
                 observeOn(AndroidSchedulers.mainThread())
-                .subscribe(this::getSegment);
+                .subscribe(this::getSegmentFromDB);
         DatabaseHelper.getPublicTransportDatabase().pointDao().getAllPoint()
                 .subscribeOn(Schedulers.io()).
                 observeOn(AndroidSchedulers.mainThread())
@@ -66,16 +66,15 @@ public class MapsFragmentPresenterImpl implements MapsFragmentPresenter {
 
     }
 
-    private void getFromDb(List<TransportEntity> transportEntities) {
-        System.out.println(transportEntities.toString());
+    private void getTransportFromDB(List<TransportEntity> transportEntities) {
+        Logger.d(transportEntities);
     }
 
-    private void getSegment(List<SegmentEntity> segmentEntities) {
-        System.out.println(segmentEntities.toString());
+    private void getSegmentFromDB(List<SegmentEntity> segmentEntities) {
+        Logger.d(segmentEntities);
     }
 
     private void getPoints(List<PointEntity> pointEntities){
-        System.out.println(pointEntities.toString());
     }
 
 }

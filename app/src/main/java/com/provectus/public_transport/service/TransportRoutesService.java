@@ -6,6 +6,7 @@ import android.os.IBinder;
 import android.support.annotation.Nullable;
 
 import com.orhanobut.logger.Logger;
+import com.provectus.public_transport.eventbus.BusEvents;
 import com.provectus.public_transport.model.Point;
 import com.provectus.public_transport.model.Segment;
 import com.provectus.public_transport.model.TransportRoutes;
@@ -14,6 +15,8 @@ import com.provectus.public_transport.persistence.entity.PointEntity;
 import com.provectus.public_transport.persistence.entity.SegmentEntity;
 import com.provectus.public_transport.persistence.entity.TransportEntity;
 import com.provectus.public_transport.service.retrofit.RetrofitProvider;
+
+import org.greenrobot.eventbus.EventBus;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -31,13 +34,18 @@ import io.reactivex.schedulers.Schedulers;
 public class TransportRoutesService extends Service {
 
     private CompositeDisposable mCompositeDisposable;
-    private List<TransportEntity> transportEntities = new ArrayList<>();
-    private List<SegmentEntity> segmentEntity = new ArrayList<>();
-    private List<PointEntity> pointEntity = new ArrayList<>();
+    private List<TransportEntity> mTransportEntity = new ArrayList<>();
+    private List<SegmentEntity> mSegmentEntity = new ArrayList<>();
+    private List<PointEntity> mPointEntity = new ArrayList<>();
+
+    @Override
+    public void onCreate() {
+        super.onCreate();
+        mCompositeDisposable = new CompositeDisposable();
+    }
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        mCompositeDisposable = new CompositeDisposable();
         getRoutesFromServer();
         Logger.d("Service is started");
         return super.onStartCommand(intent, flags, startId);
@@ -72,11 +80,11 @@ public class TransportRoutesService extends Service {
         int transportId = 1;
         int segmentId = 1;
         for (TransportRoutes currentRoutes : transportRoutes) {
-            transportEntities.add(new TransportEntity(currentRoutes.getNumber(), currentRoutes.getType().name(), currentRoutes.getDistance()));
+            mTransportEntity.add(new TransportEntity(currentRoutes.getNumber(), currentRoutes.getType().name(), currentRoutes.getDistance()));
             for (Segment currentSegment : currentRoutes.getSegment()) {
-                segmentEntity.add(new SegmentEntity(currentSegment.getPosition(), currentSegment.getDirection(), transportId));
+                mSegmentEntity.add(new SegmentEntity(currentSegment.getPosition(), currentSegment.getDirection(), transportId));
                 for (Point currentPoint : currentSegment.getPoints()) {
-                    pointEntity.add(new PointEntity(currentPoint.getPosition(), currentPoint.getLatitude(), currentPoint.getLongitude(), segmentId));
+                    mPointEntity.add(new PointEntity(currentPoint.getPosition(), currentPoint.getLatitude(), currentPoint.getLongitude(), segmentId));
                 }
                 segmentId++;
             }
@@ -86,10 +94,10 @@ public class TransportRoutesService extends Service {
         DatabaseHelper.getPublicTransportDatabase().transportDao().getAllTransport()
                 .subscribeOn(Schedulers.io()).
                 observeOn(AndroidSchedulers.mainThread())
-                .subscribe(this::getFromDb);
+                .subscribe(this::getFromDB);
     }
 
-    private void getFromDb(List<TransportEntity> transportEntities) {
+    private void getFromDB(List<TransportEntity> transportEntities) {
         if (transportEntities.isEmpty()) {
             Completable.defer(() -> Completable.fromCallable(this::putToDB))
                     .subscribeOn(Schedulers.computation())
@@ -108,12 +116,13 @@ public class TransportRoutesService extends Service {
                             throwable -> Logger.d(throwable.getMessage())
                     );
         }
+        EventBus.getDefault().post(new BusEvents.SendRoutesEvent());
     }
 
     private Object updateDB() {
-        DatabaseHelper.getPublicTransportDatabase().transportDao().updateTransport(transportEntities);
-        DatabaseHelper.getPublicTransportDatabase().segmentDao().updateSegment(segmentEntity);
-        DatabaseHelper.getPublicTransportDatabase().pointDao().updatePoint(pointEntity);
+        DatabaseHelper.getPublicTransportDatabase().transportDao().updateTransport(mTransportEntity);
+        DatabaseHelper.getPublicTransportDatabase().segmentDao().updateSegment(mSegmentEntity);
+        DatabaseHelper.getPublicTransportDatabase().pointDao().updatePoint(mPointEntity);
         Logger.d("Databse is Updated");
         return true;
     }
@@ -123,9 +132,9 @@ public class TransportRoutesService extends Service {
     }
 
     private boolean putToDB() {
-        DatabaseHelper.getPublicTransportDatabase().transportDao().insertAll(transportEntities);
-        DatabaseHelper.getPublicTransportDatabase().segmentDao().insertAll(segmentEntity);
-        DatabaseHelper.getPublicTransportDatabase().pointDao().insertAll(pointEntity);
+        DatabaseHelper.getPublicTransportDatabase().transportDao().insertAll(mTransportEntity);
+        DatabaseHelper.getPublicTransportDatabase().segmentDao().insertAll(mSegmentEntity);
+        DatabaseHelper.getPublicTransportDatabase().pointDao().insertAll(mPointEntity);
         return true;
     }
 

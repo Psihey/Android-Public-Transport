@@ -15,13 +15,10 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.provectus.public_transport.R;
-import com.provectus.public_transport.eventbus.BusEvents;
 import com.provectus.public_transport.service.TransportRoutesService;
 import com.provectus.public_transport.view.adapter.ViewPagerAdapter;
 import com.provectus.public_transport.view.fragment.mapfragment.MapsFragment;
 import com.provectus.public_transport.view.fragment.mapfragment.MapsFragmentPresenter;
-
-import org.greenrobot.eventbus.EventBus;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -81,7 +78,6 @@ public class MapsFragmentImpl extends Fragment implements MapsFragment {
 
         }
         mMapsPresenter.bindView(this);
-        EventBus.getDefault().post(new BusEvents.SendRoutesEvent());
     }
 
     @Override
