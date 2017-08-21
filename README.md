@@ -23,6 +23,7 @@ The application supports Android 4.4 KitKat (API level 19) and above.
 - Logger **https://github.com/orhanobut/logger**
 - Google Maps API **https://developers.google.com/maps/android/**
 - Room **https://developer.android.com/topic/libraries/architecture/room.html**
+- EventBus **https://github.com/greenrobot/EventBus**
 
 ### Screenshot:
 
