@@ -36,6 +36,8 @@
             </intent-filter>
         </activity>
 
+        <service android:name=".service.TransportRoutesService"/>
+
     </application>
 
 </manifest>

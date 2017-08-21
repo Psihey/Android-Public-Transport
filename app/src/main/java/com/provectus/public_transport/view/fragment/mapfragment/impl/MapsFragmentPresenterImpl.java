@@ -8,7 +8,10 @@ import com.provectus.public_transport.model.Point;
 import com.provectus.public_transport.model.Segment;
 import com.provectus.public_transport.model.TransportRoutes;
 import com.provectus.public_transport.model.TransportType;
-import com.provectus.public_transport.service.RetrofitProvider;
+import com.provectus.public_transport.persistence.database.DatabaseHelper;
+import com.provectus.public_transport.persistence.entity.PointEntity;
+import com.provectus.public_transport.persistence.entity.SegmentEntity;
+import com.provectus.public_transport.persistence.entity.TransportEntity;
 import com.provectus.public_transport.view.fragment.mapfragment.MapsFragment;
 import com.provectus.public_transport.view.fragment.mapfragment.MapsFragmentPresenter;
 
@@ -20,7 +23,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import io.reactivex.android.schedulers.AndroidSchedulers;
-import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.schedulers.Schedulers;
 
 
@@ -31,25 +33,18 @@ import io.reactivex.schedulers.Schedulers;
 public class MapsFragmentPresenterImpl implements MapsFragmentPresenter {
 
     private MapsFragment mMapsFragment;
-    private CompositeDisposable mCompositeDisposable;
 
     @Override
     public void bindView(MapsFragment mapsFragment) {
         this.mMapsFragment = mapsFragment;
-        mCompositeDisposable = new CompositeDisposable();
-        getRoutesFromServer();
         EventBus.getDefault().register(this);
         Logger.d("Maps is binded to its presenter.");
-
     }
 
     @Override
     public void unbindView() {
         this.mMapsFragment = null;
         EventBus.getDefault().unregister(this);
-        if (!mCompositeDisposable.isDisposed()) {
-            mCompositeDisposable.dispose();
-        }
         Logger.d("Maps is unbind from presenter");
     }
 
@@ -58,46 +53,39 @@ public class MapsFragmentPresenterImpl implements MapsFragmentPresenter {
         mMapsFragment.changeIconInTabLayout(newPosition);
     }
 
-    @Override
-    public void getRoutesFromServer() {
-        mCompositeDisposable.add(RetrofitProvider
-                .getRetrofit().getAllRoutes()
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(this::handleResponse, this::handleError));
-    }
-
-    private void handleResponse(List<TransportRoutes> transportRoutes) {
-        Logger.d("All Ok, we got response");
-        List<TransportRoutes> busRoutes = new ArrayList<>();
-        List<TransportRoutes> tramRoutes = new ArrayList<>();
-        for (TransportRoutes currentRoutes : transportRoutes) {
-            switch (currentRoutes.getType()) {
-                case TROLLEYBUSES_TYPE:
-                    busRoutes.add(currentRoutes);
-                    break;
-                case TRAM_TYPE:
-                    tramRoutes.add(currentRoutes);
-                    break;
-            }
-        }
-        EventBus.getDefault().post(new BusEvents.SendRoutesEvent(busRoutes, TransportType.TROLLEYBUSES_TYPE));
-        EventBus.getDefault().post(new BusEvents.SendRoutesEvent(tramRoutes, TransportType.TRAM_TYPE));
-    }
-
-    private void handleError(Throwable throwable) {
-        mMapsFragment.showDialogError();
-        Logger.d("Handle Error from when fetching data" + throwable.getMessage());
-    }
-
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void getAllRoutes(BusEvents.SendRoutesEvent routesEvent) {
-        Logger.d("We got message from Event Bus with all routes");
+        Logger.d("We got message from Event Bus with all routes ");
         List<TransportRoutes> routes = routesEvent.getTransportRoutes();
         for (int i = 0; i < routes.size(); i++) {
             List<LatLng> sortedRoutes = sortedRoutesSegment(routes.get(i));
             mMapsFragment.drawRotes(sortedRoutes);
         }
+
+        DatabaseHelper.getPublicTransportDatabase().transportDao().getAllTransport()
+                .subscribeOn(Schedulers.io()).
+                observeOn(AndroidSchedulers.mainThread())
+                .subscribe(this::getTransportFromDB);
+        DatabaseHelper.getPublicTransportDatabase().segmentDao().getAllSegment()
+                .subscribeOn(Schedulers.io()).
+                observeOn(AndroidSchedulers.mainThread())
+                .subscribe(this::getSegmentFromDB);
+        DatabaseHelper.getPublicTransportDatabase().pointDao().getAllPoint()
+                .subscribeOn(Schedulers.io()).
+                observeOn(AndroidSchedulers.mainThread())
+                .subscribe(this::getPoints);
+
+    }
+
+    private void getTransportFromDB(List<TransportEntity> transportEntities) {
+        Logger.d(transportEntities);
+    }
+
+    private void getSegmentFromDB(List<SegmentEntity> segmentEntities) {
+        Logger.d(segmentEntities);
+    }
+
+    private void getPoints(List<PointEntity> pointEntities) {
     }
 
     private List<LatLng> sortedRoutesSegment(TransportRoutes transportRoutes) {

@@ -1,4 +1,4 @@
-package com.provectus.public_transport.service;
+package com.provectus.public_transport.service.retrofit;
 
 import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;

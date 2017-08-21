@@ -7,11 +7,6 @@ import com.google.gson.annotations.SerializedName;
  */
 
 public class Point {
-    @SerializedName("id")
-    private long id;
-
-    @SerializedName("segmentId")
-    private long segmentId;
 
     @SerializedName("lat")
     private double latitude;
@@ -21,22 +16,6 @@ public class Point {
 
     @SerializedName("position")
     private int position;
-
-    public long getId() {
-        return id;
-    }
-
-    public void setId(long id) {
-        this.id = id;
-    }
-
-    public long getSegmentId() {
-        return segmentId;
-    }
-
-    public void setSegmentId(long segmentId) {
-        this.segmentId = segmentId;
-    }
 
     public double getLatitude() {
         return latitude;
@@ -64,10 +43,8 @@ public class Point {
 
     @Override
     public String toString() {
-        return "Point{" +
-                "id=" + id +
-                ", segmentId=" + segmentId +
-                ", latitude=" + latitude +
+        return "PointEntity{" +
+                "latitude=" + latitude +
                 ", longitude=" + longitude +
                 ", position=" + position +
                 '}';
