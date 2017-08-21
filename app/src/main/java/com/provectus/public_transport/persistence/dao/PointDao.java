@@ -1,12 +1,12 @@
-package com.provectus.public_transport.persistent.dao;
+package com.provectus.public_transport.persistence.dao;
 
 import android.arch.persistence.room.Dao;
 import android.arch.persistence.room.Delete;
 import android.arch.persistence.room.Insert;
 import android.arch.persistence.room.Query;
+import android.arch.persistence.room.Update;
 
-
-import com.provectus.public_transport.persistent.entity.PointEntity;
+import com.provectus.public_transport.persistence.entity.PointEntity;
 
 import java.util.List;
 
@@ -20,12 +20,15 @@ import io.reactivex.Flowable;
 public interface PointDao {
 
     @Insert
-    void insertAll(List<PointEntity> segments);
+    void insertAll(List<PointEntity> points);
 
     @Delete
     void delete(PointEntity point);
 
-    @Query("SELECT * FROM point")
-    Flowable<List<PointEntity>> getAllTransport();
+    @Query("SELECT * FROM points")
+    Flowable<List<PointEntity>> getAllPoint();
+
+    @Update()
+    void updatePoint(List<PointEntity> pointEntity);
 
 }

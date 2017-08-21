@@ -1,4 +1,4 @@
-package com.provectus.public_transport.persistent.database;
+package com.provectus.public_transport.persistence.database;
 
 import android.arch.persistence.room.Room;
 import android.content.Context;
@@ -11,7 +11,7 @@ public class DatabaseHelper {
 
     private static PublicTransportDatabase sPublicTransportDatabase;
 
-    public static PublicTransportDatabase getDatabase(Context context){
+    public static PublicTransportDatabase createPublicTransportDatabase(Context context){
         if (sPublicTransportDatabase == null){
             sPublicTransportDatabase = Room.databaseBuilder(context.getApplicationContext(),
                     PublicTransportDatabase.class,"public_transport").build();

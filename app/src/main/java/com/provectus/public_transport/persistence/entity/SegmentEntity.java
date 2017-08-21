@@ -1,16 +1,15 @@
-package com.provectus.public_transport.persistent.entity;
+package com.provectus.public_transport.persistence.entity;
 
 import android.arch.persistence.room.ColumnInfo;
 import android.arch.persistence.room.Entity;
 import android.arch.persistence.room.ForeignKey;
 import android.arch.persistence.room.PrimaryKey;
-import android.support.annotation.NonNull;
 
 /**
  * Created by Psihey on 20.08.2017.
  */
 
-@Entity(tableName = "segment",
+@Entity(tableName = "segments",
         foreignKeys = @ForeignKey(entity = TransportEntity.class,
                                   parentColumns = "id",
                                   childColumns = "transport_id"))

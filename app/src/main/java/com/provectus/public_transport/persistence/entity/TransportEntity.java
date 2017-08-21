@@ -1,4 +1,4 @@
-package com.provectus.public_transport.persistent.entity;
+package com.provectus.public_transport.persistence.entity;
 
 
 import android.arch.persistence.room.ColumnInfo;
@@ -10,7 +10,7 @@ import android.support.annotation.NonNull;
  * Created by Psihey on 20.08.2017.
  */
 
-@Entity(tableName = "transport")
+@Entity(tableName = "transports")
 public class TransportEntity {
 
     @PrimaryKey(autoGenerate = true)
@@ -21,9 +21,9 @@ public class TransportEntity {
     @NonNull
     private String type;
     @ColumnInfo(name = "transport_distance")
-    private String distance;
+    private Double distance;
 
-    public TransportEntity(int number, @NonNull String type, String distance) {
+    public TransportEntity(int number, @NonNull String type, Double distance) {
         this.number = number;
         this.type = type;
         this.distance = distance;
@@ -54,11 +54,11 @@ public class TransportEntity {
         this.type = type;
     }
 
-    public String getDistance() {
+    public Double getDistance() {
         return distance;
     }
 
-    public void setDistance(String distance) {
+    public void setDistance(Double distance) {
         this.distance = distance;
     }
 

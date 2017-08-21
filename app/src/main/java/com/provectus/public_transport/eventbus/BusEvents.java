@@ -13,13 +13,13 @@ public class BusEvents {
     public static class SendRoutesEvent {
         private List<TransportRoutes> mTransportRoutes;
 
-        public SendRoutesEvent(List<TransportRoutes> routes){
-            this.mTransportRoutes = routes;
+        public SendRoutesEvent(){
         }
 
         public List<TransportRoutes> getTransportRoutes() {
             return mTransportRoutes;
         }
     }
+
 
 }

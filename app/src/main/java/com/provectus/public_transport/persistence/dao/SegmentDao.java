@@ -1,12 +1,12 @@
-package com.provectus.public_transport.persistent.dao;
+package com.provectus.public_transport.persistence.dao;
 
 import android.arch.persistence.room.Dao;
 import android.arch.persistence.room.Delete;
 import android.arch.persistence.room.Insert;
 import android.arch.persistence.room.Query;
+import android.arch.persistence.room.Update;
 
-import com.provectus.public_transport.model.Segment;
-import com.provectus.public_transport.persistent.entity.SegmentEntity;
+import com.provectus.public_transport.persistence.entity.SegmentEntity;
 
 import java.util.List;
 
@@ -25,7 +25,10 @@ public interface SegmentDao {
     @Delete
     void delete(SegmentEntity segment);
 
-    @Query("SELECT * FROM segment")
-    Flowable<List<SegmentEntity>> getAllTransport();
+    @Query("SELECT * FROM segments")
+    Flowable<List<SegmentEntity>> getAllSegment();
+
+    @Update()
+    void updateSegment(List<SegmentEntity> segmentEntity);
 
 }

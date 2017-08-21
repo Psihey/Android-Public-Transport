@@ -1,20 +1,19 @@
-package com.provectus.public_transport.persistent.entity;
+package com.provectus.public_transport.persistence.entity;
 
 import android.arch.persistence.room.ColumnInfo;
 import android.arch.persistence.room.Entity;
 import android.arch.persistence.room.ForeignKey;
 import android.arch.persistence.room.PrimaryKey;
-import android.support.annotation.NonNull;
 
 /**
  * Created by Psihey on 20.08.2017.
  */
 
-@Entity(tableName = "point",
-        foreignKeys =@ForeignKey(entity = SegmentEntity.class,
-                                 parentColumns = "id",
-                                 childColumns = "segment_id"))
-public class PointEntity  {
+@Entity(tableName = "points",
+        foreignKeys = @ForeignKey(entity = SegmentEntity.class,
+                parentColumns = "id",
+                childColumns = "segment_id"))
+public class PointEntity {
 
     @PrimaryKey(autoGenerate = true)
     private long id;
@@ -27,7 +26,7 @@ public class PointEntity  {
     @ColumnInfo(name = "segment_id")
     private long segmentId;
 
-    public PointEntity( double latitude, double longitude, long segmentId) {
+    public PointEntity(int position, double latitude, double longitude, long segmentId) {
         this.position = position;
         this.latitude = latitude;
         this.longitude = longitude;

@@ -3,12 +3,21 @@ package com.provectus.public_transport.view.fragment.mapfragment.impl;
 
 import com.orhanobut.logger.Logger;
 import com.provectus.public_transport.eventbus.BusEvents;
+import com.provectus.public_transport.persistence.database.DatabaseHelper;
+import com.provectus.public_transport.persistence.entity.PointEntity;
+import com.provectus.public_transport.persistence.entity.SegmentEntity;
+import com.provectus.public_transport.persistence.entity.TransportEntity;
 import com.provectus.public_transport.view.fragment.mapfragment.MapsFragment;
 import com.provectus.public_transport.view.fragment.mapfragment.MapsFragmentPresenter;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
+
+import java.util.List;
+
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.schedulers.Schedulers;
 
 
 /**
@@ -39,12 +48,34 @@ public class MapsFragmentPresenterImpl implements MapsFragmentPresenter {
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
-    public void getAllRoutes(BusEvents.SendRoutesEvent routesEvent){
+    public void getAllRoutes(BusEvents.SendRoutesEvent routesEvent) {
         // TODO : call routesEvent.getTransportRoutes and you will get all routes
         Logger.d("We got message from Event Bus with all routes ");
-        System.out.println(routesEvent.getTransportRoutes().toString());
+        DatabaseHelper.getPublicTransportDatabase().transportDao().getAllTransport()
+                .subscribeOn(Schedulers.io()).
+                observeOn(AndroidSchedulers.mainThread())
+                .subscribe(this::getFromDb);
+        DatabaseHelper.getPublicTransportDatabase().segmentDao().getAllSegment()
+                .subscribeOn(Schedulers.io()).
+                observeOn(AndroidSchedulers.mainThread())
+                .subscribe(this::getSegment);
+        DatabaseHelper.getPublicTransportDatabase().pointDao().getAllPoint()
+                .subscribeOn(Schedulers.io()).
+                observeOn(AndroidSchedulers.mainThread())
+                .subscribe(this::getPoints);
+
     }
 
+    private void getFromDb(List<TransportEntity> transportEntities) {
+        System.out.println(transportEntities.toString());
+    }
 
+    private void getSegment(List<SegmentEntity> segmentEntities) {
+        System.out.println(segmentEntities.toString());
+    }
+
+    private void getPoints(List<PointEntity> pointEntities){
+        System.out.println(pointEntities.toString());
+    }
 
 }

@@ -6,14 +6,20 @@ import android.os.IBinder;
 import android.support.annotation.Nullable;
 
 import com.orhanobut.logger.Logger;
-import com.provectus.public_transport.eventbus.BusEvents;
+import com.provectus.public_transport.model.Point;
+import com.provectus.public_transport.model.Segment;
 import com.provectus.public_transport.model.TransportRoutes;
+import com.provectus.public_transport.persistence.database.DatabaseHelper;
+import com.provectus.public_transport.persistence.entity.PointEntity;
+import com.provectus.public_transport.persistence.entity.SegmentEntity;
+import com.provectus.public_transport.persistence.entity.TransportEntity;
 import com.provectus.public_transport.service.retrofit.RetrofitProvider;
 
-import org.greenrobot.eventbus.EventBus;
-
+import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
+import io.reactivex.Completable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.schedulers.Schedulers;
@@ -25,6 +31,9 @@ import io.reactivex.schedulers.Schedulers;
 public class TransportRoutesService extends Service {
 
     private CompositeDisposable mCompositeDisposable;
+    private List<TransportEntity> transportEntities = new ArrayList<>();
+    private List<SegmentEntity> segmentEntity = new ArrayList<>();
+    private List<PointEntity> pointEntity = new ArrayList<>();
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
@@ -52,6 +61,7 @@ public class TransportRoutesService extends Service {
     private void getRoutesFromServer() {
         mCompositeDisposable.add(RetrofitProvider
                 .getRetrofit().getAllRoutes()
+                .repeatWhen(objectObservable -> objectObservable.delay(60, TimeUnit.MINUTES))
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(this::handleResponse, this::handleError));
@@ -59,25 +69,64 @@ public class TransportRoutesService extends Service {
 
     private void handleResponse(List<TransportRoutes> transportRoutes) {
         Logger.d("All Ok, we got responce");
-        EventBus.getDefault().post(new BusEvents.SendRoutesEvent(transportRoutes));
-//        DatabaseHelper.getPublicTransportDatabase().transportDao().getAllTransport().subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread())
-//                .subscribe(this::getFromDb;
-//          Completable.fromAction(this:: putToDB);
+        int transportId = 1;
+        int segmentId = 1;
+        for (TransportRoutes currentRoutes : transportRoutes) {
+            transportEntities.add(new TransportEntity(currentRoutes.getNumber(), currentRoutes.getType().name(), currentRoutes.getDistance()));
+            for (Segment currentSegment : currentRoutes.getSegment()) {
+                segmentEntity.add(new SegmentEntity(currentSegment.getPosition(), currentSegment.getDirection(), transportId));
+                for (Point currentPoint : currentSegment.getPoints()) {
+                    pointEntity.add(new PointEntity(currentPoint.getPosition(), currentPoint.getLatitude(), currentPoint.getLongitude(), segmentId));
+                }
+                segmentId++;
+            }
+            transportId++;
+        }
+
+        DatabaseHelper.getPublicTransportDatabase().transportDao().getAllTransport()
+                .subscribeOn(Schedulers.io()).
+                observeOn(AndroidSchedulers.mainThread())
+                .subscribe(this::getFromDb);
+    }
+
+    private void getFromDb(List<TransportEntity> transportEntities) {
+        if (transportEntities.isEmpty()) {
+            Completable.defer(() -> Completable.fromCallable(this::putToDB))
+                    .subscribeOn(Schedulers.computation())
+                    .subscribe(
+                            () -> {
+                            },
+                            throwable -> Logger.d(throwable.getMessage())
+                    );
+            Logger.d("Database is initialized");
+        }else {
+            Completable.defer(() -> Completable.fromCallable(this::updateDB))
+                    .subscribeOn(Schedulers.computation())
+                    .subscribe(
+                            () -> {
+                            },
+                            throwable -> Logger.d(throwable.getMessage())
+                    );
+        }
+    }
+
+    private Object updateDB() {
+        DatabaseHelper.getPublicTransportDatabase().transportDao().updateTransport(transportEntities);
+        DatabaseHelper.getPublicTransportDatabase().segmentDao().updateSegment(segmentEntity);
+        DatabaseHelper.getPublicTransportDatabase().pointDao().updatePoint(pointEntity);
+        Logger.d("Databse is Updated");
+        return true;
     }
 
     private void handleError(Throwable throwable) {
         Logger.d("Handle Error from when fetching data" + throwable.getMessage());
     }
 
-//    private void putToDB() {
-//        List<TransportEntity> transportEntities = new ArrayList<>();
-//        transportEntities.add(new TransportEntity(2,"tram","ss"));
-//        transportEntities.add(new TransportEntity(3,"tram2","s2s"));
-//        DatabaseHelper.getPublicTransportDatabase().transportDao().insertAll(transportEntities);
-//        DatabaseHelper.getPublicTransportDatabase().transportDao().delete(new TransportEntity(2, "tram", "ss"));
-//    }
+    private boolean putToDB() {
+        DatabaseHelper.getPublicTransportDatabase().transportDao().insertAll(transportEntities);
+        DatabaseHelper.getPublicTransportDatabase().segmentDao().insertAll(segmentEntity);
+        DatabaseHelper.getPublicTransportDatabase().pointDao().insertAll(pointEntity);
+        return true;
+    }
 
-//    private void getFromDb(List<TransportEntity> transportEntities) {
-//        System.out.println(transportEntities.toString());
-//    }
 }
