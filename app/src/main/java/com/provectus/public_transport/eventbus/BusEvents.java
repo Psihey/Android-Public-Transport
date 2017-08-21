@@ -14,9 +14,9 @@ public class BusEvents {
     public static class SendRoutesEvent {
 
         private List<TransportRoutes> mTransportRoutes;
-        private int mType;
+        private TransportType mType;
 
-        public SendRoutesEvent(List<TransportRoutes> routes, int type) {
+        public SendRoutesEvent(List<TransportRoutes> routes, TransportType type) {
             this.mTransportRoutes = routes;
             this.mType = type;
         }
@@ -25,7 +25,7 @@ public class BusEvents {
             return mTransportRoutes;
         }
 
-        public int getTransportType() {
+        public TransportType getTransportType() {
             return mType;
         }
     }

@@ -1,16 +1,14 @@
 package com.provectus.public_transport.view.fragment.mapfragment.impl;
 
 
-import android.util.Log;
-
 import com.google.android.gms.maps.model.LatLng;
 import com.orhanobut.logger.Logger;
 import com.provectus.public_transport.eventbus.BusEvents;
 import com.provectus.public_transport.model.Point;
 import com.provectus.public_transport.model.Segment;
 import com.provectus.public_transport.model.TransportRoutes;
+import com.provectus.public_transport.model.TransportType;
 import com.provectus.public_transport.service.RetrofitProvider;
-import com.provectus.public_transport.view.adapter.ViewPagerAdapter;
 import com.provectus.public_transport.view.fragment.mapfragment.MapsFragment;
 import com.provectus.public_transport.view.fragment.mapfragment.MapsFragmentPresenter;
 
@@ -83,8 +81,8 @@ public class MapsFragmentPresenterImpl implements MapsFragmentPresenter {
                     break;
             }
         }
-        EventBus.getDefault().post(new BusEvents.SendRoutesEvent(busRoutes, ViewPagerAdapter.POSITION_BUS));
-        EventBus.getDefault().post(new BusEvents.SendRoutesEvent(tramRoutes, ViewPagerAdapter.POSITION_TRAM));
+        EventBus.getDefault().post(new BusEvents.SendRoutesEvent(busRoutes, TransportType.TROLLEYBUSES_TYPE));
+        EventBus.getDefault().post(new BusEvents.SendRoutesEvent(tramRoutes, TransportType.TRAM_TYPE));
     }
 
     private void handleError(Throwable throwable) {

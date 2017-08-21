@@ -13,6 +13,6 @@ public enum TransportType {
     @SerializedName("trolleybuses")
     TROLLEYBUSES_TYPE,
     @SerializedName("taxi")
-    TAXI_TYPE;
+    PARKING_TYPE;
 
 }

@@ -5,10 +5,8 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
-import com.orhanobut.logger.Logger;
 import android.os.Build;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
 import android.support.design.widget.BottomSheetBehavior;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.ActivityCompat;
@@ -67,23 +65,6 @@ public class MapsFragmentImpl extends Fragment implements MapsFragment, OnMapRea
     private boolean isMapReady;
 
     @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-    }
-
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_maps, container, false);
-        mUnbinder = ButterKnife.bind(this, view);
-        SupportMapFragment mapFragment = (SupportMapFragment) getChildFragmentManager()
-                .findFragmentById(R.id.map);
-        mapFragment.getMapAsync(this);
-        View bottomSheet = view.findViewById(R.id.bottom_sheet);
-        BottomSheetBehavior.from(bottomSheet);
-        return view;
-    }
-
-    @Override
     public void onAttach(Context context) {
         super.onAttach(context);
         if (Build.VERSION.SDK_INT >= 23) {
@@ -99,6 +80,19 @@ public class MapsFragmentImpl extends Fragment implements MapsFragment, OnMapRea
             onAttachToContext(activity);
         }
     }
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        View view = inflater.inflate(R.layout.fragment_maps, container, false);
+        mUnbinder = ButterKnife.bind(this, view);
+        SupportMapFragment mapFragment = (SupportMapFragment) getChildFragmentManager()
+                .findFragmentById(R.id.map);
+        mapFragment.getMapAsync(this);
+        View bottomSheet = view.findViewById(R.id.bottom_sheet);
+        BottomSheetBehavior.from(bottomSheet);
+        return view;
+    }
+
 
     @Override
     public void onResume() {
@@ -176,7 +170,7 @@ public class MapsFragmentImpl extends Fragment implements MapsFragment, OnMapRea
     public void onMapReady(GoogleMap googleMap) {
         isMapReady = true;
         mMap = googleMap;
-        defaultCameraPosition();
+        setDefaultCameraPosition();
         settingsUI();
     }
 
@@ -185,7 +179,6 @@ public class MapsFragmentImpl extends Fragment implements MapsFragment, OnMapRea
         if (isMapReady == false || mMap == null || sortedRoutes == null) {
             return;
         }
-        Logger.d("");
         setRoutesOnMap(sortedRoutes);
     }
 
@@ -224,7 +217,7 @@ public class MapsFragmentImpl extends Fragment implements MapsFragment, OnMapRea
         tabLayout.setupWithViewPager(viewPager);
     }
 
-    private void defaultCameraPosition() {
+    private void setDefaultCameraPosition() {
         mMap.setOnMapLoadedCallback(() -> {
             CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngBounds(new LatLngBounds
                     (new LatLng(LAT_1, LNG_1), new LatLng(LAT_2, LNG_2)), MARGE);
@@ -236,13 +229,6 @@ public class MapsFragmentImpl extends Fragment implements MapsFragment, OnMapRea
         UiSettings settings = mMap.getUiSettings();
         if (ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
                 && ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            // TODO: Consider calling
-            //    ActivityCompat#requestPermissions
-            // here to request the missing permissions, and then overriding
-            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-            //                                          int[] grantResults)
-            // to handle the case where the user grants the permission. See the documentation
-            // for ActivityCompat#requestPermissions for more details.
             return;
         }
         mMap.setMyLocationEnabled(true);

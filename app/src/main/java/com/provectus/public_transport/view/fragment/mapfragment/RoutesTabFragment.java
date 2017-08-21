@@ -12,16 +12,17 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.orhanobut.logger.Logger;
 import com.provectus.public_transport.R;
 import com.provectus.public_transport.eventbus.BusEvents;
 import com.provectus.public_transport.model.TransportRoutes;
+import com.provectus.public_transport.model.TransportType;
 import com.provectus.public_transport.view.adapter.TramsAndTrolleyAdapter;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.BindView;
@@ -34,6 +35,8 @@ import butterknife.Unbinder;
 
 public class RoutesTabFragment extends Fragment {
 
+    public static final String POSITION_PAR = "pos_par";
+
     @BindView(R.id.recycler_view_routes)
     RecyclerView mRoutesRecyclerView;
     @BindView(R.id.tv_tab_fragment_no_data)
@@ -41,55 +44,18 @@ public class RoutesTabFragment extends Fragment {
 
     private View view;
     private TramsAndTrolleyAdapter adapter;
-    private int mPosition;
+    private TransportType mType;
 
     private Unbinder mUnbinder;
 
-    public static final String POSITION_PAR = "pos_par";
+    private List<TransportRoutes> myRoutes;
 
-    public static RoutesTabFragment newInstance(int position) {
+    public static RoutesTabFragment newInstance(TransportType transportType) {
         RoutesTabFragment routesTabFragment = new RoutesTabFragment();
-
         Bundle bundle = new Bundle();
-        bundle.putInt(POSITION_PAR, position);
+        bundle.putSerializable(POSITION_PAR, transportType);
         routesTabFragment.setArguments(bundle);
-
         return routesTabFragment;
-    }
-
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        view = inflater.inflate(R.layout.tab_fragment, container, false);
-        mUnbinder = ButterKnife.bind(this, view);
-        EventBus.getDefault().register(this);
-        mPosition = getArguments().getInt(POSITION_PAR);
-        return view;
-    }
-
-
-    @Subscribe(threadMode = ThreadMode.MAIN)
-    public void getAllRoutes(BusEvents.SendRoutesEvent routesEvent) {
-        //TODO: After caching delete the method and load data from the database
-        if (mPosition == routesEvent.getTransportType()) {
-            initRecyclerView(routesEvent.getTransportRoutes());
-        }
-
-    }
-
-    private void initRecyclerView(List<TransportRoutes> routes) {
-        mRoutesRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-        adapter = new TramsAndTrolleyAdapter(routes);
-        mRoutesRecyclerView.setAdapter(adapter);
-        tvNoData.setVisibility(View.GONE);
-    }
-
-    @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-        if (mUnbinder != null) {
-            mUnbinder.unbind();
-        }
-        EventBus.getDefault().unregister(this);
     }
 
     @Override
@@ -109,12 +75,65 @@ public class RoutesTabFragment extends Fragment {
         }
     }
 
-    protected void onAttachToContext(Context context) {
-        Context mContext = context;
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        view = inflater.inflate(R.layout.tab_fragment, container, false);
+        mUnbinder = ButterKnife.bind(this, view);
+        EventBus.getDefault().register(this);
+        myRoutes = new ArrayList<>();
+        initRecyclerView();
+        mType = (TransportType) getArguments().get(POSITION_PAR);
+        return view;
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        if (mUnbinder != null) {
+            mUnbinder.unbind();
+        }
+        EventBus.getDefault().unregister(this);
     }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
     }
+
+    private void hideTvNoData() {
+        if (!myRoutes.isEmpty()) {
+            tvNoData.setVisibility(View.GONE);
+        }
+    }
+
+
+    protected void onAttachToContext(Context context) {
+        Context mContext = context;
+    }
+
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void getAllRoutes(BusEvents.SendRoutesEvent routesEvent) {
+        //TODO: After caching delete the method and load data from the database
+        if (mType == routesEvent.getTransportType()) {
+            myRoutes = routesEvent.getTransportRoutes();
+            initAdapter();
+            hideTvNoData();
+        }
+
+    }
+
+    private void initRecyclerView() {
+        mRoutesRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+        initAdapter();
+        hideTvNoData();
+    }
+
+    private void initAdapter() {
+        if (!myRoutes.isEmpty()) {
+            adapter = new TramsAndTrolleyAdapter(myRoutes);
+            mRoutesRecyclerView.setAdapter(adapter);
+        }
+    }
+
 }
