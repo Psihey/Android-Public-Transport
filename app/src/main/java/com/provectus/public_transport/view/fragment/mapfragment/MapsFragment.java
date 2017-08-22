@@ -10,8 +10,6 @@ import java.util.List;
 
 public interface MapsFragment {
 
-    void showDialogError();
-
     void setIconInTabLayout();
 
     void changeIconInTabLayout(int position);

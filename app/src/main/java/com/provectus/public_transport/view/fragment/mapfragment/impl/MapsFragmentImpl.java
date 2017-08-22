@@ -3,11 +3,9 @@ package com.provectus.public_transport.view.fragment.mapfragment.impl;
 import android.Manifest;
 import android.app.Activity;
 import android.content.Context;
-
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
-import android.content.Intent;
-
 import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.BottomSheetBehavior;
@@ -15,7 +13,6 @@ import android.support.design.widget.TabLayout;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewPager;
-import android.support.v7.app.AlertDialog;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -31,10 +28,7 @@ import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.provectus.public_transport.R;
-
-
 import com.provectus.public_transport.service.TransportRoutesService;
-
 import com.provectus.public_transport.view.adapter.ViewPagerAdapter;
 import com.provectus.public_transport.view.fragment.mapfragment.MapsFragment;
 import com.provectus.public_transport.view.fragment.mapfragment.MapsFragmentPresenter;
@@ -42,6 +36,7 @@ import com.provectus.public_transport.view.fragment.mapfragment.MapsFragmentPres
 import java.util.List;
 import java.util.Random;
 
+import biz.laenger.android.vpbs.BottomSheetUtils;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
@@ -95,8 +90,8 @@ public class MapsFragmentImpl extends Fragment implements MapsFragment, OnMapRea
         SupportMapFragment mapFragment = (SupportMapFragment) getChildFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
-        View bottomSheet = view.findViewById(R.id.bottom_sheet);
-        BottomSheetBehavior.from(bottomSheet);
+        initViewPager();
+        setIconInTabLayout();
         getActivity().startService(new Intent(getContext(), TransportRoutesService.class));
         return view;
     }
@@ -104,8 +99,6 @@ public class MapsFragmentImpl extends Fragment implements MapsFragment, OnMapRea
     @Override
     public void onResume() {
         super.onResume();
-        initViewPager();
-        setIconInTabLayout();
         if (mMapsPresenter == null) {
             mMapsPresenter = new MapsFragmentPresenterImpl();
         }
@@ -119,33 +112,12 @@ public class MapsFragmentImpl extends Fragment implements MapsFragment, OnMapRea
     }
 
     @Override
-    public void onStop() {
-        super.onStop();
-        mMapsPresenter.unbindView();
-    }
-
-    @Override
     public void onDestroyView() {
         super.onDestroyView();
         if (mUnbinder != null) {
             mUnbinder.unbind();
         }
         getActivity().stopService(new Intent(getContext(), TransportRoutesService.class));
-    }
-
-    @Override
-    public void showDialogError() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-        builder.setTitle(R.string.dialog_error_internet_title);
-        builder.setMessage(R.string.dialog_error_internet_message);
-        builder.setIcon(R.drawable.common_google_signin_btn_icon_dark_focused);
-        builder.setPositiveButton(R.string.dialog_error_internet_positive_button, (dialog, which) -> {
-        });
-        builder.setNegativeButton(R.string.dialog_error_internet_negative_button, (dialog, which) -> {
-            getActivity().onBackPressed();
-        });
-        AlertDialog dialog = builder.create();
-        dialog.show();
     }
 
     @Override
@@ -225,6 +197,8 @@ public class MapsFragmentImpl extends Fragment implements MapsFragment, OnMapRea
             }
         });
         tabLayout.setupWithViewPager(viewPager);
+
+        BottomSheetUtils.setupViewPager(viewPager);
     }
 
     private void setDefaultCameraPosition() {
