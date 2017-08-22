@@ -36,6 +36,7 @@ import com.provectus.public_transport.view.fragment.mapfragment.MapsFragmentPres
 import java.util.List;
 import java.util.Random;
 
+import biz.laenger.android.vpbs.BottomSheetUtils;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
@@ -89,8 +90,6 @@ public class MapsFragmentImpl extends Fragment implements MapsFragment, OnMapRea
         SupportMapFragment mapFragment = (SupportMapFragment) getChildFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
-        View bottomSheet = view.findViewById(R.id.bottom_sheet);
-        BottomSheetBehavior.from(bottomSheet);
         initViewPager();
         setIconInTabLayout();
         getActivity().startService(new Intent(getContext(), TransportRoutesService.class));
@@ -198,6 +197,7 @@ public class MapsFragmentImpl extends Fragment implements MapsFragment, OnMapRea
             }
         });
         tabLayout.setupWithViewPager(viewPager);
+        BottomSheetUtils.setupViewPager(viewPager);
     }
 
     private void setDefaultCameraPosition() {
