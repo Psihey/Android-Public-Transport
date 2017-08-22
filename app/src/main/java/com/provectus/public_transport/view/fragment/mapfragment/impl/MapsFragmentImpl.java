@@ -197,6 +197,7 @@ public class MapsFragmentImpl extends Fragment implements MapsFragment, OnMapRea
             }
         });
         tabLayout.setupWithViewPager(viewPager);
+
         BottomSheetUtils.setupViewPager(viewPager);
     }
 
