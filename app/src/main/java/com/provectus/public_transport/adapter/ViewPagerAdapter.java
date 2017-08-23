@@ -1,11 +1,11 @@
-package com.provectus.public_transport.view.adapter;
+package com.provectus.public_transport.adapter;
 
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 
 import com.provectus.public_transport.model.TransportType;
-import com.provectus.public_transport.view.fragment.mapfragment.RoutesTabFragment;
+import com.provectus.public_transport.fragment.mapfragment.RoutesTabFragment;
 
 /**
  * Created by Evgeniy on 8/17/2017.

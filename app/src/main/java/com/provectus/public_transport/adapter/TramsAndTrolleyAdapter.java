@@ -1,4 +1,4 @@
-package com.provectus.public_transport.view.adapter;
+package com.provectus.public_transport.adapter;
 
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;

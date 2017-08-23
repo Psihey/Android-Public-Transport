@@ -1,4 +1,4 @@
-package com.provectus.public_transport.view.fragment.mapfragment;
+package com.provectus.public_transport.fragment.mapfragment;
 
 
 
@@ -18,11 +18,5 @@ public interface MapsFragmentPresenter {
      * A method which unbinds a view to a presenter.
      */
     void unbindView();
-
-    /**
-     * The method change icon in TabLayout
-     * @param newPosition new position in TabLayout
-     */
-    void changeViewPager (int newPosition);
 
 }

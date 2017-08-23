@@ -1,4 +1,4 @@
-package com.provectus.public_transport.view.fragment.mapfragment;
+package com.provectus.public_transport.fragment.mapfragment;
 
 import android.app.Activity;
 import android.content.Context;
@@ -16,7 +16,7 @@ import com.provectus.public_transport.R;
 import com.provectus.public_transport.eventbus.BusEvents;
 import com.provectus.public_transport.model.TransportRoutes;
 import com.provectus.public_transport.model.TransportType;
-import com.provectus.public_transport.view.adapter.TramsAndTrolleyAdapter;
+import com.provectus.public_transport.adapter.TramsAndTrolleyAdapter;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;

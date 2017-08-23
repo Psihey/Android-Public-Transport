@@ -14,12 +14,12 @@
 
 
     <android.support.v4.view.ViewPager
-        android:id="@+id/view_pager"
+        android:id="@+id/bottom_sheet_view_pager"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
         <android.support.design.widget.TabLayout
-            android:id="@+id/tab_layout"
+            android:id="@+id/bottom_sheet_tab_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="top"

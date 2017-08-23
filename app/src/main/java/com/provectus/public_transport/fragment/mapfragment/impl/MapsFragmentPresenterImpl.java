@@ -1,4 +1,4 @@
-package com.provectus.public_transport.view.fragment.mapfragment.impl;
+package com.provectus.public_transport.fragment.mapfragment.impl;
 
 
 import com.google.android.gms.maps.model.LatLng;
@@ -7,13 +7,12 @@ import com.provectus.public_transport.eventbus.BusEvents;
 import com.provectus.public_transport.model.Point;
 import com.provectus.public_transport.model.Segment;
 import com.provectus.public_transport.model.TransportRoutes;
-import com.provectus.public_transport.model.TransportType;
 import com.provectus.public_transport.persistence.database.DatabaseHelper;
 import com.provectus.public_transport.persistence.entity.PointEntity;
 import com.provectus.public_transport.persistence.entity.SegmentEntity;
 import com.provectus.public_transport.persistence.entity.TransportEntity;
-import com.provectus.public_transport.view.fragment.mapfragment.MapsFragment;
-import com.provectus.public_transport.view.fragment.mapfragment.MapsFragmentPresenter;
+import com.provectus.public_transport.fragment.mapfragment.MapsFragment;
+import com.provectus.public_transport.fragment.mapfragment.MapsFragmentPresenter;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -46,11 +45,6 @@ public class MapsFragmentPresenterImpl implements MapsFragmentPresenter {
         this.mMapsFragment = null;
         EventBus.getDefault().unregister(this);
         Logger.d("Maps is unbind from presenter");
-    }
-
-    @Override
-    public void changeViewPager(int newPosition) {
-        mMapsFragment.changeIconInTabLayout(newPosition);
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
