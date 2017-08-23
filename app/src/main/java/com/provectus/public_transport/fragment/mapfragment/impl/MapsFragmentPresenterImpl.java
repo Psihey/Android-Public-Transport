@@ -4,6 +4,8 @@ package com.provectus.public_transport.fragment.mapfragment.impl;
 import com.google.android.gms.maps.model.LatLng;
 import com.orhanobut.logger.Logger;
 import com.provectus.public_transport.eventbus.BusEvents;
+import com.provectus.public_transport.fragment.mapfragment.MapsFragment;
+import com.provectus.public_transport.fragment.mapfragment.MapsFragmentPresenter;
 import com.provectus.public_transport.model.Point;
 import com.provectus.public_transport.model.Segment;
 import com.provectus.public_transport.model.TransportRoutes;
@@ -11,8 +13,6 @@ import com.provectus.public_transport.persistence.database.DatabaseHelper;
 import com.provectus.public_transport.persistence.entity.PointEntity;
 import com.provectus.public_transport.persistence.entity.SegmentEntity;
 import com.provectus.public_transport.persistence.entity.TransportEntity;
-import com.provectus.public_transport.fragment.mapfragment.MapsFragment;
-import com.provectus.public_transport.fragment.mapfragment.MapsFragmentPresenter;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -117,8 +117,9 @@ public class MapsFragmentPresenterImpl implements MapsFragmentPresenter {
         if (first != null) {
             listDirection2.add(first);
         }
-        listDirection1.addAll(listDirection2);
-        return listDirection1;
+        List<LatLng> listRes = new ArrayList<>(listDirection1);
+        listRes.addAll(listDirection2);
+        return listRes;
     }
 
 }

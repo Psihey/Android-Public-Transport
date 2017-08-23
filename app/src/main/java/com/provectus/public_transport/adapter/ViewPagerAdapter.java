@@ -4,8 +4,8 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 
+import com.provectus.public_transport.fragment.mapfragment.impl.RoutesTabFragmentImpl;
 import com.provectus.public_transport.model.TransportType;
-import com.provectus.public_transport.fragment.mapfragment.RoutesTabFragment;
 
 /**
  * Created by Evgeniy on 8/17/2017.
@@ -21,9 +21,9 @@ public class ViewPagerAdapter extends FragmentPagerAdapter {
 
     public ViewPagerAdapter(FragmentManager fm) {
         super(fm);
-        fragments[POSITION_BUS] = RoutesTabFragment.newInstance(TransportType.TROLLEYBUSES_TYPE);
-        fragments[POSITION_TRAM] = RoutesTabFragment.newInstance(TransportType.TRAM_TYPE);
-        fragments[POSITION_PARKING] = RoutesTabFragment.newInstance(TransportType.PARKING_TYPE);
+        fragments[POSITION_BUS] = RoutesTabFragmentImpl.newInstance(TransportType.TROLLEYBUSES_TYPE);
+        fragments[POSITION_TRAM] = RoutesTabFragmentImpl.newInstance(TransportType.TRAM_TYPE);
+        fragments[POSITION_PARKING] = RoutesTabFragmentImpl.newInstance(TransportType.PARKING_TYPE);
     }
 
     @Override
