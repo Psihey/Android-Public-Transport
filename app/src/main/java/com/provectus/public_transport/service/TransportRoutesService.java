@@ -31,7 +31,7 @@ import io.reactivex.schedulers.Schedulers;
 /**
  * Created by Psihey on 20.08.2017.
  */
-
+// TODO: 23.08.17 Use intent service
 public class TransportRoutesService extends Service {
 
     private CompositeDisposable mCompositeDisposable;
@@ -67,6 +67,7 @@ public class TransportRoutesService extends Service {
         Logger.d("Service is Destroyed");
     }
 
+    // TODO: 23.08.17 Remove schedule
     private void getRoutesFromServer() {
         mCompositeDisposable.add(RetrofitProvider
                 .getRetrofit().getAllRoutes()
@@ -79,6 +80,7 @@ public class TransportRoutesService extends Service {
     private void handleResponse(List<TransportRoutes> transportRoutes) {
         Logger.d("All Ok, we got responce");
 
+        // TODO: 23.08.17 User server side IDs
         int transportId = 1;
         int segmentId = 1;
         for (TransportRoutes currentRoutes : transportRoutes) {
@@ -115,6 +117,7 @@ public class TransportRoutesService extends Service {
                 .subscribe(this::getFromDB);
     }
 
+    // TODO: 23.08.17 Do not update DB, just clean it
     private void getFromDB(List<TransportEntity> transportEntities) {
         if (transportEntities.isEmpty()) {
             Completable.defer(() -> Completable.fromCallable(this::putToDB))
@@ -147,6 +150,7 @@ public class TransportRoutesService extends Service {
 
     private void handleError(Throwable throwable) {
         Logger.d("Handle Error from when fetching data" + throwable.getMessage());
+        // TODO: 23.08.17 send event about error
     }
 
     private boolean putToDB() {

@@ -19,6 +19,7 @@ public class MainActivity extends AppCompatActivity {
                 new MapsFragmentImpl(), TagFragmentConst.MAP_FRAGMENT).commit();
     }
 
+    // TODO: 23.08.17 Use styles
     private void setUpToolbar() {
         if (getSupportActionBar()!= null && getSupportActionBar().isShowing()) getSupportActionBar().hide();
     }

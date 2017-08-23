@@ -88,6 +88,8 @@ public class MapsFragmentPresenterImpl implements MapsFragmentPresenter {
     private void getPoints(List<PointEntity> pointEntities) {
     }
 
+    // TODO: 23.08.17 Use Rx
+    @Deprecated
     private List<LatLng> sortedRoutesSegment(TransportRoutes transportRoutes) {
         List<LatLng> listDirection1 = new ArrayList<>();
         List<LatLng> listDirection2 = new ArrayList<>();
