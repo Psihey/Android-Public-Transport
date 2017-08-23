@@ -47,6 +47,7 @@ import butterknife.Unbinder;
 
 public class MapsFragmentImpl extends Fragment implements MapsFragment, OnMapReadyCallback {
 
+    // TODO: 23.08.17 Move and rename it
     private static final Double LAT_1 = 46.348612;
     private static final Double LNG_1 = 30.671341;
     private static final Double LAT_2 = 46.499907;
@@ -66,6 +67,7 @@ public class MapsFragmentImpl extends Fragment implements MapsFragment, OnMapRea
 
     private boolean isMapReady;
 
+    // TODO: 23.08.17 Remove it
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
@@ -74,6 +76,7 @@ public class MapsFragmentImpl extends Fragment implements MapsFragment, OnMapRea
         }
     }
 
+    // TODO: 23.08.17 Remove it
     @SuppressWarnings("deprecation")
     @Override
     public void onAttach(Activity activity) {
@@ -161,6 +164,7 @@ public class MapsFragmentImpl extends Fragment implements MapsFragment, OnMapRea
         setRoutesOnMap(sortedRoutes);
     }
 
+    // TODO: 23.08.17 Remove it
     protected void onAttachToContext(Context context) {
         Context mContext = context;
     }
@@ -173,6 +177,7 @@ public class MapsFragmentImpl extends Fragment implements MapsFragment, OnMapRea
         polyline.setWidth(3);
     }
 
+    // TODO: 23.08.17 Move to Utils class
     private int getRandomColor() {
         Random rnd = new Random();
         return Color.argb(255, rnd.nextInt(256), rnd.nextInt(256), rnd.nextInt(256));
@@ -198,6 +203,7 @@ public class MapsFragmentImpl extends Fragment implements MapsFragment, OnMapRea
         });
         tabLayout.setupWithViewPager(viewPager);
 
+
         BottomSheetUtils.setupViewPager(viewPager);
     }
 
@@ -209,10 +215,12 @@ public class MapsFragmentImpl extends Fragment implements MapsFragment, OnMapRea
         });
     }
 
+    // TODO: 23.08.17 Rename it
     private void settingsUI() {
         UiSettings settings = mMap.getUiSettings();
         if (ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
                 && ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            // TODO: 23.08.17 Implement it
             return;
         }
         mMap.setMyLocationEnabled(true);

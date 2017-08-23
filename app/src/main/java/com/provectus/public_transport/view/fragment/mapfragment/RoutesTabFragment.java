@@ -35,6 +35,7 @@ import butterknife.Unbinder;
 
 public class RoutesTabFragment extends Fragment {
 
+    // TODO: 23.08.17 Rename
     public static final String POSITION_PAR = "pos_par";
 
     @BindView(R.id.recycler_view_routes)
@@ -42,12 +43,14 @@ public class RoutesTabFragment extends Fragment {
     @BindView(R.id.tv_tab_fragment_no_data)
     TextView tvNoData;
 
+    // TODO: 23.08.17 Move to local
     private View view;
     private TramsAndTrolleyAdapter adapter;
     private TransportType mType;
 
     private Unbinder mUnbinder;
 
+    // TODO: 23.08.17 Use adapter
     private List<TransportRoutes> myRoutes;
 
     public static RoutesTabFragment newInstance(TransportType transportType) {
