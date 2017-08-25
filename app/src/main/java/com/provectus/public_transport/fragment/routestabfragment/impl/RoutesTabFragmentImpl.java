@@ -1,4 +1,4 @@
-package com.provectus.public_transport.fragment.mapfragment.impl;
+package com.provectus.public_transport.fragment.routestabfragment.impl;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -11,12 +11,11 @@ import android.widget.TextView;
 
 import com.provectus.public_transport.R;
 import com.provectus.public_transport.adapter.TramsAndTrolleyAdapter;
-import com.provectus.public_transport.fragment.mapfragment.RoutesTabFragment;
+import com.provectus.public_transport.fragment.routestabfragment.RoutesTabFragment;
+import com.provectus.public_transport.model.TransportEntity;
 import com.provectus.public_transport.model.TransportType;
 
-import org.greenrobot.eventbus.EventBus;
-
-import java.util.ArrayList;
+import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -28,12 +27,13 @@ import butterknife.Unbinder;
 
 public class RoutesTabFragmentImpl extends Fragment implements RoutesTabFragment {
 
-    private static final String TRANSPORT_TYPE = "transport_type";
+    private static final String BUNDLE_TRANSPORT_TYPE = "transport_type";
 
     @BindView(R.id.recycler_view_routes)
     RecyclerView mRoutesRecyclerView;
+
     @BindView(R.id.tv_tab_fragment_no_data)
-    TextView textViewNoData;
+    TextView tvNoData;
 
     private RoutesTabFragmentPresenterImpl mTabFragmentPresenter;
     private TramsAndTrolleyAdapter mAdapter;
@@ -44,18 +44,16 @@ public class RoutesTabFragmentImpl extends Fragment implements RoutesTabFragment
     public static RoutesTabFragmentImpl newInstance(TransportType transportType) {
         RoutesTabFragmentImpl routesTabFragmentImpl = new RoutesTabFragmentImpl();
         Bundle bundle = new Bundle();
-        bundle.putSerializable(TRANSPORT_TYPE, transportType);
+        bundle.putSerializable(BUNDLE_TRANSPORT_TYPE, transportType);
         routesTabFragmentImpl.setArguments(bundle);
         return routesTabFragmentImpl;
     }
-
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.tab_fragment, container, false);
         mUnbinder = ButterKnife.bind(this, view);
-        mType = (TransportType) getArguments().get(TRANSPORT_TYPE);
-        initRecyclerView();
+        mType = (TransportType) getArguments().get(BUNDLE_TRANSPORT_TYPE);
         return view;
     }
 
@@ -66,6 +64,7 @@ public class RoutesTabFragmentImpl extends Fragment implements RoutesTabFragment
             mTabFragmentPresenter = new RoutesTabFragmentPresenterImpl();
         }
         mTabFragmentPresenter.bindView(this);
+        mTabFragmentPresenter.setTransportType(mType);
     }
 
     @Override
@@ -82,10 +81,12 @@ public class RoutesTabFragmentImpl extends Fragment implements RoutesTabFragment
         }
     }
 
-    private void initRecyclerView() {
+    @Override
+    public void initRecyclerView(List<TransportEntity> transportEntity) {
         mRoutesRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-        mAdapter = new TramsAndTrolleyAdapter(new ArrayList<>());
+        mAdapter = new TramsAndTrolleyAdapter(transportEntity);
         mRoutesRecyclerView.setAdapter(mAdapter);
+        tvNoData.setVisibility(View.GONE);
     }
 
 }

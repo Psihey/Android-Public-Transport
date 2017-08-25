@@ -3,26 +3,17 @@ package com.provectus.public_transport.fragment.mapfragment.impl;
 
 import com.google.android.gms.maps.model.LatLng;
 import com.orhanobut.logger.Logger;
-import com.provectus.public_transport.eventbus.BusEvents;
 import com.provectus.public_transport.fragment.mapfragment.MapsFragment;
 import com.provectus.public_transport.fragment.mapfragment.MapsFragmentPresenter;
-import com.provectus.public_transport.model.Point;
-import com.provectus.public_transport.model.Segment;
-import com.provectus.public_transport.model.TransportRoutes;
+import com.provectus.public_transport.model.PointEntity;
+import com.provectus.public_transport.model.SegmentEntity;
+import com.provectus.public_transport.model.TransportEntity;
 import com.provectus.public_transport.persistence.database.DatabaseHelper;
-import com.provectus.public_transport.persistence.entity.PointEntity;
-import com.provectus.public_transport.persistence.entity.SegmentEntity;
-import com.provectus.public_transport.persistence.entity.TransportEntity;
-
-import org.greenrobot.eventbus.EventBus;
-import org.greenrobot.eventbus.Subscribe;
-import org.greenrobot.eventbus.ThreadMode;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import io.reactivex.android.schedulers.AndroidSchedulers;
-import io.reactivex.schedulers.Schedulers;
 
 
 /**
@@ -32,67 +23,40 @@ import io.reactivex.schedulers.Schedulers;
 public class MapsFragmentPresenterImpl implements MapsFragmentPresenter {
 
     private MapsFragment mMapsFragment;
-
+    private List<SegmentEntity> mTransportEntity = new ArrayList<>();
     @Override
     public void bindView(MapsFragment mapsFragment) {
         this.mMapsFragment = mapsFragment;
-        EventBus.getDefault().register(this);
         Logger.d("Maps is binded to its presenter.");
+        DatabaseHelper.getPublicTransportDatabase().transportDao().get28Tram()
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(this::getTransportFromDB);
+    }
+
+    private void getTransportFromDB(List<TransportEntity> transportEntities) {
+        for (TransportEntity current:transportEntities
+             ) {
+            System.out.println(current);
+        }
     }
 
     @Override
     public void unbindView() {
         this.mMapsFragment = null;
-        EventBus.getDefault().unregister(this);
         Logger.d("Maps is unbind from presenter");
-    }
-
-    @Subscribe(threadMode = ThreadMode.MAIN)
-    public void getAllRoutes(BusEvents.SendRoutesEvent routesEvent) {
-        Logger.d("We got message from Event Bus with all routes ");
-        List<TransportRoutes> routes = routesEvent.getTransportRoutes();
-        for (int i = 0; i < routes.size(); i++) {
-            List<LatLng> sortedRoutes = sortedRoutesSegment(routes.get(i));
-            mMapsFragment.drawRotes(sortedRoutes);
-        }
-
-        DatabaseHelper.getPublicTransportDatabase().transportDao().getAllTransport()
-                .subscribeOn(Schedulers.io()).
-                observeOn(AndroidSchedulers.mainThread())
-                .subscribe(this::getTransportFromDB);
-        DatabaseHelper.getPublicTransportDatabase().segmentDao().getAllSegment()
-                .subscribeOn(Schedulers.io()).
-                observeOn(AndroidSchedulers.mainThread())
-                .subscribe(this::getSegmentFromDB);
-        DatabaseHelper.getPublicTransportDatabase().pointDao().getAllPoint()
-                .subscribeOn(Schedulers.io()).
-                observeOn(AndroidSchedulers.mainThread())
-                .subscribe(this::getPoints);
-
-    }
-
-    private void getTransportFromDB(List<TransportEntity> transportEntities) {
-        Logger.d(transportEntities);
-    }
-
-    private void getSegmentFromDB(List<SegmentEntity> segmentEntities) {
-        Logger.d(segmentEntities);
-    }
-
-    private void getPoints(List<PointEntity> pointEntities) {
     }
 
     // TODO: 23.08.17 Use Rx
     @Deprecated
-    private List<LatLng> sortedRoutesSegment(TransportRoutes transportRoutes) {
+    private List<LatLng> sortedRoutesSegment(TransportEntity transportRoutes) {
         List<LatLng> listDirection1 = new ArrayList<>();
         List<LatLng> listDirection2 = new ArrayList<>();
         LatLng first = null;
         double lat = 0.0;
         double lng = 0.0;
-        List<Segment> listSegment = transportRoutes.getSegment();
+        List<SegmentEntity> listSegment = transportRoutes.getSegments();
         for (int j = 0; j < listSegment.size(); j++) {
-            List<Point> pointList = listSegment.get(j).getPoints();
+            List<PointEntity> pointList = listSegment.get(j).getPoints();
             for (int r = 0; r < pointList.size(); r++) {
                 lat = pointList.get(r).getLatitude();
                 lng = pointList.get(r).getLongitude();

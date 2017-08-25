@@ -4,14 +4,14 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 
-import com.provectus.public_transport.fragment.mapfragment.impl.RoutesTabFragmentImpl;
+import com.provectus.public_transport.fragment.routestabfragment.impl.RoutesTabFragmentImpl;
 import com.provectus.public_transport.model.TransportType;
 
 /**
  * Created by Evgeniy on 8/17/2017.
  */
 
-public class ViewPagerAdapter extends FragmentPagerAdapter {
+public class TransportAndParkingViewPagerAdapter extends FragmentPagerAdapter {
 
     public static final int POSITION_BUS = 0;
     public static final int POSITION_TRAM = 1;
@@ -19,7 +19,7 @@ public class ViewPagerAdapter extends FragmentPagerAdapter {
 
     private final Fragment[] fragments = new Fragment[3];
 
-    public ViewPagerAdapter(FragmentManager fm) {
+    public TransportAndParkingViewPagerAdapter(FragmentManager fm) {
         super(fm);
         fragments[POSITION_BUS] = RoutesTabFragmentImpl.newInstance(TransportType.TROLLEYBUSES_TYPE);
         fragments[POSITION_TRAM] = RoutesTabFragmentImpl.newInstance(TransportType.TRAM_TYPE);

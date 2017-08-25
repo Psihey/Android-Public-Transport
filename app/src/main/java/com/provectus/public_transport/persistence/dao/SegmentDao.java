@@ -6,7 +6,7 @@ import android.arch.persistence.room.Insert;
 import android.arch.persistence.room.Query;
 import android.arch.persistence.room.Update;
 
-import com.provectus.public_transport.persistence.entity.SegmentEntity;
+import com.provectus.public_transport.model.SegmentEntity;
 
 import java.util.List;
 

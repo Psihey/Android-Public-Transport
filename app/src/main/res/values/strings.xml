@@ -1,13 +1,13 @@
 <resources>
     <string name="app_name">Public Transport</string>
 
-
     <string name="google_maps_key" templateMergeStrategy="preserve" translatable="false">AIzaSyB10fEtMfKAhzVjbG4aVfJrikoM2n6PehU</string>
     <string name="dialog_error_internet_title">Oops ,something going in wrong way</string>
     <string name="dialog_error_internet_message">Please check your internet connection</string>
     <string name="dialog_error_internet_positive_button">Retry</string>
     <string name="dialog_error_internet_negative_button">Close</string>
-    <string name="progrees_dialog_network_title">Network Working</string>
-    <string name="progrees_dialog_network_message">Please wait some seconds! fetching data from the server</string>
-    <string name="no_data">The data is loading ..</string>
+    <string name="progress_dialog_network_title">Network Working</string>
+    <string name="progress_dialog_network_message">Please wait some seconds! fetching data from the server</string>
+    <string name="text_view_tab_fragment_no_data">The data is loading ..</string>
+
 </resources>

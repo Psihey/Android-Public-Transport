@@ -1,7 +1,6 @@
 package com.provectus.public_transport.fragment.mapfragment.impl;
 
 import android.Manifest;
-import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -24,10 +23,9 @@ import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.provectus.public_transport.R;
-import com.provectus.public_transport.adapter.ViewPagerAdapter;
+import com.provectus.public_transport.adapter.TransportAndParkingViewPagerAdapter;
 import com.provectus.public_transport.fragment.mapfragment.MapsFragment;
 import com.provectus.public_transport.fragment.mapfragment.MapsFragmentPresenter;
-import com.provectus.public_transport.service.TransportRoutesService;
 import com.provectus.public_transport.utils.Const;
 
 import java.util.List;
@@ -48,14 +46,14 @@ public class MapsFragmentImpl extends Fragment implements MapsFragment, OnMapRea
     private static final int REQUEST_LOCATION_PERMISSIONS = 1;
 
     @BindView(R.id.bottom_sheet_view_pager)
-    ViewPager mViewPager;
+    ViewPager mViewPagerTransportAndParking;
 
     @BindView(R.id.bottom_sheet_tab_layout)
     TabLayout mBottomSheetTabLayout;
 
     private MapsFragmentPresenter mMapsPresenter;
     private Unbinder mUnbinder;
-    private ViewPagerAdapter mPagerAdapter;
+    private TransportAndParkingViewPagerAdapter mPagerAdapter;
     private GoogleMap mMap;
 
     private boolean isMapReady;
@@ -68,7 +66,6 @@ public class MapsFragmentImpl extends Fragment implements MapsFragment, OnMapRea
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
         initViewPager();
-        getActivity().startService(new Intent(getContext(), TransportRoutesService.class));
         return view;
     }
 
@@ -93,7 +90,6 @@ public class MapsFragmentImpl extends Fragment implements MapsFragment, OnMapRea
         if (mUnbinder != null) {
             mUnbinder.unbind();
         }
-        getActivity().stopService(new Intent(getContext(), TransportRoutesService.class));
     }
 
     @Override
@@ -129,10 +125,10 @@ public class MapsFragmentImpl extends Fragment implements MapsFragment, OnMapRea
     }
 
     private void initViewPager() {
-        mPagerAdapter = new ViewPagerAdapter(getFragmentManager());
-        mViewPager.setOffscreenPageLimit(3);
-        mViewPager.setAdapter(mPagerAdapter);
-        mViewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+        mPagerAdapter = new TransportAndParkingViewPagerAdapter(getFragmentManager());
+        mViewPagerTransportAndParking.setOffscreenPageLimit(3);
+        mViewPagerTransportAndParking.setAdapter(mPagerAdapter);
+        mViewPagerTransportAndParking.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override
             public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
             }
@@ -146,26 +142,26 @@ public class MapsFragmentImpl extends Fragment implements MapsFragment, OnMapRea
             public void onPageScrollStateChanged(int state) {
             }
         });
-        mBottomSheetTabLayout.setupWithViewPager(mViewPager);
-        mBottomSheetTabLayout.getTabAt(ViewPagerAdapter.POSITION_BUS).setIcon(R.drawable.ic_front_bus_blue);
-        mBottomSheetTabLayout.getTabAt(ViewPagerAdapter.POSITION_TRAM).setIcon(R.drawable.ic_tram_public_gray);
-        mBottomSheetTabLayout.getTabAt(ViewPagerAdapter.POSITION_PARKING).setIcon(R.drawable.ic_parking_gray);
-        BottomSheetUtils.setupViewPager(mViewPager);
+        mBottomSheetTabLayout.setupWithViewPager(mViewPagerTransportAndParking);
+        mBottomSheetTabLayout.getTabAt(TransportAndParkingViewPagerAdapter.POSITION_BUS).setIcon(R.drawable.ic_front_bus_blue);
+        mBottomSheetTabLayout.getTabAt(TransportAndParkingViewPagerAdapter.POSITION_TRAM).setIcon(R.drawable.ic_tram_public_gray);
+        mBottomSheetTabLayout.getTabAt(TransportAndParkingViewPagerAdapter.POSITION_PARKING).setIcon(R.drawable.ic_parking_gray);
+        BottomSheetUtils.setupViewPager(mViewPagerTransportAndParking);
     }
 
     public void changeIconInTabLayout(int position) {
-        mBottomSheetTabLayout.getTabAt(ViewPagerAdapter.POSITION_BUS).setIcon(R.drawable.ic_front_bus_gray);
-        mBottomSheetTabLayout.getTabAt(ViewPagerAdapter.POSITION_TRAM).setIcon(R.drawable.ic_tram_public_gray);
-        mBottomSheetTabLayout.getTabAt(ViewPagerAdapter.POSITION_PARKING).setIcon(R.drawable.ic_parking_gray);
+        mBottomSheetTabLayout.getTabAt(TransportAndParkingViewPagerAdapter.POSITION_BUS).setIcon(R.drawable.ic_front_bus_gray);
+        mBottomSheetTabLayout.getTabAt(TransportAndParkingViewPagerAdapter.POSITION_TRAM).setIcon(R.drawable.ic_tram_public_gray);
+        mBottomSheetTabLayout.getTabAt(TransportAndParkingViewPagerAdapter.POSITION_PARKING).setIcon(R.drawable.ic_parking_gray);
         switch (position) {
-            case ViewPagerAdapter.POSITION_BUS:
-                mBottomSheetTabLayout.getTabAt(ViewPagerAdapter.POSITION_BUS).setIcon(R.drawable.ic_front_bus_blue);
+            case TransportAndParkingViewPagerAdapter.POSITION_BUS:
+                mBottomSheetTabLayout.getTabAt(TransportAndParkingViewPagerAdapter.POSITION_BUS).setIcon(R.drawable.ic_front_bus_blue);
                 break;
-            case ViewPagerAdapter.POSITION_TRAM:
-                mBottomSheetTabLayout.getTabAt(ViewPagerAdapter.POSITION_TRAM).setIcon(R.drawable.ic_tram_public_blue);
+            case TransportAndParkingViewPagerAdapter.POSITION_TRAM:
+                mBottomSheetTabLayout.getTabAt(TransportAndParkingViewPagerAdapter.POSITION_TRAM).setIcon(R.drawable.ic_tram_public_blue);
                 break;
-            case ViewPagerAdapter.POSITION_PARKING:
-                mBottomSheetTabLayout.getTabAt(ViewPagerAdapter.POSITION_PARKING).setIcon(R.drawable.ic_parking_blue);
+            case TransportAndParkingViewPagerAdapter.POSITION_PARKING:
+                mBottomSheetTabLayout.getTabAt(TransportAndParkingViewPagerAdapter.POSITION_PARKING).setIcon(R.drawable.ic_parking_blue);
                 break;
         }
     }
@@ -173,7 +169,7 @@ public class MapsFragmentImpl extends Fragment implements MapsFragment, OnMapRea
     private void setDefaultCameraPosition() {
         mMap.setOnMapLoadedCallback(() -> {
             CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngBounds(new LatLngBounds
-                    (Const.DefCamPos.FIRST_POINTS, Const.DefCamPos.SECOND_POINTS), Const.DefCamPos.MARGE);
+                    (Const.DefaultCameraPosition.ODESSA_FIRST_POINTS, Const.DefaultCameraPosition.ODESSA_SECOND_POINTS), Const.DefaultCameraPosition.ZOOM_ON_MAP);
             mMap.animateCamera(cameraUpdate);
         });
     }

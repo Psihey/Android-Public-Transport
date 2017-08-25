@@ -11,11 +11,10 @@ public final class Const {
     private Const() {
     }
 
-    public static class DefCamPos {
-        public static final LatLng FIRST_POINTS = new LatLng(46.348612, 30.671341);
-        public static final LatLng SECOND_POINTS = new LatLng(46.499907, 30.781572);
-        public static final Integer MARGE = 30;
+   public interface DefaultCameraPosition {
+        LatLng ODESSA_FIRST_POINTS = new LatLng(46.348612, 30.671341);
+        LatLng ODESSA_SECOND_POINTS = new LatLng(46.499907, 30.781572);
+        Integer ZOOM_ON_MAP = 30;
     }
-
 
 }
