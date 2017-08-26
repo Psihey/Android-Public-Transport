@@ -23,7 +23,7 @@ public class RoutesTabFragmentPresenterImpl implements RoutesTabFragmentPresente
 
     @Override
     public void bindView(RoutesTabFragment routesTabFragment) {
-        this.mRoutesTabFragment = routesTabFragment;
+        mRoutesTabFragment = routesTabFragment;
     }
 
     @Override
@@ -52,7 +52,20 @@ public class RoutesTabFragmentPresenterImpl implements RoutesTabFragmentPresente
     }
 
     private void getTransportFromDB(List<TransportEntity> transportEntities) {
+        sortByRouteNumber(transportEntities);
         mRoutesTabFragment.initRecyclerView(transportEntities);
+    }
+
+    private void sortByRouteNumber(List<TransportEntity> transportEntities) {
+        Collections.sort(transportEntities, (t1, t2) -> {
+            int res = 0;
+            if (t1.getmNumber() > t2.getmNumber()) {
+                res = 1;
+            } else if (t1.getmNumber() < t2.getmNumber()) {
+                res = -1;
+            }
+            return res;
+        });
     }
 
 }

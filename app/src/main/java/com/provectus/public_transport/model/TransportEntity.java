@@ -19,59 +19,60 @@ public class TransportEntity {
     @PrimaryKey
     @SerializedName("id")
     @ColumnInfo(name = "transport_id")
-    private int serverId;
+    private int mServerId;
 
     @SerializedName("number")
     @ColumnInfo(name = "transport_number")
-    private int number;
+    private int mNumber;
 
     @SerializedName("type")
     @ColumnInfo(name = "transport_type")
     @TypeConverters({TransportType.class})
-    private TransportType type;
+    private TransportType mType;
 
     @SerializedName("distance")
     @ColumnInfo(name = "transport_distance")
-    private Double distance;
+    private Double mDistance;
 
     @SerializedName("segments")
     @Ignore
     private List<SegmentEntity> segments;
 
     public TransportEntity(int serverId, int number, TransportType type, Double distance) {
-        this.serverId = serverId;
-        this.number = number;
-        this.type = type;
-        this.distance = distance;
+        mServerId = serverId;
+        mNumber = number;
+        mType = type;
+        mDistance = distance;
     }
 
-    public int getServerId() {
-        return serverId;
+    public int getmServerId() {
+        return mServerId;
     }
 
-    public int getNumber() {
-        return number;
+    public int getmNumber() {
+        return mNumber;
     }
 
-    public Double getDistance() {
-        return distance;
+    public TransportType getmType() {
+        return mType;
     }
 
-    public TransportType getType() {
-        return type;
+    public Double getmDistance() {
+        return mDistance;
     }
 
     public List<SegmentEntity> getSegments() {
         return segments;
     }
 
+
     @Override
     public String toString() {
         return "TransportEntity{" +
-                "serverId=" + serverId +
-                ", number=" + number +
-                ", type=" + type +
-                ", distance=" + distance +
+                "mServerId=" + mServerId +
+                ", mNumber=" + mNumber +
+                ", mType=" + mType +
+                ", mDistance=" + mDistance +
                 ", segments=" + segments +
                 '}';
     }

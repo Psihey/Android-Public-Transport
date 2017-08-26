@@ -13,6 +13,7 @@ import com.provectus.public_transport.persistence.database.DatabaseHelper;
 import java.util.ArrayList;
 import java.util.List;
 
+import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 
 
@@ -27,7 +28,7 @@ public class MapsFragmentPresenterImpl implements MapsFragmentPresenter {
 
     @Override
     public void bindView(MapsFragment mapsFragment) {
-        this.mMapsFragment = mapsFragment;
+        mMapsFragment = mapsFragment;
         Logger.d("Maps is binded to its presenter.");
         DatabaseHelper.getPublicTransportDatabase().transportDao().get28Tram()
                 .observeOn(AndroidSchedulers.mainThread())
@@ -42,7 +43,7 @@ public class MapsFragmentPresenterImpl implements MapsFragmentPresenter {
 
     @Override
     public void unbindView() {
-        this.mMapsFragment = null;
+        mMapsFragment = null;
         Logger.d("Maps is unbind from presenter");
     }
 
@@ -86,4 +87,9 @@ public class MapsFragmentPresenterImpl implements MapsFragmentPresenter {
         return listRes;
     }
 
+    private void sotr(List<TransportEntity> transportEntityList) {
+        //Observable<List<TransportEntity>> query ();
+    }
 }
+
+

@@ -68,10 +68,10 @@ public class TransportRoutesService extends IntentService {
         Logger.d("All Ok, we got responce");
         if (response.body() != null) {
             for (TransportEntity currentRoutes : response.body()) {
-                TransportEntity currentTransportEntity = new TransportEntity(currentRoutes.getServerId(), currentRoutes.getNumber(), currentRoutes.getType(), currentRoutes.getDistance());
+                TransportEntity currentTransportEntity = new TransportEntity(currentRoutes.getmServerId(), currentRoutes.getNumber(), currentRoutes.getType(), currentRoutes.getDistance());
                 mTransportEntity.add(currentTransportEntity);
                 for (SegmentEntity currentSegment : currentRoutes.getSegments()) {
-                    SegmentEntity currentSegmentEntity = new SegmentEntity(currentSegment.getServerId(), currentSegment.getDirection(), currentSegment.getPosition(), currentTransportEntity.getServerId());
+                    SegmentEntity currentSegmentEntity = new SegmentEntity(currentSegment.getServerId(), currentSegment.getDirection(), currentSegment.getPosition(), currentTransportEntity.getmServerId());
                     mSegmentEntity.add(currentSegmentEntity);
                     for (PointEntity currentPoint : currentSegment.getPoints()) {
                         mPointEntity.add(new PointEntity(currentPoint.getLatitude(), currentPoint.getLongitude(), currentPoint.getPosition(), currentSegmentEntity.getServerId()));

@@ -43,6 +43,7 @@ import static com.provectus.public_transport.utils.Utils.getRandomColor;
 
 public class MapsFragmentImpl extends Fragment implements MapsFragment, OnMapReadyCallback {
 
+    public final static String TAG_MAP_FRAGMENT = "fragment_map";
     private static final int REQUEST_LOCATION_PERMISSIONS = 1;
 
     @BindView(R.id.bottom_sheet_view_pager)

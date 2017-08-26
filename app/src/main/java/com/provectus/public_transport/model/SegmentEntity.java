@@ -17,63 +17,64 @@ import java.util.List;
         foreignKeys = @ForeignKey(entity = TransportEntity.class,
                 parentColumns = "transport_id",
                 childColumns = "transport_id"))
-public class SegmentEntity  {
+public class SegmentEntity {
 
     @PrimaryKey
     @SerializedName("id")
     @ColumnInfo(name = "id")
-    private int serverId;
+    private int mServerId;
 
     @SerializedName("direction")
     @ColumnInfo(name = "segment_direction")
-    private int direction;
+    private int mDirection;
 
     @SerializedName("position")
     @ColumnInfo(name = "segment_position")
-    private int position;
+    private int mPosition;
 
     @ColumnInfo(name = "transport_id")
-    private long transportId;
+    private long mTransportId;
 
     @SerializedName("points")
     @Ignore
-    private List<PointEntity> points;
+    private List<PointEntity> mPoints;
 
     public SegmentEntity(int serverId, int direction, int position, long transportId) {
-        this.serverId = serverId;
-        this.direction = direction;
-        this.position = position;
-        this.transportId = transportId;
+        mServerId = serverId;
+        mDirection = direction;
+        mPosition = position;
+        mTransportId = transportId;
     }
 
-    public int getServerId() {
-        return serverId;
+
+    public int getmServerId() {
+        return mServerId;
     }
 
-    public int getDirection() {
-        return direction;
+    public int getmDirection() {
+        return mDirection;
     }
 
-    public int getPosition() {
-        return position;
+    public int getmPosition() {
+        return mPosition;
     }
 
-    public long getTransportId() {
-        return transportId;
+    public long getmTransportId() {
+        return mTransportId;
     }
 
-    public List<PointEntity> getPoints() {
-        return points;
+    public List<PointEntity> getmPoints() {
+        return mPoints;
     }
 
     @Override
     public String toString() {
         return "SegmentEntity{" +
-                "serverId=" + serverId +
-                ", direction=" + direction +
-                ", position=" + position +
-                ", transportId=" + transportId +
-                ", points=" + points +
+                "mServerId=" + mServerId +
+                ", mDirection=" + mDirection +
+                ", mPosition=" + mPosition +
+                ", mTransportId=" + mTransportId +
+                ", mPoints=" + mPoints +
                 '}';
     }
 }

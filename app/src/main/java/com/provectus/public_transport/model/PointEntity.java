@@ -7,6 +7,8 @@ import android.arch.persistence.room.PrimaryKey;
 
 import com.google.gson.annotations.SerializedName;
 
+import static android.R.attr.id;
+
 /**
  * Created by Psihey on 18.08.2017.
  */
@@ -17,62 +19,58 @@ import com.google.gson.annotations.SerializedName;
 public class PointEntity {
 
     @PrimaryKey(autoGenerate = true)
-    private int id;
+    private int mId;
 
     @SerializedName("lat")
     @ColumnInfo(name = "latitude")
-    private double latitude;
+    private double mLatitude;
 
     @SerializedName("lng")
     @ColumnInfo(name = "longitude")
-    private double longitude;
+    private double mLongitude;
 
     @SerializedName("position")
     @ColumnInfo(name = "point_position")
-    private int position;
+    private int mPosition;
 
     @ColumnInfo(name = "segment_id")
-    private long segmentId;
+    private long mSegmentId;
 
     public PointEntity(double latitude, double longitude, int position, long segmentId) {
-        this.latitude = latitude;
-        this.longitude = longitude;
-        this.position = position;
-        this.segmentId = segmentId;
+        mLatitude = latitude;
+        mLongitude = longitude;
+        mPosition = position;
+        mSegmentId = segmentId;
     }
 
-    public int getId() {
-        return id;
+    public int getmId() {
+        return mId;
     }
 
-    public double getLatitude() {
-        return latitude;
+    public double getmLatitude() {
+        return mLatitude;
     }
 
-    public double getLongitude() {
-        return longitude;
+    public double getmLongitude() {
+        return mLongitude;
     }
 
-    public int getPosition() {
-        return position;
+    public int getmPosition() {
+        return mPosition;
     }
 
-    public long getSegmentId() {
-        return segmentId;
-    }
-
-    public void setId(int id) {
-        this.id = id;
+    public long getmSegmentId() {
+        return mSegmentId;
     }
 
     @Override
     public String toString() {
         return "PointEntity{" +
                 "id=" + id +
-                ", latitude=" + latitude +
-                ", longitude=" + longitude +
-                ", position=" + position +
-                ", segmentId=" + segmentId +
+                ", mLatitude=" + mLatitude +
+                ", mLongitude=" + mLongitude +
+                ", mPosition=" + mPosition +
+                ", mSegmentId=" + mSegmentId +
                 '}';
     }
 }
