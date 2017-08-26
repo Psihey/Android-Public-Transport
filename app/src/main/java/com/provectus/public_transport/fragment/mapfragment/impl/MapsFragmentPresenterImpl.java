@@ -24,6 +24,7 @@ public class MapsFragmentPresenterImpl implements MapsFragmentPresenter {
 
     private MapsFragment mMapsFragment;
     private List<SegmentEntity> mTransportEntity = new ArrayList<>();
+
     @Override
     public void bindView(MapsFragment mapsFragment) {
         this.mMapsFragment = mapsFragment;
@@ -34,8 +35,7 @@ public class MapsFragmentPresenterImpl implements MapsFragmentPresenter {
     }
 
     private void getTransportFromDB(List<TransportEntity> transportEntities) {
-        for (TransportEntity current:transportEntities
-             ) {
+        for (TransportEntity current : transportEntities) {
             System.out.println(current);
         }
     }

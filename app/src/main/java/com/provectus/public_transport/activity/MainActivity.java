@@ -8,9 +8,11 @@ import com.provectus.public_transport.fragment.mapfragment.impl.MapsFragmentImpl
 import com.provectus.public_transport.R;
 import com.provectus.public_transport.service.TransportRoutesService;
 
+import static com.provectus.public_transport.utils.Const.TAG_MAP_FRAGMENT;
+
 public class MainActivity extends AppCompatActivity {
 
-    public final static String TAG_MAP_FRAGMENT = "fragment_map";
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

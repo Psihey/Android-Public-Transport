@@ -6,6 +6,7 @@ import com.provectus.public_transport.model.TransportEntity;
 import com.provectus.public_transport.model.TransportType;
 import com.provectus.public_transport.persistence.database.DatabaseHelper;
 
+import java.util.Collections;
 import java.util.List;
 
 import io.reactivex.android.schedulers.AndroidSchedulers;
@@ -33,10 +34,10 @@ public class RoutesTabFragmentPresenterImpl implements RoutesTabFragmentPresente
     @Override
     public void setTransportType(TransportType transportType) {
         mTransportType = transportType;
-        getDatafromDB();
+        getDataFromDB();
     }
 
-    private void getDatafromDB() {
+    private void getDataFromDB() {
         if (mTransportType == TransportType.TRAM_TYPE) {
             DatabaseHelper.getPublicTransportDatabase().transportDao().getAllTram()
                     .subscribeOn(Schedulers.io())
