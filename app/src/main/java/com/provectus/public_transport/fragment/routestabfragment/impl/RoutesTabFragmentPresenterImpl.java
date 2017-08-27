@@ -7,6 +7,7 @@ import com.provectus.public_transport.model.TransportType;
 import com.provectus.public_transport.persistence.database.DatabaseHelper;
 
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import io.reactivex.android.schedulers.AndroidSchedulers;
@@ -40,11 +41,19 @@ public class RoutesTabFragmentPresenterImpl implements RoutesTabFragmentPresente
     private void getDataFromDB() {
         if (mTransportType == TransportType.TRAM_TYPE) {
             DatabaseHelper.getPublicTransportDatabase().transportDao().getAllTram()
+                    .map(list -> {
+                        Collections.sort(list, sortByNumber);
+                        return list;
+                    })
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe(this::getTransportFromDB);
         } else if (mTransportType == TransportType.TROLLEYBUSES_TYPE) {
             DatabaseHelper.getPublicTransportDatabase().transportDao().getAllTrolleybuses()
+                    .map(list -> {
+                        Collections.sort(list, sortByNumber);
+                        return list;
+                    })
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe(this::getTransportFromDB);
@@ -52,20 +61,17 @@ public class RoutesTabFragmentPresenterImpl implements RoutesTabFragmentPresente
     }
 
     private void getTransportFromDB(List<TransportEntity> transportEntities) {
-        sortByRouteNumber(transportEntities);
         mRoutesTabFragment.initRecyclerView(transportEntities);
     }
 
-    private void sortByRouteNumber(List<TransportEntity> transportEntities) {
-        Collections.sort(transportEntities, (t1, t2) -> {
-            int res = 0;
-            if (t1.getNumber() > t2.getNumber()) {
-                res = 1;
-            } else if (t1.getNumber() < t2.getNumber()) {
-                res = -1;
-            }
-            return res;
-        });
-    }
+    private Comparator<TransportEntity> sortByNumber = (t1, t2) -> {
+        int res = 0;
+        if (t1.getNumber() > t2.getNumber()) {
+            res = 1;
+        } else if (t1.getNumber() < t2.getNumber()) {
+            res = -1;
+        }
+        return res;
+    };
 
 }

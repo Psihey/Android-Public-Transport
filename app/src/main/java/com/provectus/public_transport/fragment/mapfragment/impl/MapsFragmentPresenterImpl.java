@@ -30,14 +30,14 @@ public class MapsFragmentPresenterImpl implements MapsFragmentPresenter {
     public void bindView(MapsFragment mapsFragment) {
         mMapsFragment = mapsFragment;
         Logger.d("Maps is binded to its presenter.");
-        DatabaseHelper.getPublicTransportDatabase().transportDao().get28Tram()
+        DatabaseHelper.getPublicTransportDatabase().transportDao().getAllTransport()
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(this::getTransportFromDB);
     }
 
     private void getTransportFromDB(List<TransportEntity> transportEntities) {
         for (TransportEntity current : transportEntities) {
-            System.out.println(current);
+            //System.out.println(current);
         }
     }
 
