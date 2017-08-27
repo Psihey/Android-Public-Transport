@@ -8,6 +8,7 @@
     <string name="dialog_error_internet_negative_button">Close</string>
     <string name="progress_dialog_network_title">Network Working</string>
     <string name="progress_dialog_network_message">Please wait some seconds! fetching data from the server</string>
-    <string name="text_view_tab_fragment_no_data">The data is loading ..</string>
+    <string name="text_view_tab_fragment_no_data">Error, no data</string>
+    <string name="btn_update_name">Update</string>
 
 </resources>

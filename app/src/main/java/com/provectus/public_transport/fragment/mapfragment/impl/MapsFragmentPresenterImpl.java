@@ -36,7 +36,6 @@ public class MapsFragmentPresenterImpl implements MapsFragmentPresenter {
     }
 
     private void getTransportFromDB(List<TransportEntity> transportEntities) {
-
         for (TransportEntity current : transportEntities) {
             //System.out.println(current);
         }

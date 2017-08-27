@@ -15,8 +15,29 @@
         android:id="@+id/tv_tab_fragment_no_data"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/text_view_tab_fragment_no_data"
+        android:layout_centerHorizontal="true"
         android:layout_centerVertical="true"
-        android:layout_centerHorizontal="true" />
+        android:text="@string/text_view_tab_fragment_no_data"
+        android:textColor="@android:color/black"
+        android:visibility="gone" />
+
+    <Button
+        android:id="@+id/bottom_sheet_btn_update"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/tv_tab_fragment_no_data"
+        android:layout_centerHorizontal="true"
+        android:layout_centerVertical="true"
+        android:layout_marginTop="10dp"
+        android:background="@color/colorBottomSheet"
+        android:text="@string/btn_update_name"
+        android:visibility="gone" />
+
+    <ProgressBar
+        android:id="@+id/tab_fragment_progress_bar"
+        style="?android:attr/progressBarStyle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true" />
 
 </RelativeLayout>

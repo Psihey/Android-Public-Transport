@@ -1,5 +1,8 @@
 package com.provectus.public_transport.fragment.routestabfragment.impl;
 
+import android.app.ActivityManager;
+import android.content.Context;
+
 import com.provectus.public_transport.fragment.routestabfragment.RoutesTabFragment;
 import com.provectus.public_transport.fragment.routestabfragment.RoutesTabFragmentPresenter;
 import com.provectus.public_transport.model.TransportEntity;
@@ -61,7 +64,11 @@ public class RoutesTabFragmentPresenterImpl implements RoutesTabFragmentPresente
     }
 
     private void getTransportFromDB(List<TransportEntity> transportEntities) {
-        mRoutesTabFragment.initRecyclerView(transportEntities);
+        if (!transportEntities.isEmpty()){
+            mRoutesTabFragment.initRecyclerView(transportEntities);
+        }else {
+            mRoutesTabFragment.checkMyServiceRunning();
+        }
     }
 
     private Comparator<TransportEntity> sortByNumber = (t1, t2) -> {
@@ -73,5 +80,7 @@ public class RoutesTabFragmentPresenterImpl implements RoutesTabFragmentPresente
         }
         return res;
     };
+
+
 
 }
