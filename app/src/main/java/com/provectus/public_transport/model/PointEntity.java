@@ -43,23 +43,27 @@ public class PointEntity {
         mSegmentId = segmentId;
     }
 
-    public int getmId() {
+    public int getId() {
         return mId;
     }
 
-    public double getmLatitude() {
+    public void setId(int mId) {
+        this.mId = mId;
+    }
+
+    public double getLatitude() {
         return mLatitude;
     }
 
-    public double getmLongitude() {
+    public double getLongitude() {
         return mLongitude;
     }
 
-    public int getmPosition() {
+    public int getPosition() {
         return mPosition;
     }
 
-    public long getmSegmentId() {
+    public long getSegmentId() {
         return mSegmentId;
     }
 

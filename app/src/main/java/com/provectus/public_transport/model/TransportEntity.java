@@ -45,19 +45,19 @@ public class TransportEntity {
         mDistance = distance;
     }
 
-    public int getmServerId() {
+    public int getServerId() {
         return mServerId;
     }
 
-    public int getmNumber() {
+    public int getNumber() {
         return mNumber;
     }
 
-    public TransportType getmType() {
+    public TransportType getType() {
         return mType;
     }
 
-    public Double getmDistance() {
+    public Double getDistance() {
         return mDistance;
     }
 

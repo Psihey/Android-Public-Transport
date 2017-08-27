@@ -87,9 +87,6 @@ public class MapsFragmentPresenterImpl implements MapsFragmentPresenter {
         return listRes;
     }
 
-    private void sotr(List<TransportEntity> transportEntityList) {
-        //Observable<List<TransportEntity>> query ();
-    }
 }
 
 

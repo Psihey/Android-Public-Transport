@@ -59,9 +59,9 @@ public class RoutesTabFragmentPresenterImpl implements RoutesTabFragmentPresente
     private void sortByRouteNumber(List<TransportEntity> transportEntities) {
         Collections.sort(transportEntities, (t1, t2) -> {
             int res = 0;
-            if (t1.getmNumber() > t2.getmNumber()) {
+            if (t1.getNumber() > t2.getNumber()) {
                 res = 1;
-            } else if (t1.getmNumber() < t2.getmNumber()) {
+            } else if (t1.getNumber() < t2.getNumber()) {
                 res = -1;
             }
             return res;

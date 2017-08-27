@@ -47,23 +47,23 @@ public class SegmentEntity {
     }
 
 
-    public int getmServerId() {
+    public int getServerId() {
         return mServerId;
     }
 
-    public int getmDirection() {
+    public int getDirection() {
         return mDirection;
     }
 
-    public int getmPosition() {
+    public int getPosition() {
         return mPosition;
     }
 
-    public long getmTransportId() {
+    public long getTransportId() {
         return mTransportId;
     }
 
-    public List<PointEntity> getmPoints() {
+    public List<PointEntity> getPoints() {
         return mPoints;
     }
 
