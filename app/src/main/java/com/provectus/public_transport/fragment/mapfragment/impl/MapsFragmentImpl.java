@@ -18,8 +18,10 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.UiSettings;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
+import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.provectus.public_transport.R;
@@ -107,6 +109,15 @@ public class MapsFragmentImpl extends Fragment implements MapsFragment, OnMapRea
             return;
         }
         setRoutesOnMap(sortedRoutes);
+        drawStops(sortedRoutes);
+    }
+
+    public void drawStops(List<LatLng> listStops) {
+        for (int i = 0; i < listStops.size(); i++) {
+            mMap.addMarker(new MarkerOptions()
+                    .position(new LatLng(46.421419, 30.717963))
+                   .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_place_24dp)));
+        }
     }
 
     @Override
