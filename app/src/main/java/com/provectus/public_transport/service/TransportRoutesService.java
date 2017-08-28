@@ -34,7 +34,7 @@ public class TransportRoutesService extends IntentService {
     private List<PointEntity> mPointEntity = new ArrayList<>();
 
     public TransportRoutesService() {
-        super("TransportRoutesService");
+        super(TransportRoutesService.class.getName());
     }
 
     @Override

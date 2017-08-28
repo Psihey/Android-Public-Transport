@@ -20,7 +20,7 @@ public enum TransportType {
     PARKING_TYPE;
 
     @TypeConverter
-    public static TransportType fromTimestamp(String value) {
+    public static TransportType fromStringToTransportType(String value) {
         if (Objects.equals(value, "TRAM_TYPE")) {
             return TransportType.TRAM_TYPE;
         } else if (Objects.equals(value, "TROLLEYBUSES_TYPE")) {
@@ -30,7 +30,7 @@ public enum TransportType {
     }
 
     @TypeConverter
-    public static String dateToTimestamp(TransportType date) {
+    public static String transportTypeToString(TransportType date) {
         return date == null ? null : date.name();
     }
 }
