@@ -4,7 +4,6 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
-
     <android.support.v7.widget.RecyclerView
         android:id="@+id/recycler_view_routes"
         android:layout_width="match_parent"
@@ -16,7 +15,7 @@
         android:id="@+id/tv_tab_fragment_no_data"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/no_data"
+        android:text="@string/text_view_tab_fragment_no_data"
         android:layout_centerVertical="true"
         android:layout_centerHorizontal="true" />
 

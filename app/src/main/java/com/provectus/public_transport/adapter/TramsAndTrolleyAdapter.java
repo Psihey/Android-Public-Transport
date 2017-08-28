@@ -1,4 +1,4 @@
-package com.provectus.public_transport.view.adapter;
+package com.provectus.public_transport.adapter;
 
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -9,7 +9,7 @@ import android.widget.TextView;
 
 import com.orhanobut.logger.Logger;
 import com.provectus.public_transport.R;
-import com.provectus.public_transport.model.TransportRoutes;
+import com.provectus.public_transport.model.TransportEntity;
 
 import java.util.List;
 
@@ -22,9 +22,9 @@ import butterknife.ButterKnife;
  */
 
 public class TramsAndTrolleyAdapter extends RecyclerView.Adapter<TramsAndTrolleyAdapter.TramsAndTrolleyViewHolder> {
-    private List<TransportRoutes> mTransportRoutesData;
+    private List<TransportEntity> mTransportRoutesData;
 
-    public TramsAndTrolleyAdapter(List<TransportRoutes> data) {
+    public TramsAndTrolleyAdapter(List<TransportEntity> data) {
         this.mTransportRoutesData = data;
     }
 
@@ -37,7 +37,7 @@ public class TramsAndTrolleyAdapter extends RecyclerView.Adapter<TramsAndTrolley
 
     @Override
     public void onBindViewHolder(TramsAndTrolleyViewHolder holder, int position) {
-        final TransportRoutes transportRoutes = mTransportRoutesData.get(position);
+        final TransportEntity transportRoutes = mTransportRoutesData.get(position);
 
         switch (transportRoutes.getType()) {
             case TRAM_TYPE:

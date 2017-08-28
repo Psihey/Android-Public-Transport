@@ -6,7 +6,7 @@ import android.arch.persistence.room.Insert;
 import android.arch.persistence.room.Query;
 import android.arch.persistence.room.Update;
 
-import com.provectus.public_transport.persistence.entity.TransportEntity;
+import com.provectus.public_transport.model.TransportEntity;
 
 import java.util.List;
 
@@ -30,5 +30,12 @@ public interface TransportDao {
 
     @Update()
     void updateTransport(List<TransportEntity> transportEntity);
+
+    @Query("SELECT * FROM transports WHERE transport_type = 'TRAM_TYPE'")
+    Flowable<List<TransportEntity>> getAllTram();
+
+    @Query("SELECT * FROM transports WHERE transport_type = 'TROLLEYBUSES_TYPE'")
+    Flowable<List<TransportEntity>> getAllTrolleybuses();
+
 
 }
