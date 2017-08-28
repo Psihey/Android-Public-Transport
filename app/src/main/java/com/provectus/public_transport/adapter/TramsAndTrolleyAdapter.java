@@ -1,5 +1,6 @@
 package com.provectus.public_transport.adapter;
 
+import android.support.v7.widget.AppCompatCheckBox;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -9,7 +10,10 @@ import android.widget.TextView;
 
 import com.orhanobut.logger.Logger;
 import com.provectus.public_transport.R;
+import com.provectus.public_transport.eventbus.BusEvents;
 import com.provectus.public_transport.model.TransportEntity;
+
+import org.greenrobot.eventbus.EventBus;
 
 import java.util.List;
 
@@ -23,6 +27,7 @@ import butterknife.ButterKnife;
 
 public class TramsAndTrolleyAdapter extends RecyclerView.Adapter<TramsAndTrolleyAdapter.TramsAndTrolleyViewHolder> {
     private List<TransportEntity> mTransportRoutesData;
+
 
     public TramsAndTrolleyAdapter(List<TransportEntity> data) {
         this.mTransportRoutesData = data;
@@ -52,6 +57,7 @@ public class TramsAndTrolleyAdapter extends RecyclerView.Adapter<TramsAndTrolley
         }
 
         holder.tvRoutesNumber.setText(String.valueOf(mTransportRoutesData.get(position).getNumber()));
+        holder.checkBoxSelectRout.setOnClickListener(view -> EventBus.getDefault().post(new BusEvents.SendChosenRouter(mTransportRoutesData.get(position))));
     }
 
     @Override
@@ -64,6 +70,8 @@ public class TramsAndTrolleyAdapter extends RecyclerView.Adapter<TramsAndTrolley
         TextView tvRoutesNumber;
         @BindView(R.id.image_view_logo_transport)
         ImageView ivLogoTransport;
+        @BindView(R.id.checkbox_select_rout)
+        AppCompatCheckBox checkBoxSelectRout;
 
         TramsAndTrolleyViewHolder(View itemView) {
             super(itemView);

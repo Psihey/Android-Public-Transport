@@ -50,6 +50,12 @@ public class SegmentEntity {
         mTransportId = transportId;
     }
 
+    public SegmentEntity(int mDirection, int mPosition, List<PointEntity> mPoints) {
+        this.mDirection = mDirection;
+        this.mPosition = mPosition;
+        this.mPoints = mPoints;
+    }
+
     public int getServerId() {
         return mServerId;
     }

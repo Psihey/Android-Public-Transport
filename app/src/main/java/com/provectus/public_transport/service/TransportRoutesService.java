@@ -68,7 +68,9 @@ public class TransportRoutesService extends IntentService {
 
     private void handleResponse(Response<List<TransportEntity>> response) {
         Logger.d("All Ok, we got responce");
-        if (response.body() != null || response.code() == CODE_CHECK_FOR_UPDATE) {
+        if (response.code() == CODE_CHECK_FOR_UPDATE) {
+            Logger.d("We got 304 Code Data not modified");
+        } else {
             for (TransportEntity currentRoutes : response.body()) {
                 TransportEntity currentTransportEntity = new TransportEntity(currentRoutes.getServerId(),
                         currentRoutes.getNumber(),
@@ -134,7 +136,6 @@ public class TransportRoutesService extends IntentService {
                         throwable -> Logger.d(throwable.getMessage())
                 );
         Logger.d("Database is initialized");
-        EventBus.getDefault().post(new BusEvents.SendRoutesEvent());
     }
 
     private boolean putToDB() {
