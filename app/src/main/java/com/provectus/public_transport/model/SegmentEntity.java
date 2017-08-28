@@ -21,7 +21,7 @@ public class SegmentEntity {
 
     @PrimaryKey
     @SerializedName("id")
-    @ColumnInfo(name = "id")
+    @ColumnInfo(name = "segment_id")
     private int mServerId;
 
     @SerializedName("direction")
@@ -39,13 +39,16 @@ public class SegmentEntity {
     @Ignore
     private List<PointEntity> mPoints;
 
+    @SerializedName("stopping")
+    @Ignore
+    private StopEntity mStopEntity;
+
     public SegmentEntity(int serverId, int direction, int position, long transportId) {
         mServerId = serverId;
         mDirection = direction;
         mPosition = position;
         mTransportId = transportId;
     }
-
 
     public int getServerId() {
         return mServerId;
@@ -65,6 +68,10 @@ public class SegmentEntity {
 
     public List<PointEntity> getPoints() {
         return mPoints;
+    }
+
+    public StopEntity getStopEntity() {
+        return mStopEntity;
     }
 
     @Override

@@ -13,7 +13,6 @@ import com.provectus.public_transport.persistence.database.DatabaseHelper;
 import java.util.ArrayList;
 import java.util.List;
 
-import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 
 
@@ -30,14 +29,13 @@ public class MapsFragmentPresenterImpl implements MapsFragmentPresenter {
     public void bindView(MapsFragment mapsFragment) {
         mMapsFragment = mapsFragment;
         Logger.d("Maps is binded to its presenter.");
-        DatabaseHelper.getPublicTransportDatabase().transportDao().get28Tram()
+        DatabaseHelper.getPublicTransportDatabase().transportDao().getAllTransport()
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(this::getTransportFromDB);
     }
 
     private void getTransportFromDB(List<TransportEntity> transportEntities) {
         for (TransportEntity current : transportEntities) {
-            System.out.println(current);
         }
     }
 
