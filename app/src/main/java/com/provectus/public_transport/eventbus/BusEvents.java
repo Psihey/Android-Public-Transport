@@ -13,22 +13,21 @@ public class BusEvents {
         }
     }
 
-    public static class SendRoutesErrorEvent{
+    public static class SendRoutesErrorEvent {
         public SendRoutesErrorEvent() {
         }
     }
 
-    public static class SendChosenRouter{
-        private TransportEntity mTransportEntity;
+    public static class SendChosenRouter {
+        private TransportEntity mSelectRout;
 
-        public SendChosenRouter(TransportEntity mTransportEntity) {
-            this.mTransportEntity = mTransportEntity;
+        public SendChosenRouter(TransportEntity selectRout) {
+            this.mSelectRout = selectRout;
         }
 
-        public TransportEntity getmTransportEntity() {
-            return mTransportEntity;
+        public TransportEntity getSelectRout() {
+            return mSelectRout;
         }
     }
-
 
 }

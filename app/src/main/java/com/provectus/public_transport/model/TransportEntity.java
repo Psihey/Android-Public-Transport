@@ -69,10 +69,10 @@ public class TransportEntity {
     @Override
     public String toString() {
         return "TransportEntity{" +
-                "mServerId=" + mServerId +
-                ", mNumber=" + mNumber +
-                ", mType=" + mType +
-                ", mDistance=" + mDistance +
+                "ServerId=" + mServerId +
+                ", Number=" + mNumber +
+                ", Type=" + mType +
+                ", Distance=" + mDistance +
                 ", segments=" + segments +
                 '}';
     }

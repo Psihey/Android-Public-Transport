@@ -71,10 +71,10 @@ public class PointEntity {
     public String toString() {
         return "PointEntity{" +
                 "id=" + id +
-                ", mLatitude=" + mLatitude +
-                ", mLongitude=" + mLongitude +
-                ", mPosition=" + mPosition +
-                ", mSegmentId=" + mSegmentId +
+                ", Latitude=" + mLatitude +
+                ", Longitude=" + mLongitude +
+                ", Position=" + mPosition +
+                ", SegmentId=" + mSegmentId +
                 '}';
     }
 }

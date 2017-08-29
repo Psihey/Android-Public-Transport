@@ -50,10 +50,10 @@ public class SegmentEntity {
         mTransportId = transportId;
     }
 
-    public SegmentEntity(int mDirection, int mPosition, List<PointEntity> mPoints) {
-        this.mDirection = mDirection;
-        this.mPosition = mPosition;
-        this.mPoints = mPoints;
+    public SegmentEntity(int Direction, int Position, List<PointEntity> Points) {
+        this.mDirection = Direction;
+        this.mPosition = Position;
+        this.mPoints = Points;
     }
 
     public int getServerId() {
@@ -83,11 +83,11 @@ public class SegmentEntity {
     @Override
     public String toString() {
         return "SegmentEntity{" +
-                "mServerId=" + mServerId +
-                ", mDirection=" + mDirection +
-                ", mPosition=" + mPosition +
-                ", mTransportId=" + mTransportId +
-                ", mPoints=" + mPoints +
+                "ServerId=" + mServerId +
+                ", Direction=" + mDirection +
+                ", Position=" + mPosition +
+                ", TransportId=" + mTransportId +
+                ", Points=" + mPoints +
                 '}';
     }
 }

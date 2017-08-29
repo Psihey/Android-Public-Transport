@@ -27,9 +27,9 @@ import io.reactivex.android.schedulers.AndroidSchedulers;
 public class MapsFragmentPresenterImpl implements MapsFragmentPresenter {
 
     private MapsFragment mMapsFragment;
-    private List<SegmentEntity> mSegmentEntity = new ArrayList<>();
-    private List<PointEntity> mPointEntity = new ArrayList<>();
-    private List<SegmentEntity> finalData = new ArrayList<>();
+    private List<SegmentEntity> mSegmentsDataForCurrentRoute = new ArrayList<>();
+    private List<PointEntity> mPointsDataForCurrentRoute = new ArrayList<>();
+    private List<SegmentEntity> mSegmentsWithPointsForCurrentRoute = new ArrayList<>();
 
     @Override
     public void bindView(MapsFragment mapsFragment) {
@@ -47,23 +47,23 @@ public class MapsFragmentPresenterImpl implements MapsFragmentPresenter {
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onMessageEvent(BusEvents.SendChosenRouter event) {
-        finalData.clear();
-        mSegmentEntity.clear();
-        mPointEntity.clear();
-        switch (event.getmTransportEntity().getType()) {
+        mSegmentsWithPointsForCurrentRoute.clear();
+        mSegmentsDataForCurrentRoute.clear();
+        mPointsDataForCurrentRoute.clear();
+        switch (event.getSelectRout().getType()) {
             case TROLLEYBUSES_TYPE:
-                DatabaseHelper.getPublicTransportDatabase().transportDao().getSegmentForCurrentTrolley(event.getmTransportEntity().getNumber())
+                DatabaseHelper.getPublicTransportDatabase().transportDao().getSegmentForCurrentTrolley(event.getSelectRout().getNumber())
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribe(this::getSegmnetsTrolleyFromDB);
-                DatabaseHelper.getPublicTransportDatabase().transportDao().getPointsForCurrentTrolley(event.getmTransportEntity().getNumber())
+                DatabaseHelper.getPublicTransportDatabase().transportDao().getPointsForCurrentTrolley(event.getSelectRout().getNumber())
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribe(this::getPointsTrolleyFromDB);
                 break;
             case TRAM_TYPE:
-                DatabaseHelper.getPublicTransportDatabase().transportDao().getSegmentForCurrentTram(event.getmTransportEntity().getNumber())
+                DatabaseHelper.getPublicTransportDatabase().transportDao().getSegmentForCurrentTram(event.getSelectRout().getNumber())
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribe(this::getSegmentsTramFromDB);
-                DatabaseHelper.getPublicTransportDatabase().transportDao().getPointsForCurrentTram(event.getmTransportEntity().getNumber())
+                DatabaseHelper.getPublicTransportDatabase().transportDao().getPointsForCurrentTram(event.getSelectRout().getNumber())
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribe(this::getPointsTramFromDB);
         }
@@ -71,41 +71,41 @@ public class MapsFragmentPresenterImpl implements MapsFragmentPresenter {
 
     private void getSegmentsTramFromDB(List<SegmentEntity> transportEntities) {
         for (SegmentEntity current : transportEntities) {
-            mSegmentEntity.add(current);
+            mSegmentsDataForCurrentRoute.add(current);
         }
     }
 
     private void getSegmnetsTrolleyFromDB(List<SegmentEntity> transportEntities) {
         for (SegmentEntity current : transportEntities) {
-            mSegmentEntity.add(current);
+            mSegmentsDataForCurrentRoute.add(current);
         }
     }
 
     private void getPointsTramFromDB(List<PointEntity> transportEntities) {
         for (PointEntity current : transportEntities) {
-            mPointEntity.add(current);
+            mPointsDataForCurrentRoute.add(current);
         }
         connectPointsToSegments();
     }
 
     private void getPointsTrolleyFromDB(List<PointEntity> transportEntities) {
         for (PointEntity current : transportEntities) {
-            mPointEntity.add(current);
+            mPointsDataForCurrentRoute.add(current);
         }
         connectPointsToSegments();
     }
 
     private void connectPointsToSegments() {
-        for (SegmentEntity currentSegment : mSegmentEntity) {
+        for (SegmentEntity currentSegment : mSegmentsDataForCurrentRoute) {
             List<PointEntity> finals = new ArrayList<>();
-            for (PointEntity currentPoint : mPointEntity) {
+            for (PointEntity currentPoint : mPointsDataForCurrentRoute) {
                 if (currentSegment.getServerId() == currentPoint.getSegmentId()) {
                     finals.add(currentPoint);
                 }
             }
-            finalData.add(new SegmentEntity(currentSegment.getDirection(), currentSegment.getPosition(), finals));
+            mSegmentsWithPointsForCurrentRoute.add(new SegmentEntity(currentSegment.getDirection(), currentSegment.getPosition(), finals));
         }
-        mMapsFragment.drawRotes(sortedRoutesSegment(finalData));
+        mMapsFragment.drawRotes(sortedRoutesSegment(mSegmentsWithPointsForCurrentRoute));
 
     }
 

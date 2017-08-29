@@ -15,6 +15,7 @@ import com.provectus.public_transport.service.retrofit.RetrofitProvider;
 
 import org.greenrobot.eventbus.EventBus;
 
+import java.net.HttpURLConnection;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -28,7 +29,6 @@ import retrofit2.Response;
  * Created by Psihey on 20.08.2017.
  */
 public class TransportRoutesService extends IntentService {
-    private static final int CODE_CHECK_FOR_UPDATE = 304;
     private CompositeDisposable mCompositeDisposable;
     private List<TransportEntity> mTransportEntity = new ArrayList<>();
     private List<SegmentEntity> mSegmentEntity = new ArrayList<>();
@@ -68,7 +68,7 @@ public class TransportRoutesService extends IntentService {
 
     private void handleResponse(Response<List<TransportEntity>> response) {
         Logger.d("All Ok, we got responce");
-        if (response.code() == CODE_CHECK_FOR_UPDATE) {
+        if (response.code() == HttpURLConnection.HTTP_NOT_MODIFIED) {
             Logger.d("We got 304 Code Data not modified");
         } else {
             for (TransportEntity currentRoutes : response.body()) {
