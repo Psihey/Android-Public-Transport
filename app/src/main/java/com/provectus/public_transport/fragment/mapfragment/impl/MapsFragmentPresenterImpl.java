@@ -32,6 +32,7 @@ public class MapsFragmentPresenterImpl implements MapsFragmentPresenter {
     private List<PointEntity> mPointsDataForCurrentRoute = new ArrayList<>();
     private List<StopEntity> mStopsDataForCurrentRoute = new ArrayList<>();
     private List<SegmentEntity> mSegmentsWithPointsForCurrentRoute = new ArrayList<>();
+    private boolean mIsSelectRoute;
 
     @Override
     public void bindView(MapsFragment mapsFragment) {
@@ -53,6 +54,7 @@ public class MapsFragmentPresenterImpl implements MapsFragmentPresenter {
         mSegmentsDataForCurrentRoute.clear();
         mPointsDataForCurrentRoute.clear();
         mStopsDataForCurrentRoute.clear();
+        mIsSelectRoute = event.isCheckBoxState();
         String transportType = event.getSelectRout().getType().toString();
         DatabaseHelper.getPublicTransportDatabase().transportDao().getSegmentForCurrentTrolley(event.getSelectRout().getNumber(), transportType)
                 .observeOn(AndroidSchedulers.mainThread())
@@ -89,7 +91,7 @@ public class MapsFragmentPresenterImpl implements MapsFragmentPresenter {
             }
             mSegmentsWithPointsForCurrentRoute.add(new SegmentEntity(currentSegment.getDirection(), currentSegment.getPosition(), finals));
         }
-        mMapsFragment.drawRotes(sortedRoutesSegment(mSegmentsWithPointsForCurrentRoute), getStopsOnRoute(mStopsDataForCurrentRoute));
+        mMapsFragment.drawRotes(sortedRoutesSegment(mSegmentsWithPointsForCurrentRoute), getStopsOnRoute(mStopsDataForCurrentRoute),mIsSelectRoute);
     }
 
     // TODO: 23.08.17 Use Rx
