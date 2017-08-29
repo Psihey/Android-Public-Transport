@@ -16,6 +16,7 @@ import static android.R.attr.id;
         foreignKeys = @ForeignKey(entity = SegmentEntity.class,
                 parentColumns = "segment_id",
                 childColumns = "segment_id"))
+
 public class PointEntity {
 
     @PrimaryKey(autoGenerate = true)

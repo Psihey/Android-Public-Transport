@@ -1,5 +1,6 @@
 package com.provectus.public_transport.fragment.routestabfragment.impl;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -8,6 +9,8 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.provectus.public_transport.R;
@@ -15,6 +18,8 @@ import com.provectus.public_transport.adapter.TramsAndTrolleyAdapter;
 import com.provectus.public_transport.fragment.routestabfragment.RoutesTabFragment;
 import com.provectus.public_transport.model.TransportEntity;
 import com.provectus.public_transport.model.TransportType;
+import com.provectus.public_transport.service.TransportRoutesService;
+import com.provectus.public_transport.utils.Utils;
 
 import java.util.List;
 
@@ -32,9 +37,12 @@ public class RoutesTabFragmentImpl extends Fragment implements RoutesTabFragment
 
     @BindView(R.id.recycler_view_routes)
     RecyclerView mRoutesRecyclerView;
-
+    @BindView(R.id.tab_fragment_progress_bar)
+    ProgressBar progressBar;
     @BindView(R.id.tv_tab_fragment_no_data)
-    TextView tvNoData;
+    TextView textViewNoData;
+    @BindView(R.id.bottom_sheet_btn_update)
+    Button btnUdate;
 
     private RoutesTabFragmentPresenterImpl mTabFragmentPresenter;
     private TramsAndTrolleyAdapter mAdapter;
@@ -92,7 +100,27 @@ public class RoutesTabFragmentImpl extends Fragment implements RoutesTabFragment
         mRoutesRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         mAdapter = new TramsAndTrolleyAdapter(transportEntity);
         mRoutesRecyclerView.setAdapter(mAdapter);
-        tvNoData.setVisibility(View.GONE);
+        progressBar.setVisibility(View.GONE);
+        setErrorVisible(View.GONE);
+    }
+
+    @Override
+    public void checkMyServiceRunning() {
+        if (!Utils.isMyServiceRunning(TransportRoutesService.class, getActivity())) {
+            progressBar.setVisibility(View.GONE);
+            setErrorVisible(View.VISIBLE);
+            btnUdate.setOnClickListener(view -> {
+                setErrorVisible(View.GONE);
+                getActivity().startService(new Intent(getActivity(), TransportRoutesService.class));
+                progressBar.setVisibility(View.VISIBLE);
+            });
+
+        }
+    }
+
+    private void setErrorVisible(int visible) {
+        textViewNoData.setVisibility(visible);
+        btnUdate.setVisibility(visible);
     }
 
 }

@@ -18,8 +18,10 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.UiSettings;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
+import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.provectus.public_transport.R;
@@ -102,11 +104,19 @@ public class MapsFragmentImpl extends Fragment implements MapsFragment, OnMapRea
     }
 
     @Override
-    public void drawRotes(List<LatLng> sortedRoutes) {
+    public void drawRotes(List<LatLng> sortedRoutes, List<LatLng> stops) {
         if (!isMapReady || mMap == null || sortedRoutes == null) {
             return;
         }
-        setRoutesOnMap(sortedRoutes);
+        drawRoutesOnMap(sortedRoutes);
+        drawStops(stops);
+    }
+
+    public void drawStops(List<LatLng> listStops) {
+        for (int i = 0; i < listStops.size(); i++) {
+            mMap.addMarker(new MarkerOptions()
+                    .position(listStops.get(i)));
+        }
     }
 
     @Override
@@ -117,12 +127,12 @@ public class MapsFragmentImpl extends Fragment implements MapsFragment, OnMapRea
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
     }
 
-    private void setRoutesOnMap(List<LatLng> listDirection) {
+    private void drawRoutesOnMap(List<LatLng> listDirection) {
         PolylineOptions polylineOptions = new PolylineOptions();
         polylineOptions.addAll(listDirection);
         Polyline polyline = mMap.addPolyline(polylineOptions);
         polyline.setColor(getRandomColor());
-        polyline.setWidth(3);
+        polyline.setWidth(4);
     }
 
     private void initViewPager() {

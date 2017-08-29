@@ -23,11 +23,11 @@ public class StopEntity {
 
     @SerializedName("lat")
     @ColumnInfo(name = "latitude")
-    private String mLatitude;
+    private double mLatitude;
 
     @SerializedName("lng")
     @ColumnInfo(name = "longitude")
-    private String mLongitude;
+    private double mLongitude;
 
     @SerializedName("title")
     @ColumnInfo(name = "title")
@@ -36,11 +36,11 @@ public class StopEntity {
     @ColumnInfo(name = "segment_id")
     private long mSegmentId;
 
-    public StopEntity(String latitude, String longitude, String title, long segmentId) {
-        this.mLatitude = latitude;
-        this.mLongitude = longitude;
-        this.mTitle = title;
-        this.mSegmentId = segmentId;
+    public StopEntity(double mLatitude, double mLongitude, String mTitle, long mSegmentId) {
+        this.mLatitude = mLatitude;
+        this.mLongitude = mLongitude;
+        this.mTitle = mTitle;
+        this.mSegmentId = mSegmentId;
     }
 
     public void setId(int mId) {
@@ -51,11 +51,11 @@ public class StopEntity {
         return mId;
     }
 
-    public String getLatitude() {
+    public double getLatitude() {
         return mLatitude;
     }
 
-    public String getLongitude() {
+    public double getLongitude() {
         return mLongitude;
     }
 

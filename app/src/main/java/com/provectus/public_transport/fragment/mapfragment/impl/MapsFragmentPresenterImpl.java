@@ -8,6 +8,7 @@ import com.provectus.public_transport.fragment.mapfragment.MapsFragment;
 import com.provectus.public_transport.fragment.mapfragment.MapsFragmentPresenter;
 import com.provectus.public_transport.model.PointEntity;
 import com.provectus.public_transport.model.SegmentEntity;
+import com.provectus.public_transport.model.StopEntity;
 import com.provectus.public_transport.persistence.database.DatabaseHelper;
 
 import org.greenrobot.eventbus.EventBus;
@@ -29,6 +30,7 @@ public class MapsFragmentPresenterImpl implements MapsFragmentPresenter {
     private MapsFragment mMapsFragment;
     private List<SegmentEntity> mSegmentsDataForCurrentRoute = new ArrayList<>();
     private List<PointEntity> mPointsDataForCurrentRoute = new ArrayList<>();
+    private List<StopEntity> mStopsDataForCurrentRoute = new ArrayList<>();
     private List<SegmentEntity> mSegmentsWithPointsForCurrentRoute = new ArrayList<>();
 
     @Override
@@ -50,48 +52,30 @@ public class MapsFragmentPresenterImpl implements MapsFragmentPresenter {
         mSegmentsWithPointsForCurrentRoute.clear();
         mSegmentsDataForCurrentRoute.clear();
         mPointsDataForCurrentRoute.clear();
-        switch (event.getSelectRout().getType()) {
-            case TROLLEYBUSES_TYPE:
-                DatabaseHelper.getPublicTransportDatabase().transportDao().getSegmentForCurrentTrolley(event.getSelectRout().getNumber())
-                        .observeOn(AndroidSchedulers.mainThread())
-                        .subscribe(this::getSegmnetsTrolleyFromDB);
-                DatabaseHelper.getPublicTransportDatabase().transportDao().getPointsForCurrentTrolley(event.getSelectRout().getNumber())
-                        .observeOn(AndroidSchedulers.mainThread())
-                        .subscribe(this::getPointsTrolleyFromDB);
-                break;
-            case TRAM_TYPE:
-                DatabaseHelper.getPublicTransportDatabase().transportDao().getSegmentForCurrentTram(event.getSelectRout().getNumber())
-                        .observeOn(AndroidSchedulers.mainThread())
-                        .subscribe(this::getSegmentsTramFromDB);
-                DatabaseHelper.getPublicTransportDatabase().transportDao().getPointsForCurrentTram(event.getSelectRout().getNumber())
-                        .observeOn(AndroidSchedulers.mainThread())
-                        .subscribe(this::getPointsTramFromDB);
-        }
+        mStopsDataForCurrentRoute.clear();
+        String transportType = event.getSelectRout().getType().toString();
+        DatabaseHelper.getPublicTransportDatabase().transportDao().getSegmentForCurrentTrolley(event.getSelectRout().getNumber(), transportType)
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(this::getSegmentsFromDB);
+        DatabaseHelper.getPublicTransportDatabase().transportDao().getStopsForCurrentTrolley(event.getSelectRout().getNumber(), transportType)
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(this::getStopsFromDB);
+        DatabaseHelper.getPublicTransportDatabase().transportDao().getPointsForCurrentTrolley(event.getSelectRout().getNumber(), transportType)
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(this::getPointsFromDB);
+
     }
 
-    private void getSegmentsTramFromDB(List<SegmentEntity> transportEntities) {
-        for (SegmentEntity current : transportEntities) {
-            mSegmentsDataForCurrentRoute.add(current);
-        }
+    private void getSegmentsFromDB(List<SegmentEntity> segmentEntities) {
+        mSegmentsDataForCurrentRoute.addAll(segmentEntities);
     }
 
-    private void getSegmnetsTrolleyFromDB(List<SegmentEntity> transportEntities) {
-        for (SegmentEntity current : transportEntities) {
-            mSegmentsDataForCurrentRoute.add(current);
-        }
+    private void getStopsFromDB(List<StopEntity> stopEntities) {
+        mStopsDataForCurrentRoute.addAll(stopEntities);
     }
 
-    private void getPointsTramFromDB(List<PointEntity> transportEntities) {
-        for (PointEntity current : transportEntities) {
-            mPointsDataForCurrentRoute.add(current);
-        }
-        connectPointsToSegments();
-    }
-
-    private void getPointsTrolleyFromDB(List<PointEntity> transportEntities) {
-        for (PointEntity current : transportEntities) {
-            mPointsDataForCurrentRoute.add(current);
-        }
+    private void getPointsFromDB(List<PointEntity> pointEntities) {
+        mPointsDataForCurrentRoute.addAll(pointEntities);
         connectPointsToSegments();
     }
 
@@ -105,19 +89,18 @@ public class MapsFragmentPresenterImpl implements MapsFragmentPresenter {
             }
             mSegmentsWithPointsForCurrentRoute.add(new SegmentEntity(currentSegment.getDirection(), currentSegment.getPosition(), finals));
         }
-        mMapsFragment.drawRotes(sortedRoutesSegment(mSegmentsWithPointsForCurrentRoute));
-
+        mMapsFragment.drawRotes(sortedRoutesSegment(mSegmentsWithPointsForCurrentRoute), getStopsOnRoute(mStopsDataForCurrentRoute));
     }
 
     // TODO: 23.08.17 Use Rx
-    private List<LatLng> sortedRoutesSegment(List<SegmentEntity> transportRoutes) {
+    private List<LatLng> sortedRoutesSegment(List<SegmentEntity> segmentEntities) {
         List<LatLng> listDirection1 = new ArrayList<>();
         List<LatLng> listDirection2 = new ArrayList<>();
         LatLng first = null;
         double lat = 0.0;
         double lng = 0.0;
-        for (int j = 0; j < transportRoutes.size(); j++) {
-            List<PointEntity> pointList = transportRoutes.get(j).getPoints();
+        for (int j = 0; j < segmentEntities.size(); j++) {
+            List<PointEntity> pointList = segmentEntities.get(j).getPoints();
             for (int r = 0; r < pointList.size(); r++) {
                 lat = pointList.get(r).getLatitude();
                 lng = pointList.get(r).getLongitude();
@@ -125,17 +108,17 @@ public class MapsFragmentPresenterImpl implements MapsFragmentPresenter {
             if (lng == lat) {
                 continue;
             }
-            if (transportRoutes.get(j).getDirection() == -1 && transportRoutes.get(j).getPosition() == -1) {
+            if (segmentEntities.get(j).getDirection() == -1 && segmentEntities.get(j).getPosition() == -1) {
                 //This is the beginning of the segment route with direction "1"
                 first = new LatLng(lat, lng);
                 listDirection1.add(0, new LatLng(lat, lng));
-            } else if (transportRoutes.get(j).getDirection() == -1 && transportRoutes.get(j).getPosition() == 0) {
+            } else if (segmentEntities.get(j).getDirection() == -1 && segmentEntities.get(j).getPosition() == 0) {
                 //This is the beginning of the segment route with direction "0"
                 listDirection2.add(0, new LatLng(lat, lng));
             }
-            if (transportRoutes.get(j).getDirection() == 1) {
+            if (segmentEntities.get(j).getDirection() == 1) {
                 listDirection1.add(new LatLng(lat, lng));
-            } else if (transportRoutes.get(j).getDirection() == 0) {
+            } else if (segmentEntities.get(j).getDirection() == 0) {
                 listDirection2.add(new LatLng(lat, lng));
             }
         }
@@ -144,6 +127,16 @@ public class MapsFragmentPresenterImpl implements MapsFragmentPresenter {
         }
         List<LatLng> listRes = new ArrayList<>(listDirection1);
         listRes.addAll(listDirection2);
+        return listRes;
+    }
+
+    private List<LatLng> getStopsOnRoute(List<StopEntity> stopEntities) {
+        List<LatLng> listRes = new ArrayList<>();
+        for (int i = 0; i < stopEntities.size(); i++) {
+            double lat = stopEntities.get(i).getLatitude();
+            double lng = stopEntities.get(i).getLongitude();
+            listRes.add(new LatLng(lat, lng));
+        }
         return listRes;
     }
 
