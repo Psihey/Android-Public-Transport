@@ -1,10 +1,16 @@
 package com.provectus.public_transport.fragment.routestabfragment.impl;
 
+import com.orhanobut.logger.Logger;
+import com.provectus.public_transport.eventbus.BusEvents;
 import com.provectus.public_transport.fragment.routestabfragment.RoutesTabFragment;
 import com.provectus.public_transport.fragment.routestabfragment.RoutesTabFragmentPresenter;
 import com.provectus.public_transport.model.TransportEntity;
 import com.provectus.public_transport.model.TransportType;
 import com.provectus.public_transport.persistence.database.DatabaseHelper;
+
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 
 import java.util.Collections;
 import java.util.Comparator;
@@ -25,11 +31,13 @@ public class RoutesTabFragmentPresenterImpl implements RoutesTabFragmentPresente
     @Override
     public void bindView(RoutesTabFragment routesTabFragment) {
         mRoutesTabFragment = routesTabFragment;
+        EventBus.getDefault().register(this);
     }
 
     @Override
     public void unbindView() {
         mRoutesTabFragment = null;
+        EventBus.getDefault().unregister(this);
     }
 
     @Override
@@ -60,9 +68,19 @@ public class RoutesTabFragmentPresenterImpl implements RoutesTabFragmentPresente
         }
     }
 
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void getUpdateDBEvent(BusEvents.SendRoutesEvent updateDBEvent) {
+        getDataFromDB();
+    }
+
     private void getTransportFromDB(List<TransportEntity> transportEntities) {
+        if (mRoutesTabFragment == null){
+            return;
+        }
         if (transportEntities != null && !transportEntities.isEmpty()) {
             mRoutesTabFragment.initRecyclerView(transportEntities);
+        } else {
+            mRoutesTabFragment.checkMyServiceRunning();
         }
     }
 

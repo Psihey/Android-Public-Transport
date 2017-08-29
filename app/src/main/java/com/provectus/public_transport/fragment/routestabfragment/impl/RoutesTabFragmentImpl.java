@@ -103,6 +103,7 @@ public class RoutesTabFragmentImpl extends Fragment implements RoutesTabFragment
         mAdapter = new TramsAndTrolleyAdapter(transportEntity);
         mRoutesRecyclerView.setAdapter(mAdapter);
         progressBar.setVisibility(View.GONE);
+        setErrorVisible(View.GONE);
     }
 
     @Override

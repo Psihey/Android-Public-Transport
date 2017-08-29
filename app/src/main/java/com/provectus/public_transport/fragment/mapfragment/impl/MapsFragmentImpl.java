@@ -104,19 +104,18 @@ public class MapsFragmentImpl extends Fragment implements MapsFragment, OnMapRea
     }
 
     @Override
-    public void drawRotes(List<LatLng> sortedRoutes) {
+    public void drawRotes(List<LatLng> sortedRoutes, List<LatLng> stops) {
         if (!isMapReady || mMap == null || sortedRoutes == null) {
             return;
         }
-        setRoutesOnMap(sortedRoutes);
-        drawStops(sortedRoutes);
+        drawRoutesOnMap(sortedRoutes);
+        drawStops(stops);
     }
 
     public void drawStops(List<LatLng> listStops) {
         for (int i = 0; i < listStops.size(); i++) {
             mMap.addMarker(new MarkerOptions()
-                    .position(new LatLng(46.421419, 30.717963))
-                   .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_place_24dp)));
+                    .position(listStops.get(i)));
         }
     }
 
@@ -128,12 +127,13 @@ public class MapsFragmentImpl extends Fragment implements MapsFragment, OnMapRea
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
     }
 
-    private void setRoutesOnMap(List<LatLng> listDirection) {
+    private void drawRoutesOnMap(List<LatLng> listDirection) {
         PolylineOptions polylineOptions = new PolylineOptions();
         polylineOptions.addAll(listDirection);
         Polyline polyline = mMap.addPolyline(polylineOptions);
         polyline.setColor(getRandomColor());
-        polyline.setWidth(3);
+        polyline.setVisible(true);
+        polyline.setWidth(4);
     }
 
     private void initViewPager() {

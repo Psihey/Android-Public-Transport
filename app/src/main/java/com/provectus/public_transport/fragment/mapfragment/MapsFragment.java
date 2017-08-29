@@ -1,6 +1,7 @@
 package com.provectus.public_transport.fragment.mapfragment;
 
 import com.google.android.gms.maps.model.LatLng;
+import com.provectus.public_transport.model.SegmentEntity;
 
 import java.util.List;
 
@@ -10,7 +11,6 @@ import java.util.List;
 
 public interface MapsFragment {
 
-    void drawRotes(List<LatLng> routes);
-
+    void drawRotes(List<LatLng> routes, List<LatLng> stops);
 
 }
