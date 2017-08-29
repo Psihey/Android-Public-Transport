@@ -132,7 +132,6 @@ public class MapsFragmentImpl extends Fragment implements MapsFragment, OnMapRea
         polylineOptions.addAll(listDirection);
         Polyline polyline = mMap.addPolyline(polylineOptions);
         polyline.setColor(getRandomColor());
-        polyline.setVisible(true);
         polyline.setWidth(4);
     }
 
