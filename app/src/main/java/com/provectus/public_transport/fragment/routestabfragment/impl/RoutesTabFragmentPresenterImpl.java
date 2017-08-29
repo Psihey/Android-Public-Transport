@@ -61,17 +61,11 @@ public class RoutesTabFragmentPresenterImpl implements RoutesTabFragmentPresente
     }
 
     private void getTransportFromDB(List<TransportEntity> transportEntities) {
-        mRoutesTabFragment.initRecyclerView(transportEntities);
+        if (transportEntities != null && !transportEntities.isEmpty()) {
+            mRoutesTabFragment.initRecyclerView(transportEntities);
+        }
     }
 
-    private Comparator<TransportEntity> sortByNumber = (t1, t2) -> {
-        int res = 0;
-        if (t1.getNumber() > t2.getNumber()) {
-            res = 1;
-        } else if (t1.getNumber() < t2.getNumber()) {
-            res = -1;
-        }
-        return res;
-    };
+    private Comparator<TransportEntity> sortByNumber = (t1, t2) -> t1.getNumber() > t2.getNumber() ? 1 : -1;
 
 }

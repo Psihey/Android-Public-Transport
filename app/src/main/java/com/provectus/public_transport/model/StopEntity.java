@@ -7,60 +7,60 @@ import android.arch.persistence.room.PrimaryKey;
 
 import com.google.gson.annotations.SerializedName;
 
-import static android.R.attr.id;
-
 /**
- * Created by Psihey on 18.08.2017.
+ * Created by Psihey on 28.08.2017.
  */
-@Entity(tableName = "points",
+
+@Entity(tableName = "stopping",
         foreignKeys = @ForeignKey(entity = SegmentEntity.class,
                 parentColumns = "segment_id",
                 childColumns = "segment_id"))
-public class PointEntity {
+public class StopEntity {
 
+    @SerializedName("id")
     @PrimaryKey(autoGenerate = true)
     private int mId;
 
     @SerializedName("lat")
     @ColumnInfo(name = "latitude")
-    private double mLatitude;
+    private String mLatitude;
 
     @SerializedName("lng")
     @ColumnInfo(name = "longitude")
-    private double mLongitude;
+    private String mLongitude;
 
-    @SerializedName("position")
-    @ColumnInfo(name = "point_position")
-    private int mPosition;
+    @SerializedName("title")
+    @ColumnInfo(name = "title")
+    private String mTitle;
 
     @ColumnInfo(name = "segment_id")
     private long mSegmentId;
 
-    public PointEntity(double latitude, double longitude, int position, long segmentId) {
-        mLatitude = latitude;
-        mLongitude = longitude;
-        mPosition = position;
-        mSegmentId = segmentId;
-    }
-
-    public int getId() {
-        return mId;
+    public StopEntity(String latitude, String longitude, String title, long segmentId) {
+        this.mLatitude = latitude;
+        this.mLongitude = longitude;
+        this.mTitle = title;
+        this.mSegmentId = segmentId;
     }
 
     public void setId(int mId) {
         this.mId = mId;
     }
 
-    public double getLatitude() {
+    public int getId() {
+        return mId;
+    }
+
+    public String getLatitude() {
         return mLatitude;
     }
 
-    public double getLongitude() {
+    public String getLongitude() {
         return mLongitude;
     }
 
-    public int getPosition() {
-        return mPosition;
+    public String getTitle() {
+        return mTitle;
     }
 
     public long getSegmentId() {
@@ -69,11 +69,11 @@ public class PointEntity {
 
     @Override
     public String toString() {
-        return "PointEntity{" +
-                "id=" + id +
+        return "StopEntity{" +
+                "Id=" + mId +
                 ", Latitude=" + mLatitude +
                 ", Longitude=" + mLongitude +
-                ", Position=" + mPosition +
+                ", Title='" + mTitle + '\'' +
                 ", SegmentId=" + mSegmentId +
                 '}';
     }
