@@ -18,7 +18,6 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.UiSettings;
-import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.MarkerOptions;
@@ -30,6 +29,7 @@ import com.provectus.public_transport.fragment.mapfragment.MapsFragment;
 import com.provectus.public_transport.fragment.mapfragment.MapsFragmentPresenter;
 import com.provectus.public_transport.utils.Const;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import biz.laenger.android.vpbs.BottomSheetUtils;
@@ -48,6 +48,7 @@ public class MapsFragmentImpl extends Fragment implements MapsFragment, OnMapRea
     public final static String TAG_MAP_FRAGMENT = "fragment_map";
     private static final int REQUEST_LOCATION_PERMISSIONS = 1;
 
+
     @BindView(R.id.bottom_sheet_view_pager)
     ViewPager mViewPagerTransportAndParking;
 
@@ -56,9 +57,8 @@ public class MapsFragmentImpl extends Fragment implements MapsFragment, OnMapRea
 
     private MapsFragmentPresenter mMapsPresenter;
     private Unbinder mUnbinder;
-    private TransportAndParkingViewPagerAdapter mPagerAdapter;
     private GoogleMap mMap;
-
+    private List<Polyline> currentPolylineForDraw = new ArrayList<>();
     private boolean isMapReady;
 
     @Override
@@ -104,19 +104,12 @@ public class MapsFragmentImpl extends Fragment implements MapsFragment, OnMapRea
     }
 
     @Override
-    public void drawRotes(List<LatLng> sortedRoutes, List<LatLng> stops) {
+    public void drawRotes(List<LatLng> sortedRoutes, List<LatLng> stops, boolean isSelectedRoute) {
         if (!isMapReady || mMap == null || sortedRoutes == null) {
             return;
         }
-        drawRoutesOnMap(sortedRoutes);
-        drawStops(stops);
-    }
+        drawRoutesWithStopOnMap(sortedRoutes, isSelectedRoute, stops);
 
-    public void drawStops(List<LatLng> listStops) {
-        for (int i = 0; i < listStops.size(); i++) {
-            mMap.addMarker(new MarkerOptions()
-                    .position(listStops.get(i)));
-        }
     }
 
     @Override
@@ -127,16 +120,40 @@ public class MapsFragmentImpl extends Fragment implements MapsFragment, OnMapRea
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
     }
 
-    private void drawRoutesOnMap(List<LatLng> listDirection) {
-        PolylineOptions polylineOptions = new PolylineOptions();
-        polylineOptions.addAll(listDirection);
-        Polyline polyline = mMap.addPolyline(polylineOptions);
+    private void drawRoutesWithStopOnMap(List<LatLng> listDirection, boolean checkBoxState, List<LatLng> stops) {
+        if (checkBoxState) {
+            drawCurrentStop(stops);
+            drawCurrentRoute(listDirection);
+        } else {
+            currentPolylineForDraw.remove(listDirection);
+            for (Polyline polyline : currentPolylineForDraw) {
+                mMap.clear();
+                drawPolyline(polyline);
+            }
+        }
+    }
+
+    public void drawCurrentStop(List<LatLng> stops) {
+        for (int i = 0; i < stops.size(); i++) {
+            mMap.addMarker(new MarkerOptions()
+                    .position(stops.get(i)));
+        }
+    }
+
+    private void drawCurrentRoute(List<LatLng> listDirection) {
+        currentPolylineForDraw.add(mMap.addPolyline(new PolylineOptions().addAll(listDirection)));
+        for (Polyline polyline : currentPolylineForDraw) {
+            drawPolyline(polyline);
+        }
+    }
+
+    private void drawPolyline(Polyline polyline) {
         polyline.setColor(getRandomColor());
         polyline.setWidth(4);
     }
 
     private void initViewPager() {
-        mPagerAdapter = new TransportAndParkingViewPagerAdapter(getFragmentManager());
+        TransportAndParkingViewPagerAdapter mPagerAdapter = new TransportAndParkingViewPagerAdapter(getFragmentManager());
         mViewPagerTransportAndParking.setOffscreenPageLimit(3);
         mViewPagerTransportAndParking.setAdapter(mPagerAdapter);
         mViewPagerTransportAndParking.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
@@ -160,7 +177,7 @@ public class MapsFragmentImpl extends Fragment implements MapsFragment, OnMapRea
         BottomSheetUtils.setupViewPager(mViewPagerTransportAndParking);
     }
 
-    public void changeIconInTabLayout(int position) {
+    private void changeIconInTabLayout(int position) {
         mBottomSheetTabLayout.getTabAt(TransportAndParkingViewPagerAdapter.POSITION_BUS).setIcon(R.drawable.ic_front_bus_gray);
         mBottomSheetTabLayout.getTabAt(TransportAndParkingViewPagerAdapter.POSITION_TRAM).setIcon(R.drawable.ic_tram_public_gray);
         mBottomSheetTabLayout.getTabAt(TransportAndParkingViewPagerAdapter.POSITION_PARKING).setIcon(R.drawable.ic_parking_gray);

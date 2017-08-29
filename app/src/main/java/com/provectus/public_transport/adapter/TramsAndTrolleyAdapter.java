@@ -27,7 +27,7 @@ import butterknife.ButterKnife;
 
 public class TramsAndTrolleyAdapter extends RecyclerView.Adapter<TramsAndTrolleyAdapter.TramsAndTrolleyViewHolder> {
     private List<TransportEntity> mTransportRoutesData;
-
+    private boolean mIsSelectRoute;
 
     public TramsAndTrolleyAdapter(List<TransportEntity> data) {
         this.mTransportRoutesData = data;
@@ -57,7 +57,9 @@ public class TramsAndTrolleyAdapter extends RecyclerView.Adapter<TramsAndTrolley
         }
 
         holder.tvRoutesNumber.setText(String.valueOf(mTransportRoutesData.get(position).getNumber()));
-        holder.checkBoxSelectRout.setOnClickListener(view -> EventBus.getDefault().post(new BusEvents.SendChosenRouter(mTransportRoutesData.get(position))));
+
+        holder.checkBoxSelectRout.setOnCheckedChangeListener((buttonView, isChecked) -> mIsSelectRoute = isChecked);
+        holder.checkBoxSelectRout.setOnClickListener(view -> EventBus.getDefault().post(new BusEvents.SendChosenRouter(mTransportRoutesData.get(position),mIsSelectRoute)));
     }
 
     @Override
