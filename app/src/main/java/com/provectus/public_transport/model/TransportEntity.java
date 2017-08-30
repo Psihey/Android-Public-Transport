@@ -32,13 +32,13 @@ public class TransportEntity {
 
     @SerializedName("distance")
     @ColumnInfo(name = "transport_distance")
-    private Double mDistance;
+    private String mDistance;
 
     @SerializedName("segments")
     @Ignore
     private List<SegmentEntity> segments;
 
-    public TransportEntity(int serverId, int number, TransportType type, Double distance) {
+    public TransportEntity(int serverId, int number, TransportType type, String distance) {
         mServerId = serverId;
         mNumber = number;
         mType = type;
@@ -57,7 +57,7 @@ public class TransportEntity {
         return mType;
     }
 
-    public Double getDistance() {
+    public String getDistance() {
         return mDistance;
     }
 

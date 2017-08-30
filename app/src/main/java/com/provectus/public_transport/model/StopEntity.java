@@ -34,9 +34,9 @@ public class StopEntity {
     private String mTitle;
 
     @ColumnInfo(name = "segment_id")
-    private long mSegmentId;
+    private int mSegmentId;
 
-    public StopEntity(double mLatitude, double mLongitude, String mTitle, long mSegmentId) {
+    public StopEntity(double mLatitude, double mLongitude, String mTitle, int mSegmentId) {
         this.mLatitude = mLatitude;
         this.mLongitude = mLongitude;
         this.mTitle = mTitle;
@@ -63,7 +63,7 @@ public class StopEntity {
         return mTitle;
     }
 
-    public long getSegmentId() {
+    public int getSegmentId() {
         return mSegmentId;
     }
 
