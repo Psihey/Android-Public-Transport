@@ -4,6 +4,7 @@ import android.arch.persistence.room.ColumnInfo;
 import android.arch.persistence.room.Entity;
 import android.arch.persistence.room.ForeignKey;
 import android.arch.persistence.room.Ignore;
+import android.arch.persistence.room.Index;
 import android.arch.persistence.room.PrimaryKey;
 
 import com.google.gson.annotations.SerializedName;
@@ -16,13 +17,15 @@ import java.util.List;
 @Entity(tableName = "segments",
         foreignKeys = @ForeignKey(entity = TransportEntity.class,
                 parentColumns = "transport_id",
-                childColumns = "transport_id"))
+                childColumns = "transport_id"), indices = {@Index(value = {"segment_id"}, unique = true)})
 public class SegmentEntity {
 
-    @PrimaryKey
+    @PrimaryKey(autoGenerate = true)
+    private long mId;
+
     @SerializedName("id")
     @ColumnInfo(name = "segment_id")
-    private int mServerId;
+    private long mServerId;
 
     @SerializedName("direction")
     @ColumnInfo(name = "segment_direction")
@@ -33,7 +36,7 @@ public class SegmentEntity {
     private int mPosition;
 
     @ColumnInfo(name = "transport_id")
-    private int mTransportId;
+    private long mTransportId;
 
     @SerializedName("points")
     @Ignore
@@ -41,13 +44,14 @@ public class SegmentEntity {
 
     @SerializedName("stoppingId")
     @Ignore
-    private  int stoppingId;
+    private int stoppingId;
 
     @SerializedName("stopping")
     @Ignore
     private StopEntity mStopEntity;
 
-    public SegmentEntity(int serverId, int direction, int position, int transportId) {
+
+    public SegmentEntity(long serverId, int direction, int position, long transportId) {
         mServerId = serverId;
         mDirection = direction;
         mPosition = position;
@@ -60,7 +64,7 @@ public class SegmentEntity {
         this.mPoints = Points;
     }
 
-    public int getServerId() {
+    public long getServerId() {
         return mServerId;
     }
 
@@ -68,11 +72,19 @@ public class SegmentEntity {
         return mDirection;
     }
 
+    public long getId() {
+        return mId;
+    }
+
+    public void setId(long mId) {
+        this.mId = mId;
+    }
+
     public int getPosition() {
         return mPosition;
     }
 
-    public int getTransportId() {
+    public long getTransportId() {
         return mTransportId;
     }
 

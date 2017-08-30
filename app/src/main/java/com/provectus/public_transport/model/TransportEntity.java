@@ -3,6 +3,7 @@ package com.provectus.public_transport.model;
 import android.arch.persistence.room.ColumnInfo;
 import android.arch.persistence.room.Entity;
 import android.arch.persistence.room.Ignore;
+import android.arch.persistence.room.Index;
 import android.arch.persistence.room.PrimaryKey;
 import android.arch.persistence.room.TypeConverters;
 
@@ -13,13 +14,15 @@ import java.util.List;
 /**
  * Created by Psihey on 11.08.2017.
  */
-@Entity(tableName = "transports")
+@Entity(tableName = "transports",indices = {@Index(value = {"transport_id"},unique = true)})
 public class TransportEntity {
 
-    @PrimaryKey
+    @PrimaryKey(autoGenerate = true)
+    private long mId;
+
     @SerializedName("id")
     @ColumnInfo(name = "transport_id")
-    private int mServerId;
+    private long mServerId;
 
     @SerializedName("number")
     @ColumnInfo(name = "transport_number")
@@ -32,20 +35,28 @@ public class TransportEntity {
 
     @SerializedName("distance")
     @ColumnInfo(name = "transport_distance")
-    private String mDistance;
+    private double mDistance;
 
     @SerializedName("segments")
     @Ignore
     private List<SegmentEntity> segments;
 
-    public TransportEntity(int serverId, int number, TransportType type, String distance) {
+    public TransportEntity(long serverId, int number, TransportType type, double distance) {
         mServerId = serverId;
         mNumber = number;
         mType = type;
         mDistance = distance;
     }
 
-    public int getServerId() {
+    public long getId() {
+        return mId;
+    }
+
+    public void setId(long mId) {
+        this.mId = mId;
+    }
+
+    public long getServerId() {
         return mServerId;
     }
 
@@ -57,7 +68,7 @@ public class TransportEntity {
         return mType;
     }
 
-    public String getDistance() {
+    public double getDistance() {
         return mDistance;
     }
 

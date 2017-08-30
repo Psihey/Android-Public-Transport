@@ -19,7 +19,7 @@ public class StopEntity {
 
     @SerializedName("id")
     @PrimaryKey(autoGenerate = true)
-    private int mId;
+    private long mId;
 
     @SerializedName("lat")
     @ColumnInfo(name = "latitude")
@@ -34,20 +34,20 @@ public class StopEntity {
     private String mTitle;
 
     @ColumnInfo(name = "segment_id")
-    private int mSegmentId;
+    private long mSegmentId;
 
-    public StopEntity(double mLatitude, double mLongitude, String mTitle, int mSegmentId) {
+    public StopEntity(double mLatitude, double mLongitude, String mTitle, long mSegmentId) {
         this.mLatitude = mLatitude;
         this.mLongitude = mLongitude;
         this.mTitle = mTitle;
         this.mSegmentId = mSegmentId;
     }
 
-    public void setId(int mId) {
+    public void setId(long mId) {
         this.mId = mId;
     }
 
-    public int getId() {
+    public long getId() {
         return mId;
     }
 
@@ -63,7 +63,7 @@ public class StopEntity {
         return mTitle;
     }
 
-    public int getSegmentId() {
+    public long getSegmentId() {
         return mSegmentId;
     }
 

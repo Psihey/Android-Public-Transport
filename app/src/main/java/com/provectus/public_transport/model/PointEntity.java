@@ -20,7 +20,7 @@ import static android.R.attr.id;
 public class PointEntity {
 
     @PrimaryKey(autoGenerate = true)
-    private int mId;
+    private long mId;
 
     @SerializedName("lat")
     @ColumnInfo(name = "latitude")
@@ -44,11 +44,11 @@ public class PointEntity {
         mSegmentId = segmentId;
     }
 
-    public int getId() {
+    public long getId() {
         return mId;
     }
 
-    public void setId(int mId) {
+    public void setId(long mId) {
         this.mId = mId;
     }
 
