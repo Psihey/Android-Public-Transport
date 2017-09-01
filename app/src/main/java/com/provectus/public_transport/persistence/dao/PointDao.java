@@ -1,6 +1,7 @@
 package com.provectus.public_transport.persistence.dao;
 
 import android.arch.persistence.room.Dao;
+import android.arch.persistence.room.Delete;
 import android.arch.persistence.room.Insert;
 import android.arch.persistence.room.Query;
 
@@ -23,7 +24,7 @@ public interface PointDao {
     @Query("SELECT * FROM points")
     Flowable<List<PointEntity>> getAllPoint();
 
-    @Query("DELETE FROM points")
-    void deleteAll();
+    @Delete()
+    void deleteAll(List<PointEntity> pointEntities);;
 
 }

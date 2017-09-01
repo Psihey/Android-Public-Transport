@@ -14,7 +14,8 @@ import com.google.gson.annotations.SerializedName;
 @Entity(tableName = "stopping",
         foreignKeys = @ForeignKey(entity = SegmentEntity.class,
                 parentColumns = "segment_id",
-                childColumns = "segment_id"))
+                childColumns = "segment_id",
+                onDelete = ForeignKey.CASCADE))
 public class StopEntity {
 
     @SerializedName("id")

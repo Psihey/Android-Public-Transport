@@ -1,6 +1,5 @@
 package com.provectus.public_transport.fragment.routestabfragment.impl;
 
-import com.orhanobut.logger.Logger;
 import com.provectus.public_transport.eventbus.BusEvents;
 import com.provectus.public_transport.fragment.routestabfragment.RoutesTabFragment;
 import com.provectus.public_transport.fragment.routestabfragment.RoutesTabFragmentPresenter;
@@ -69,7 +68,7 @@ public class RoutesTabFragmentPresenterImpl implements RoutesTabFragmentPresente
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
-    public void getUpdateDBEvent(BusEvents.SendRoutesEvent updateDBEvent) {
+    public void getUpdateDBEvent(BusEvents.DataBaseInitialized routesEvent) {
         getDataFromDB();
     }
 

@@ -1,6 +1,7 @@
 package com.provectus.public_transport.persistence.dao;
 
 import android.arch.persistence.room.Dao;
+import android.arch.persistence.room.Delete;
 import android.arch.persistence.room.Insert;
 import android.arch.persistence.room.Query;
 
@@ -8,7 +9,6 @@ import com.provectus.public_transport.model.PointEntity;
 import com.provectus.public_transport.model.SegmentEntity;
 import com.provectus.public_transport.model.StopEntity;
 import com.provectus.public_transport.model.TransportEntity;
-import com.provectus.public_transport.model.TransportType;
 
 import java.util.List;
 
@@ -33,25 +33,25 @@ public interface TransportDao {
     @Query("SELECT * FROM transports WHERE transport_type = 'TROLLEYBUSES_TYPE'")
     Flowable<List<TransportEntity>> getAllTrolleybuses();
 
-    @Query("DELETE FROM segments")
-    void deleteAll();
+    @Delete()
+    void deleteAll(List<TransportEntity> transportEntities);
 
     @Query("SELECT * FROM transports "
             + "INNER JOIN segments ON segments.transport_id = transports.transport_id "
             + "INNER JOIN points ON points.segment_id = segments.segment_id "
-            + "WHERE transports.transport_number = :tramNumber AND transports.transport_type = :type")
-    Flowable<List<SegmentEntity>> getSegmentForCurrentTrolley(int tramNumber, String type);
+            + "WHERE transports.transport_number = :transportNumber AND transports.transport_type = :transportType")
+    Flowable<List<SegmentEntity>> getSegmentForCurrentTransport(int transportNumber, String transportType);
 
     @Query("SELECT * FROM transports "
             + "INNER JOIN segments ON segments.transport_id = transports.transport_id "
             + "INNER JOIN points ON points.segment_id = segments.segment_id "
-            + "WHERE transports.transport_number = :tramNumber AND transports.transport_type = :type")
-    Flowable<List<PointEntity>> getPointsForCurrentTrolley(int tramNumber, String type);
+            + "WHERE transports.transport_number = :transportNumber AND transports.transport_type = :transportType")
+    Flowable<List<PointEntity>> getPointsForCurrentTransport(int transportNumber, String transportType);
 
     @Query("SELECT * FROM transports "
             + "INNER JOIN segments ON segments.transport_id = transports.transport_id "
             + "INNER JOIN stopping ON stopping.segment_id = segments.segment_id "
-            + "WHERE transports.transport_number = :tramNumber AND transports.transport_type = :type")
-    Flowable<List<StopEntity>> getStopsForCurrentTrolley(int tramNumber, String type);
+            + "WHERE transports.transport_number = :transportNumber AND transports.transport_type = :transportType")
+    Flowable<List<StopEntity>> getStopsForCurrentTransport(int transportNumber, String transportType);
 
 }
