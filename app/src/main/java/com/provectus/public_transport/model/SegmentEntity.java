@@ -4,7 +4,6 @@ import android.arch.persistence.room.ColumnInfo;
 import android.arch.persistence.room.Entity;
 import android.arch.persistence.room.ForeignKey;
 import android.arch.persistence.room.Ignore;
-import android.arch.persistence.room.Index;
 import android.arch.persistence.room.PrimaryKey;
 
 import com.google.gson.annotations.SerializedName;
@@ -17,14 +16,14 @@ import java.util.List;
 @Entity(tableName = "segments",
         foreignKeys = @ForeignKey(entity = TransportEntity.class,
                 parentColumns = "transport_id",
-                childColumns = "transport_id"), indices = {@Index(value = {"segment_id"}, unique = true)})
+                childColumns = "transport_id",
+                onDelete = ForeignKey.CASCADE))
 public class SegmentEntity {
 
-    @PrimaryKey(autoGenerate = true)
-    private long mId;
 
     @SerializedName("id")
     @ColumnInfo(name = "segment_id")
+    @PrimaryKey(autoGenerate = false)
     private long mServerId;
 
     @SerializedName("direction")
@@ -70,14 +69,6 @@ public class SegmentEntity {
 
     public int getDirection() {
         return mDirection;
-    }
-
-    public long getId() {
-        return mId;
-    }
-
-    public void setId(long mId) {
-        this.mId = mId;
     }
 
     public int getPosition() {

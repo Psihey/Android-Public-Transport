@@ -8,13 +8,13 @@ import com.provectus.public_transport.model.TransportEntity;
 
 public class BusEvents {
 
-    public static class SendRoutesEvent {
-        public SendRoutesEvent() {
+    public static class DataBaseInitialized {
+        public DataBaseInitialized() {
         }
     }
 
-    public static class SendRoutesErrorEvent {
-        public SendRoutesErrorEvent() {
+    public static class DataForCurrentRouteFetched {
+        public DataForCurrentRouteFetched() {
         }
     }
 

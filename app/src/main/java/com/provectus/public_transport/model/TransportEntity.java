@@ -3,7 +3,6 @@ package com.provectus.public_transport.model;
 import android.arch.persistence.room.ColumnInfo;
 import android.arch.persistence.room.Entity;
 import android.arch.persistence.room.Ignore;
-import android.arch.persistence.room.Index;
 import android.arch.persistence.room.PrimaryKey;
 import android.arch.persistence.room.TypeConverters;
 
@@ -14,14 +13,12 @@ import java.util.List;
 /**
  * Created by Psihey on 11.08.2017.
  */
-@Entity(tableName = "transports",indices = {@Index(value = {"transport_id"},unique = true)})
+@Entity(tableName = "transports")
 public class TransportEntity {
-
-    @PrimaryKey(autoGenerate = true)
-    private long mId;
 
     @SerializedName("id")
     @ColumnInfo(name = "transport_id")
+    @PrimaryKey(autoGenerate = false)
     private long mServerId;
 
     @SerializedName("number")
@@ -46,14 +43,6 @@ public class TransportEntity {
         mNumber = number;
         mType = type;
         mDistance = distance;
-    }
-
-    public long getId() {
-        return mId;
-    }
-
-    public void setId(long mId) {
-        this.mId = mId;
     }
 
     public long getServerId() {

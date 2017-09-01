@@ -15,7 +15,8 @@ import static android.R.attr.id;
 @Entity(tableName = "points",
         foreignKeys = @ForeignKey(entity = SegmentEntity.class,
                 parentColumns = "segment_id",
-                childColumns = "segment_id"))
+                childColumns = "segment_id",
+                onDelete = ForeignKey.CASCADE))
 
 public class PointEntity {
 

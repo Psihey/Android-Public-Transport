@@ -1,6 +1,7 @@
 package com.provectus.public_transport.persistence.dao;
 
 import android.arch.persistence.room.Dao;
+import android.arch.persistence.room.Delete;
 import android.arch.persistence.room.Insert;
 import android.arch.persistence.room.Query;
 
@@ -23,7 +24,7 @@ public interface SegmentDao {
     @Query("SELECT * FROM segments")
     Flowable<List<SegmentEntity>> getAllSegment();
 
-    @Query("DELETE FROM segments")
-    void deleteAll();
+    @Delete()
+    void deleteAll(List<SegmentEntity> segmentsEntities);
 
 }

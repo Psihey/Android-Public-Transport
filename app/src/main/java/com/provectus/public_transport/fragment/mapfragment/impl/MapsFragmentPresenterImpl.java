@@ -56,17 +56,20 @@ public class MapsFragmentPresenterImpl implements MapsFragmentPresenter {
         mStopsDataForCurrentRoute.clear();
         mIsSelectRoute = event.isCheckBoxState();
         String transportType = event.getSelectRout().getType().toString();
-        DatabaseHelper.getPublicTransportDatabase().transportDao().getSegmentForCurrentTrolley(event.getSelectRout().getNumber(), transportType)
+        DatabaseHelper.getPublicTransportDatabase().transportDao().getSegmentForCurrentTransport(event.getSelectRout().getNumber(), transportType)
                 .observeOn(AndroidSchedulers.mainThread())
+                .doOnError(throwable -> Logger.d(throwable.getMessage()))
                 .subscribe(this::getSegmentsFromDB);
-        DatabaseHelper.getPublicTransportDatabase().transportDao().getStopsForCurrentTrolley(event.getSelectRout().getNumber(), transportType)
+        DatabaseHelper.getPublicTransportDatabase().transportDao().getStopsForCurrentTransport(event.getSelectRout().getNumber(), transportType)
                 .observeOn(AndroidSchedulers.mainThread())
+                .doOnError(throwable -> Logger.d(throwable.getMessage()))
                 .subscribe(this::getStopsFromDB);
-        DatabaseHelper.getPublicTransportDatabase().transportDao().getPointsForCurrentTrolley(event.getSelectRout().getNumber(), transportType)
+        DatabaseHelper.getPublicTransportDatabase().transportDao().getPointsForCurrentTransport(event.getSelectRout().getNumber(), transportType)
                 .observeOn(AndroidSchedulers.mainThread())
+                .doOnError(throwable -> Logger.d(throwable.getMessage()))
                 .subscribe(this::getPointsFromDB);
-
     }
+
 
     private void getSegmentsFromDB(List<SegmentEntity> segmentEntities) {
         mSegmentsDataForCurrentRoute.addAll(segmentEntities);
@@ -78,10 +81,10 @@ public class MapsFragmentPresenterImpl implements MapsFragmentPresenter {
 
     private void getPointsFromDB(List<PointEntity> pointEntities) {
         mPointsDataForCurrentRoute.addAll(pointEntities);
-        connectPointsToSegments();
+        EventBus.getDefault().post(new BusEvents.DataForCurrentRouteFetched());
     }
-
-    private void connectPointsToSegments() {
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void connectPointsToSegments(BusEvents.DataForCurrentRouteFetched event) {
         for (SegmentEntity currentSegment : mSegmentsDataForCurrentRoute) {
             List<PointEntity> finals = new ArrayList<>();
             for (PointEntity currentPoint : mPointsDataForCurrentRoute) {

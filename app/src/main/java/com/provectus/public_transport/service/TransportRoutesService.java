@@ -15,63 +15,53 @@ import com.provectus.public_transport.service.retrofit.RetrofitProvider;
 
 import org.greenrobot.eventbus.EventBus;
 
-import java.net.HttpURLConnection;
+import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
-import io.reactivex.Completable;
-import io.reactivex.android.schedulers.AndroidSchedulers;
-import io.reactivex.disposables.CompositeDisposable;
-import io.reactivex.schedulers.Schedulers;
-import retrofit2.Response;
+import retrofit2.Call;
 
 /**
  * Created by Psihey on 20.08.2017.
  */
 public class TransportRoutesService extends IntentService {
-    private CompositeDisposable mCompositeDisposable;
+
     private List<TransportEntity> mTransportEntity = new ArrayList<>();
     private List<SegmentEntity> mSegmentEntity = new ArrayList<>();
     private List<PointEntity> mPointEntity = new ArrayList<>();
     private List<StopEntity> mStopEntity = new ArrayList<>();
 
     public TransportRoutesService() {
-        super(TransportRoutesService.class.getName());
+        super(TransportRoutesService.class.getSimpleName());
     }
 
     @Override
     public void onCreate() {
         super.onCreate();
-        mCompositeDisposable = new CompositeDisposable();
         Logger.d("Service is Created");
-    }
-
-    @Override
-    protected void onHandleIntent(@Nullable Intent intent) {
-        Logger.d("Service is HandleIntent");
-        getRoutesFromServer();
     }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
         Logger.d("Service is Destroyed");
+
+    }
+
+    @Override
+    protected void onHandleIntent(@Nullable Intent intent) {
+        getRoutesFromServer();
     }
 
     private void getRoutesFromServer() {
-        mCompositeDisposable.add(RetrofitProvider
-                .getRetrofit().getAllRoutes()
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(this::handleResponse, this::handleError));
-    }
-
-    private void handleResponse(Response<List<TransportEntity>> response) {
-        Logger.d("All Ok, we got responce");
-        if (response.code() == HttpURLConnection.HTTP_NOT_MODIFIED) {
-            Logger.d("We got 304 Code Data not modified");
-        } else {
-            for (TransportEntity currentRoutes : response.body()) {
+        SimpleDateFormat dateFormat = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss z", Locale.ENGLISH);
+        System.out.println(dateFormat.format(new Date()));
+        Call<List<TransportEntity>> call = RetrofitProvider.getRetrofit().getAllRoutes(dateFormat.format(new Date()));
+        try {
+            for (TransportEntity currentRoutes : call.execute().body()) {
                 TransportEntity currentTransportEntity = new TransportEntity(currentRoutes.getServerId(),
                         currentRoutes.getNumber(),
                         currentRoutes.getType(),
@@ -94,56 +84,28 @@ public class TransportRoutesService extends IntentService {
                             currentSegmentEntity.getServerId()));
                 }
             }
-            removeAllFromTables();
-            initDataToDataBase();
+        } catch (IOException e) {
+            e.printStackTrace();
         }
 
-        if (!mCompositeDisposable.isDisposed()) {
-            mCompositeDisposable.dispose();
-        }
-    }
-
-    private void handleError(Throwable throwable) {
-        Logger.d("Handle Error from when fetching data" + throwable.getMessage());
-        EventBus.getDefault().post(new BusEvents.SendRoutesErrorEvent());
+        removeAllFromTables();
+        initDataToDataBase();
     }
 
     private void removeAllFromTables() {
-        Completable.defer(() -> Completable.fromCallable(this::deleteFromDataBase))
-                .subscribeOn(Schedulers.computation())
-                .subscribe(
-                        () -> {
-                        },
-                        throwable -> Logger.d(throwable.getMessage())
-                );
-        Logger.d("Database is removed");
+        DatabaseHelper.getPublicTransportDatabase().transportDao().deleteAll(mTransportEntity);
+        DatabaseHelper.getPublicTransportDatabase().segmentDao().deleteAll(mSegmentEntity);
+        DatabaseHelper.getPublicTransportDatabase().pointDao().deleteAll(mPointEntity);
+        DatabaseHelper.getPublicTransportDatabase().stopDao().deleteAll(mStopEntity);
     }
 
-    private boolean deleteFromDataBase() {
-        DatabaseHelper.getPublicTransportDatabase().transportDao().deleteAll();
-        DatabaseHelper.getPublicTransportDatabase().segmentDao().deleteAll();
-        DatabaseHelper.getPublicTransportDatabase().pointDao().deleteAll();
-        DatabaseHelper.getPublicTransportDatabase().stopDao().deleteAll();
-        return true;
-    }
 
     private void initDataToDataBase() {
-        Completable.defer(() -> Completable.fromCallable(this::putToDB))
-                .subscribeOn(Schedulers.computation())
-                .subscribe(
-                        () -> {
-                        },
-                        throwable -> Logger.d(throwable.getMessage())
-                );
-        Logger.d("Database is initialized");
-    }
-
-    private boolean putToDB() {
         DatabaseHelper.getPublicTransportDatabase().transportDao().insertAll(mTransportEntity);
         DatabaseHelper.getPublicTransportDatabase().segmentDao().insertAll(mSegmentEntity);
         DatabaseHelper.getPublicTransportDatabase().pointDao().insertAll(mPointEntity);
         DatabaseHelper.getPublicTransportDatabase().stopDao().insertAll(mStopEntity);
-        return true;
+        EventBus.getDefault().post(new BusEvents.DataBaseInitialized());
     }
 
 }
