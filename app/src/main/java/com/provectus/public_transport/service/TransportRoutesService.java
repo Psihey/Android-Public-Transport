@@ -58,7 +58,6 @@ public class TransportRoutesService extends IntentService {
 
     private void getRoutesFromServer() {
         SimpleDateFormat dateFormat = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss z", Locale.ENGLISH);
-        System.out.println(dateFormat.format(new Date()));
         Call<List<TransportEntity>> call = RetrofitProvider.getRetrofit().getAllRoutes(dateFormat.format(new Date()));
         try {
             for (TransportEntity currentRoutes : call.execute().body()) {
@@ -85,7 +84,7 @@ public class TransportRoutesService extends IntentService {
                 }
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            Logger.d(e.getMessage());
         }
 
         removeAllFromTables();
