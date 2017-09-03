@@ -2,6 +2,8 @@ package com.provectus.public_transport.fragment.mapfragment.impl;
 
 
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.PolylineOptions;
 import com.orhanobut.logger.Logger;
 import com.provectus.public_transport.eventbus.BusEvents;
 import com.provectus.public_transport.fragment.mapfragment.MapsFragment;
@@ -17,6 +19,8 @@ import org.greenrobot.eventbus.ThreadMode;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import io.reactivex.android.schedulers.AndroidSchedulers;
 
@@ -33,6 +37,10 @@ public class MapsFragmentPresenterImpl implements MapsFragmentPresenter {
     private List<StopEntity> mStopsDataForCurrentRoute = new ArrayList<>();
     private List<SegmentEntity> mSegmentsWithPointsForCurrentRoute = new ArrayList<>();
     private boolean mIsSelectRoute;
+    private int number;
+    private Map<Integer,PolylineOptions> currentRoute = new ConcurrentHashMap<>();
+    private Map<Integer,List<MarkerOptions>> currentOptions = new ConcurrentHashMap<>();
+
 
     @Override
     public void bindView(MapsFragment mapsFragment) {
@@ -56,6 +64,12 @@ public class MapsFragmentPresenterImpl implements MapsFragmentPresenter {
         mStopsDataForCurrentRoute.clear();
         mIsSelectRoute = event.isCheckBoxState();
         String transportType = event.getSelectRout().getType().toString();
+        Logger.d(transportType);
+        if (transportType.equals("TROLLEYBUSES_TYPE")){
+            number = event.getSelectRout().getNumber()+100;
+        }else if(transportType.equals("TRAM_TYPE")){
+            number=event.getSelectRout().getNumber()+1000;
+        }
         DatabaseHelper.getPublicTransportDatabase().transportDao().getSegmentForCurrentTransport(event.getSelectRout().getNumber(), transportType)
                 .observeOn(AndroidSchedulers.mainThread())
                 .doOnError(throwable -> Logger.d(throwable.getMessage()))
@@ -94,11 +108,11 @@ public class MapsFragmentPresenterImpl implements MapsFragmentPresenter {
             }
             mSegmentsWithPointsForCurrentRoute.add(new SegmentEntity(currentSegment.getDirection(), currentSegment.getPosition(), finals));
         }
-        mMapsFragment.drawRotes(sortedRoutesSegment(mSegmentsWithPointsForCurrentRoute), getStopsOnRoute(mStopsDataForCurrentRoute),mIsSelectRoute);
+        mMapsFragment.drawRotes(sortedRoutesSegment(mSegmentsWithPointsForCurrentRoute), getStopsOnRoute(mStopsDataForCurrentRoute));
     }
 
     // TODO: 23.08.17 Use Rx
-    private List<LatLng> sortedRoutesSegment(List<SegmentEntity> segmentEntities) {
+    private Map<Integer,PolylineOptions> sortedRoutesSegment(List<SegmentEntity> segmentEntities) {
         List<LatLng> listDirection1 = new ArrayList<>();
         List<LatLng> listDirection2 = new ArrayList<>();
         LatLng first = null;
@@ -132,17 +146,51 @@ public class MapsFragmentPresenterImpl implements MapsFragmentPresenter {
         }
         List<LatLng> listRes = new ArrayList<>(listDirection1);
         listRes.addAll(listDirection2);
-        return listRes;
+
+        PolylineOptions  polylineOptions = new PolylineOptions().addAll(listRes);
+        Logger.d(number);
+        Logger.d(polylineOptions);
+        if (mIsSelectRoute){
+            currentRoute.put(number,polylineOptions);
+        }else {
+            for (Map.Entry<Integer,PolylineOptions> entry : currentRoute.entrySet()){
+                Logger.d("ffffffffff");
+                Integer key = entry.getKey();
+                if (key!= number){
+
+                }else{
+                    Logger.d("addddddddd");
+                    currentRoute.remove(number);
+                }
+            }
+        }
+        return  currentRoute;
     }
 
-    private List<LatLng> getStopsOnRoute(List<StopEntity> stopEntities) {
-        List<LatLng> listRes = new ArrayList<>();
+    private Map<Integer,List<MarkerOptions>> getStopsOnRoute(List<StopEntity> stopEntities) {
+        List<MarkerOptions> markerOption = new ArrayList<>();
         for (int i = 0; i < stopEntities.size(); i++) {
             double lat = stopEntities.get(i).getLatitude();
             double lng = stopEntities.get(i).getLongitude();
-            listRes.add(new LatLng(lat, lng));
+            markerOption.add(new MarkerOptions().position(new LatLng(lat,lng)));
         }
-        return listRes;
+
+        if (mIsSelectRoute){
+            currentOptions.put(number,markerOption);
+        }else {
+            for (Map.Entry<Integer,List<MarkerOptions>> entry : currentOptions.entrySet()){
+                Logger.d("ffffffffff");
+                Integer key = entry.getKey();
+                if (key!= number){
+
+                }else{
+                    Logger.d("addddddddd");
+                    currentOptions.remove(number);
+                }
+            }
+        }
+
+        return currentOptions;
     }
 
 }

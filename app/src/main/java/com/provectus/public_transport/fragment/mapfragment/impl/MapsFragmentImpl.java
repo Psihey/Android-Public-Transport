@@ -31,6 +31,7 @@ import com.provectus.public_transport.utils.Const;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import biz.laenger.android.vpbs.BottomSheetUtils;
 import butterknife.BindView;
@@ -58,8 +59,9 @@ public class MapsFragmentImpl extends Fragment implements MapsFragment, OnMapRea
     private MapsFragmentPresenter mMapsPresenter;
     private Unbinder mUnbinder;
     private GoogleMap mMap;
-    private List<Polyline> currentPolylineForDraw = new ArrayList<>();
+    private List<PolylineOptions> currentPolylineForDraw = new ArrayList<>();
     private boolean isMapReady;
+    private List<Polyline> polylines = new ArrayList<>();
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -104,11 +106,11 @@ public class MapsFragmentImpl extends Fragment implements MapsFragment, OnMapRea
     }
 
     @Override
-    public void drawRotes(List<LatLng> sortedRoutes, List<LatLng> stops, boolean isSelectedRoute) {
+    public void drawRotes(Map<Integer, PolylineOptions> sortedRoutes, Map<Integer,List<MarkerOptions>> stops) {
         if (!isMapReady || mMap == null || sortedRoutes == null) {
             return;
         }
-        drawRoutesWithStopOnMap(sortedRoutes, isSelectedRoute, stops);
+        drawRoutesWithStopOnMap(sortedRoutes, stops);
 
     }
 
@@ -120,17 +122,21 @@ public class MapsFragmentImpl extends Fragment implements MapsFragment, OnMapRea
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
     }
 
-    private void drawRoutesWithStopOnMap(List<LatLng> listDirection, boolean checkBoxState, List<LatLng> stops) {
-        if (checkBoxState) {
-            drawCurrentStop(stops);
-            drawCurrentRoute(listDirection);
-        } else {
-            currentPolylineForDraw.remove(listDirection);
-            for (Polyline polyline : currentPolylineForDraw) {
-                mMap.clear();
-                drawPolyline(polyline);
+    private void drawRoutesWithStopOnMap(Map<Integer, PolylineOptions> listDirection, Map<Integer,List<MarkerOptions>> stops) {
+        mMap.clear();
+        for (Map.Entry<Integer, PolylineOptions> entry : listDirection.entrySet()) {
+            PolylineOptions value = entry.getValue();
+            Polyline polyline = mMap.addPolyline(value);
+            polyline.setColor(getRandomColor());
+            polyline.setWidth(5);
+        }
+        for (Map.Entry<Integer,List<MarkerOptions>> entry : stops.entrySet()){
+            for (MarkerOptions value : entry.getValue()) {
+                    mMap.addMarker(value);
             }
         }
+
+
     }
 
     public void drawCurrentStop(List<LatLng> stops) {
@@ -138,18 +144,6 @@ public class MapsFragmentImpl extends Fragment implements MapsFragment, OnMapRea
             mMap.addMarker(new MarkerOptions()
                     .position(stops.get(i)));
         }
-    }
-
-    private void drawCurrentRoute(List<LatLng> listDirection) {
-        currentPolylineForDraw.add(mMap.addPolyline(new PolylineOptions().addAll(listDirection)));
-        for (Polyline polyline : currentPolylineForDraw) {
-            drawPolyline(polyline);
-        }
-    }
-
-    private void drawPolyline(Polyline polyline) {
-        polyline.setColor(getRandomColor());
-        polyline.setWidth(4);
     }
 
     private void initViewPager() {
