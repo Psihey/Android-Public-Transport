@@ -20,19 +20,13 @@ public class BusEvents {
 
     public static class SendChosenRouter {
         private TransportEntity mSelectRout;
-        private boolean mCheckBoxState;
 
-        public SendChosenRouter(TransportEntity selectRout, boolean checkBoxState) {
+        public SendChosenRouter(TransportEntity selectRout) {
             this.mSelectRout = selectRout;
-            this.mCheckBoxState = checkBoxState;
         }
 
         public TransportEntity getSelectRout() {
             return mSelectRout;
-        }
-
-        public boolean isCheckBoxState() {
-            return mCheckBoxState;
         }
 
     }

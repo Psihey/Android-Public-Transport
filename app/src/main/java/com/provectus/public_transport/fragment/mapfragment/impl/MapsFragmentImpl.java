@@ -18,7 +18,6 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.UiSettings;
-import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polyline;
@@ -137,13 +136,6 @@ public class MapsFragmentImpl extends Fragment implements MapsFragment, OnMapRea
         }
 
 
-    }
-
-    public void drawCurrentStop(List<LatLng> stops) {
-        for (int i = 0; i < stops.size(); i++) {
-            mMap.addMarker(new MarkerOptions()
-                    .position(stops.get(i)));
-        }
     }
 
     private void initViewPager() {

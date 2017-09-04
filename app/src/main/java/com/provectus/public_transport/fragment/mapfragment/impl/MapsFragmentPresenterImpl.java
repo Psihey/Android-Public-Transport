@@ -62,7 +62,7 @@ public class MapsFragmentPresenterImpl implements MapsFragmentPresenter {
         mSegmentsDataForCurrentRoute.clear();
         mPointsDataForCurrentRoute.clear();
         mStopsDataForCurrentRoute.clear();
-        mIsSelectRoute = event.isCheckBoxState();
+        mIsSelectRoute = event.getSelectRout().isIsSelected();
         String transportType = event.getSelectRout().getType().toString();
         Logger.d(transportType);
         if (transportType.equals("TROLLEYBUSES_TYPE")){
