@@ -37,13 +37,17 @@ public class RoutesTabFragmentPresenterImpl implements RoutesTabFragmentPresente
     @Override
     public void unbindView() {
         mRoutesTabFragment = null;
-        EventBus.getDefault().unregister(this);
     }
 
     @Override
     public void setTransportType(TransportType transportType) {
         mTransportType = transportType;
         getDataFromDB();
+    }
+
+    @Override
+    public void unregisteredEventBus() {
+        EventBus.getDefault().unregister(this);
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)

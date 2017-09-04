@@ -54,8 +54,12 @@ public class MapsFragmentPresenterImpl implements MapsFragmentPresenter {
     @Override
     public void unbindView() {
         mMapsFragment = null;
-        EventBus.getDefault().unregister(this);
         Logger.d("Maps is unbind from presenter");
+    }
+
+    @Override
+    public void unregisteredEventBus() {
+        EventBus.getDefault().unregister(this);
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)

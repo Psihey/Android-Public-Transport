@@ -81,7 +81,7 @@ public class MapsFragmentImpl extends Fragment implements MapsFragment, OnMapRea
     @Override
     public void onPause() {
         super.onPause();
-        mMapsPresenter.unbindView();
+        mMapsPresenter.unregisteredEventBus();
     }
 
     @Override
@@ -90,6 +90,7 @@ public class MapsFragmentImpl extends Fragment implements MapsFragment, OnMapRea
         if (mUnbinder != null) {
             mUnbinder.unbind();
         }
+        mMapsPresenter.unbindView();
     }
 
     @Override

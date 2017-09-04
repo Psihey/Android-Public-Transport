@@ -2,10 +2,6 @@ package com.provectus.public_transport.utils;
 
 import com.google.android.gms.maps.model.LatLng;
 
-/**
- * Created by Evgeniy on 8/10/2017.
- */
-
 public final class Const {
 
     private Const() {

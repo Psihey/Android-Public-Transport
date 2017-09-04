@@ -19,4 +19,6 @@ public interface MapsFragmentPresenter {
      */
     void unbindView();
 
+    void unregisteredEventBus();
+
 }

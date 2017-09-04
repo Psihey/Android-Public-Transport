@@ -29,7 +29,7 @@
         android:layout_centerHorizontal="true"
         android:layout_centerVertical="true"
         android:layout_marginTop="10dp"
-        android:background="@color/colorBottomSheet"
+        android:background="@drawable/button_update_border"
         android:text="@string/btn_update_name"
         android:visibility="gone" />
 

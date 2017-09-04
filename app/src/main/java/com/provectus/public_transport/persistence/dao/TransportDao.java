@@ -14,10 +14,6 @@ import java.util.List;
 
 import io.reactivex.Flowable;
 
-/**
- * Created by Psihey on 20.08.2017.
- */
-
 @Dao
 public interface TransportDao {
 

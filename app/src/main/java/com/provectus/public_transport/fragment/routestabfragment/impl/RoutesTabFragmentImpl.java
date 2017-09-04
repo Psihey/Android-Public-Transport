@@ -13,7 +13,6 @@ import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
-import com.orhanobut.logger.Logger;
 import com.provectus.public_transport.R;
 import com.provectus.public_transport.adapter.TramsAndTrolleyAdapter;
 import com.provectus.public_transport.fragment.routestabfragment.RoutesTabFragment;
@@ -67,32 +66,27 @@ public class RoutesTabFragmentImpl extends Fragment implements RoutesTabFragment
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.tab_fragment, container, false);
         mUnbinder = ButterKnife.bind(this, view);
-        return view;
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
         if (mTabFragmentPresenter == null) {
             mTabFragmentPresenter = new RoutesTabFragmentPresenterImpl();
         }
         mTabFragmentPresenter.bindView(this);
         mTabFragmentPresenter.setTransportType(mType);
-        Logger.d("RouteTabFragment bind to its presenter");
+        return view;
     }
 
     @Override
     public void onPause() {
         super.onPause();
-        mTabFragmentPresenter.unbindView();
+        mTabFragmentPresenter.unregisteredEventBus();
     }
 
     @Override
-    public void onDestroyView() {
-        super.onDestroyView();
+    public void onDestroy() {
+        super.onDestroy();
         if (mUnbinder != null) {
             mUnbinder.unbind();
         }
+        mTabFragmentPresenter.unbindView();
     }
 
     @Override
