@@ -90,6 +90,7 @@ public class RoutesTabFragmentPresenterImpl implements RoutesTabFragmentPresente
         }
         if (transportEntities != null && !transportEntities.isEmpty()) {
             mRoutesTabFragment.initRecyclerView(transportEntities);
+            mRoutesTabFragment.serviceEndWorked();
         } else {
             mRoutesTabFragment.checkMyServiceRunning();
         }

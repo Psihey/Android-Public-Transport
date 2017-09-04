@@ -2,6 +2,7 @@ package com.provectus.public_transport.service;
 
 import android.app.IntentService;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.support.annotation.Nullable;
 
 import com.orhanobut.logger.Logger;
@@ -29,7 +30,11 @@ import retrofit2.Response;
 
 public class TransportRoutesService extends IntentService {
 
-    private static final String RFC_1123_DATE_TIME = "EEE, dd MMM 2016 HH:mm:ss z";
+    private static final String RFC_1123_DATE_TIME_FOR_GET_200_CODE = "EEE, dd MMM 2016 HH:mm:ss z";
+    private static final String RFC_1123_DATE_TIME = "EEE, dd MMM yyyy HH:mm:ss z";
+    private static final String TIME_ZONE_GMT = "GMT";
+    private static final String PREFS_NAME = "HttpCodePrefs";
+    private static final String PREFS_KEY = "code";
     private List<TransportEntity> mTransportEntity = new ArrayList<>();
     private List<SegmentEntity> mSegmentEntity = new ArrayList<>();
     private List<PointEntity> mPointEntity = new ArrayList<>();
@@ -58,17 +63,20 @@ public class TransportRoutesService extends IntentService {
     }
 
     private void getRoutesFromServer() {
+        SharedPreferences mLastGetModified = getSharedPreferences(PREFS_NAME, 0);
 
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat(RFC_1123_DATE_TIME, Locale.ENGLISH);
-        simpleDateFormat.setTimeZone(TimeZone.getTimeZone("GMT"));
-        Call<List<TransportEntity>> call = RetrofitProvider.getRetrofit().getAllRoutes(simpleDateFormat.format(new Date()));
-        Logger.d(simpleDateFormat.format(new Date()));
+        String date = getDateForRequest(mLastGetModified);
+
+        Call<List<TransportEntity>> call = RetrofitProvider.getRetrofit().getAllRoutes(date);
+
         try {
             Response<List<TransportEntity>> response = call.execute();
             Logger.d(response.code());
             if (response.isSuccessful() && response.code() == HttpURLConnection.HTTP_NOT_MODIFIED) {
                 Logger.d("There are no updates");
+                EventBus.getDefault().post(new BusEvents.DataBaseInitialized());
             } else if (response.isSuccessful() && response.body() != null) {
+                putLastModifiedDateToPreference(mLastGetModified);
                 for (TransportEntity currentRoutes : response.body()) {
                     TransportEntity currentTransportEntity = new TransportEntity(currentRoutes.getServerId(),
                             currentRoutes.getNumber(),
@@ -94,14 +102,29 @@ public class TransportRoutesService extends IntentService {
                 }
                 removeAllFromTables();
                 initDataToDataBase();
-            } else {
-                Logger.d("Response is failed");
             }
-
         } catch (IOException e) {
             Logger.d(e.getMessage());
         }
 
+    }
+
+    private String getDateForRequest(SharedPreferences mLastGetModified) {
+        if (mLastGetModified.getString(PREFS_KEY, "").isEmpty()) {
+            SimpleDateFormat simpleDateFormat = new SimpleDateFormat(RFC_1123_DATE_TIME_FOR_GET_200_CODE, Locale.ENGLISH);
+            simpleDateFormat.setTimeZone(TimeZone.getTimeZone(TIME_ZONE_GMT));
+            return simpleDateFormat.format(new Date());
+        } else {
+            return mLastGetModified.getString(PREFS_KEY, "");
+        }
+    }
+
+    private void putLastModifiedDateToPreference(SharedPreferences mLastGetModified) {
+        SimpleDateFormat simpleDateFormat2 = new SimpleDateFormat(RFC_1123_DATE_TIME, Locale.ENGLISH);
+        simpleDateFormat2.setTimeZone(TimeZone.getTimeZone(TIME_ZONE_GMT));
+        SharedPreferences.Editor editor = mLastGetModified.edit();
+        editor.putString(PREFS_KEY, simpleDateFormat2.format(new Date()));
+        editor.apply();
     }
 
     private void removeAllFromTables() {
