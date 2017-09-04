@@ -20,14 +20,8 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-
-/**
- * Created by Psihey on 11.08.2017.
- */
-
 public class TramsAndTrolleyAdapter extends RecyclerView.Adapter<TramsAndTrolleyAdapter.TramsAndTrolleyViewHolder> {
     private List<TransportEntity> mTransportRoutesData;
-    private boolean mIsSelectRoute;
 
     public TramsAndTrolleyAdapter(List<TransportEntity> data) {
         this.mTransportRoutesData = data;
@@ -58,8 +52,10 @@ public class TramsAndTrolleyAdapter extends RecyclerView.Adapter<TramsAndTrolley
 
         holder.tvRoutesNumber.setText(String.valueOf(mTransportRoutesData.get(position).getNumber()));
 
-        holder.checkBoxSelectRout.setOnCheckedChangeListener((buttonView, isChecked) -> mIsSelectRoute = isChecked);
-        holder.checkBoxSelectRout.setOnClickListener(view -> EventBus.getDefault().post(new BusEvents.SendChosenRouter(mTransportRoutesData.get(position),mIsSelectRoute)));
+        holder.checkBoxSelectRout.setOnCheckedChangeListener(null);
+        holder.checkBoxSelectRout.setChecked(transportRoutes.isIsSelected());
+        holder.checkBoxSelectRout.setOnCheckedChangeListener((buttonView, isChecked) -> transportRoutes.setIsSelected(isChecked));
+        holder.checkBoxSelectRout.setOnClickListener(view -> EventBus.getDefault().post(new BusEvents.SendChosenRouter(transportRoutes)));
     }
 
     @Override

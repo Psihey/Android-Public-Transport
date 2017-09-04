@@ -14,4 +14,5 @@ public interface RoutesTabFragment {
 
     void checkMyServiceRunning();
 
+    void serviceEndWorked();
 }

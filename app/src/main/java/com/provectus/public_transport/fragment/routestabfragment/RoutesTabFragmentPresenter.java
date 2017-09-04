@@ -14,4 +14,6 @@ public interface RoutesTabFragmentPresenter {
 
     void setTransportType(TransportType transportType);
 
+    void unregisteredEventBus();
+
 }

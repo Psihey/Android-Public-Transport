@@ -18,7 +18,7 @@ public class TransportEntity {
 
     @SerializedName("id")
     @ColumnInfo(name = "transport_id")
-    @PrimaryKey(autoGenerate = false)
+    @PrimaryKey()
     private long mServerId;
 
     @SerializedName("number")
@@ -38,6 +38,9 @@ public class TransportEntity {
     @Ignore
     private List<SegmentEntity> segments;
 
+    @Ignore
+    private boolean mIsSelected;
+
     public TransportEntity(long serverId, int number, TransportType type, double distance) {
         mServerId = serverId;
         mNumber = number;
@@ -47,6 +50,14 @@ public class TransportEntity {
 
     public long getServerId() {
         return mServerId;
+    }
+
+    public boolean isIsSelected() {
+        return mIsSelected;
+    }
+
+    public void setIsSelected(boolean mIsSelected) {
+        this.mIsSelected = mIsSelected;
     }
 
     public int getNumber() {

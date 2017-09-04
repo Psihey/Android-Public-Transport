@@ -4,10 +4,6 @@ import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;
 
-/**
- * Created by Psihey on 11.08.2017.
- */
-
 public class RetrofitProvider {
 
     private final static String BASE_URl = "http://188.166.95.36:8080/";

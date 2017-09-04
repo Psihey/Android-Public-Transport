@@ -15,11 +15,14 @@ import android.widget.TextView;
 
 import com.provectus.public_transport.R;
 import com.provectus.public_transport.adapter.TramsAndTrolleyAdapter;
+import com.provectus.public_transport.eventbus.BusEvents;
 import com.provectus.public_transport.fragment.routestabfragment.RoutesTabFragment;
 import com.provectus.public_transport.model.TransportEntity;
 import com.provectus.public_transport.model.TransportType;
 import com.provectus.public_transport.service.TransportRoutesService;
 import com.provectus.public_transport.utils.Utils;
+
+import org.greenrobot.eventbus.EventBus;
 
 import java.util.List;
 
@@ -38,16 +41,16 @@ public class RoutesTabFragmentImpl extends Fragment implements RoutesTabFragment
     @BindView(R.id.recycler_view_routes)
     RecyclerView mRoutesRecyclerView;
     @BindView(R.id.tab_fragment_progress_bar)
-    ProgressBar progressBar;
+    ProgressBar mProgressBarNoItem;
     @BindView(R.id.tv_tab_fragment_no_data)
-    TextView textViewNoData;
+    TextView mTextViewNoData;
     @BindView(R.id.bottom_sheet_btn_update)
-    Button btnUdate;
+    Button mBtnUpdate;
+    @BindView(R.id.tv_wait_for_loading)
+    TextView mBtnLoading;
 
     private RoutesTabFragmentPresenterImpl mTabFragmentPresenter;
-    private TramsAndTrolleyAdapter mAdapter;
     private TransportType mType;
-
     private Unbinder mUnbinder;
 
     public static RoutesTabFragmentImpl newInstance(TransportType transportType) {
@@ -68,59 +71,63 @@ public class RoutesTabFragmentImpl extends Fragment implements RoutesTabFragment
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.tab_fragment, container, false);
         mUnbinder = ButterKnife.bind(this, view);
-        return view;
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
         if (mTabFragmentPresenter == null) {
             mTabFragmentPresenter = new RoutesTabFragmentPresenterImpl();
         }
         mTabFragmentPresenter.bindView(this);
         mTabFragmentPresenter.setTransportType(mType);
+        mRoutesRecyclerView.setVisibility(View.GONE);
+        return view;
     }
 
     @Override
     public void onPause() {
         super.onPause();
-        mTabFragmentPresenter.unbindView();
+        mTabFragmentPresenter.unregisteredEventBus();
     }
 
     @Override
-    public void onDestroyView() {
-        super.onDestroyView();
+    public void onDestroy() {
+        super.onDestroy();
         if (mUnbinder != null) {
             mUnbinder.unbind();
         }
+        mTabFragmentPresenter.unbindView();
     }
 
     @Override
     public void initRecyclerView(List<TransportEntity> transportEntity) {
         mRoutesRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-        mAdapter = new TramsAndTrolleyAdapter(transportEntity);
+        TramsAndTrolleyAdapter mAdapter = new TramsAndTrolleyAdapter(transportEntity);
         mRoutesRecyclerView.setAdapter(mAdapter);
-        progressBar.setVisibility(View.GONE);
         setErrorVisible(View.GONE);
     }
 
     @Override
     public void checkMyServiceRunning() {
         if (!Utils.isMyServiceRunning(TransportRoutesService.class, getActivity())) {
-            progressBar.setVisibility(View.GONE);
+            mProgressBarNoItem.setVisibility(View.GONE);
             setErrorVisible(View.VISIBLE);
-            btnUdate.setOnClickListener(view -> {
+            mBtnUpdate.setOnClickListener(view -> {
                 setErrorVisible(View.GONE);
                 getActivity().startService(new Intent(getActivity(), TransportRoutesService.class));
-                progressBar.setVisibility(View.VISIBLE);
+                mProgressBarNoItem.setVisibility(View.VISIBLE);
             });
 
         }
     }
 
+    @Override
+    public void serviceEndWorked() {
+        mProgressBarNoItem.setVisibility(View.GONE);
+        mBtnLoading.setVisibility(View.GONE);
+        mRoutesRecyclerView.setVisibility(View.VISIBLE);
+        EventBus.getDefault().post(new BusEvents.DataBaseInitialized());
+    }
+
     private void setErrorVisible(int visible) {
-        textViewNoData.setVisibility(visible);
-        btnUdate.setVisibility(visible);
+        mTextViewNoData.setVisibility(visible);
+        mBtnUpdate.setVisibility(visible);
     }
 
 }

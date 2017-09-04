@@ -23,7 +23,7 @@ public class SegmentEntity {
 
     @SerializedName("id")
     @ColumnInfo(name = "segment_id")
-    @PrimaryKey(autoGenerate = false)
+    @PrimaryKey()
     private long mServerId;
 
     @SerializedName("direction")

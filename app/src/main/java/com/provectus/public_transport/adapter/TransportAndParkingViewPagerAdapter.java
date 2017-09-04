@@ -7,10 +7,6 @@ import android.support.v4.app.FragmentPagerAdapter;
 import com.provectus.public_transport.fragment.routestabfragment.impl.RoutesTabFragmentImpl;
 import com.provectus.public_transport.model.TransportType;
 
-/**
- * Created by Evgeniy on 8/17/2017.
- */
-
 public class TransportAndParkingViewPagerAdapter extends FragmentPagerAdapter {
 
     public static final int POSITION_BUS = 0;

@@ -1,5 +1,6 @@
 package com.provectus.public_transport.fragment.routestabfragment.impl;
 
+import com.orhanobut.logger.Logger;
 import com.provectus.public_transport.eventbus.BusEvents;
 import com.provectus.public_transport.fragment.routestabfragment.RoutesTabFragment;
 import com.provectus.public_transport.fragment.routestabfragment.RoutesTabFragmentPresenter;
@@ -36,13 +37,27 @@ public class RoutesTabFragmentPresenterImpl implements RoutesTabFragmentPresente
     @Override
     public void unbindView() {
         mRoutesTabFragment = null;
-        EventBus.getDefault().unregister(this);
     }
 
     @Override
     public void setTransportType(TransportType transportType) {
         mTransportType = transportType;
         getDataFromDB();
+    }
+
+    @Override
+    public void unregisteredEventBus() {
+        EventBus.getDefault().unregister(this);
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void getUpdateDBEvent(BusEvents.DataBaseInitialized routesEvent) {
+        getDataFromDB();
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void getUpdateDBEvent(BusEvents.ServiceEndWorked service) {
+       mRoutesTabFragment.serviceEndWorked();
     }
 
     private void getDataFromDB() {
@@ -54,6 +69,7 @@ public class RoutesTabFragmentPresenterImpl implements RoutesTabFragmentPresente
                     })
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
+                    .doOnError(throwable -> Logger.d(throwable.getMessage()))
                     .subscribe(this::getTransportFromDB);
         } else if (mTransportType == TransportType.TROLLEYBUSES_TYPE) {
             DatabaseHelper.getPublicTransportDatabase().transportDao().getAllTrolleybuses()
@@ -63,17 +79,13 @@ public class RoutesTabFragmentPresenterImpl implements RoutesTabFragmentPresente
                     })
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
+                    .doOnError(throwable -> Logger.d(throwable.getMessage()))
                     .subscribe(this::getTransportFromDB);
         }
     }
 
-    @Subscribe(threadMode = ThreadMode.MAIN)
-    public void getUpdateDBEvent(BusEvents.DataBaseInitialized routesEvent) {
-        getDataFromDB();
-    }
-
     private void getTransportFromDB(List<TransportEntity> transportEntities) {
-        if (mRoutesTabFragment == null){
+        if (mRoutesTabFragment == null) {
             return;
         }
         if (transportEntities != null && !transportEntities.isEmpty()) {
@@ -81,6 +93,7 @@ public class RoutesTabFragmentPresenterImpl implements RoutesTabFragmentPresente
         } else {
             mRoutesTabFragment.checkMyServiceRunning();
         }
+
     }
 
     private Comparator<TransportEntity> sortByNumber = (t1, t2) -> t1.getNumber() > t2.getNumber() ? 1 : -1;

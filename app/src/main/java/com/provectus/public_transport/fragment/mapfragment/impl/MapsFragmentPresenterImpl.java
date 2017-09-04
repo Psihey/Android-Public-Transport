@@ -2,6 +2,8 @@ package com.provectus.public_transport.fragment.mapfragment.impl;
 
 
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.PolylineOptions;
 import com.orhanobut.logger.Logger;
 import com.provectus.public_transport.eventbus.BusEvents;
 import com.provectus.public_transport.fragment.mapfragment.MapsFragment;
@@ -9,6 +11,7 @@ import com.provectus.public_transport.fragment.mapfragment.MapsFragmentPresenter
 import com.provectus.public_transport.model.PointEntity;
 import com.provectus.public_transport.model.SegmentEntity;
 import com.provectus.public_transport.model.StopEntity;
+import com.provectus.public_transport.model.TransportType;
 import com.provectus.public_transport.persistence.database.DatabaseHelper;
 
 import org.greenrobot.eventbus.EventBus;
@@ -17,6 +20,8 @@ import org.greenrobot.eventbus.ThreadMode;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import io.reactivex.android.schedulers.AndroidSchedulers;
 
@@ -26,13 +31,18 @@ import io.reactivex.android.schedulers.AndroidSchedulers;
  */
 
 public class MapsFragmentPresenterImpl implements MapsFragmentPresenter {
+    private static final int TRAM_NUMBER_INCREMENT = 1000;
+    private static final int TROLLEY_NUMBER_INCREMENT = 100;
 
     private MapsFragment mMapsFragment;
     private List<SegmentEntity> mSegmentsDataForCurrentRoute = new ArrayList<>();
     private List<PointEntity> mPointsDataForCurrentRoute = new ArrayList<>();
     private List<StopEntity> mStopsDataForCurrentRoute = new ArrayList<>();
     private List<SegmentEntity> mSegmentsWithPointsForCurrentRoute = new ArrayList<>();
+    private Map<Integer, PolylineOptions> mAllCurrentRoutesOnMap = new ConcurrentHashMap<>();
+    private Map<Integer, List<MarkerOptions>> mAllCurrentMarkerOnMap = new ConcurrentHashMap<>();
     private boolean mIsSelectRoute;
+    private int mTransportNumber;
 
     @Override
     public void bindView(MapsFragment mapsFragment) {
@@ -44,8 +54,12 @@ public class MapsFragmentPresenterImpl implements MapsFragmentPresenter {
     @Override
     public void unbindView() {
         mMapsFragment = null;
-        EventBus.getDefault().unregister(this);
         Logger.d("Maps is unbind from presenter");
+    }
+
+    @Override
+    public void unregisteredEventBus() {
+        EventBus.getDefault().unregister(this);
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
@@ -54,8 +68,13 @@ public class MapsFragmentPresenterImpl implements MapsFragmentPresenter {
         mSegmentsDataForCurrentRoute.clear();
         mPointsDataForCurrentRoute.clear();
         mStopsDataForCurrentRoute.clear();
-        mIsSelectRoute = event.isCheckBoxState();
+        mIsSelectRoute = event.getSelectRout().isIsSelected();
         String transportType = event.getSelectRout().getType().toString();
+        if (transportType.equals(TransportType.TROLLEYBUSES_TYPE.name())) {
+            mTransportNumber = event.getSelectRout().getNumber() + TROLLEY_NUMBER_INCREMENT;
+        } else if (transportType.equals(TransportType.TRAM_TYPE.name())) {
+            mTransportNumber = event.getSelectRout().getNumber() + TRAM_NUMBER_INCREMENT;
+        }
         DatabaseHelper.getPublicTransportDatabase().transportDao().getSegmentForCurrentTransport(event.getSelectRout().getNumber(), transportType)
                 .observeOn(AndroidSchedulers.mainThread())
                 .doOnError(throwable -> Logger.d(throwable.getMessage()))
@@ -70,6 +89,19 @@ public class MapsFragmentPresenterImpl implements MapsFragmentPresenter {
                 .subscribe(this::getPointsFromDB);
     }
 
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void connectPointsToSegments(BusEvents.DataForCurrentRouteFetched event) {
+        for (SegmentEntity currentSegment : mSegmentsDataForCurrentRoute) {
+            List<PointEntity> finals = new ArrayList<>();
+            for (PointEntity currentPoint : mPointsDataForCurrentRoute) {
+                if (currentSegment.getServerId() == currentPoint.getSegmentId()) {
+                    finals.add(currentPoint);
+                }
+            }
+            mSegmentsWithPointsForCurrentRoute.add(new SegmentEntity(currentSegment.getDirection(), currentSegment.getPosition(), finals));
+        }
+        mMapsFragment.drawSelectedPosition(sortedRoutesSegment(mSegmentsWithPointsForCurrentRoute), getStopsOnRoute(mStopsDataForCurrentRoute));
+    }
 
     private void getSegmentsFromDB(List<SegmentEntity> segmentEntities) {
         mSegmentsDataForCurrentRoute.addAll(segmentEntities);
@@ -83,22 +115,9 @@ public class MapsFragmentPresenterImpl implements MapsFragmentPresenter {
         mPointsDataForCurrentRoute.addAll(pointEntities);
         EventBus.getDefault().post(new BusEvents.DataForCurrentRouteFetched());
     }
-    @Subscribe(threadMode = ThreadMode.MAIN)
-    public void connectPointsToSegments(BusEvents.DataForCurrentRouteFetched event) {
-        for (SegmentEntity currentSegment : mSegmentsDataForCurrentRoute) {
-            List<PointEntity> finals = new ArrayList<>();
-            for (PointEntity currentPoint : mPointsDataForCurrentRoute) {
-                if (currentSegment.getServerId() == currentPoint.getSegmentId()) {
-                    finals.add(currentPoint);
-                }
-            }
-            mSegmentsWithPointsForCurrentRoute.add(new SegmentEntity(currentSegment.getDirection(), currentSegment.getPosition(), finals));
-        }
-        mMapsFragment.drawRotes(sortedRoutesSegment(mSegmentsWithPointsForCurrentRoute), getStopsOnRoute(mStopsDataForCurrentRoute),mIsSelectRoute);
-    }
 
     // TODO: 23.08.17 Use Rx
-    private List<LatLng> sortedRoutesSegment(List<SegmentEntity> segmentEntities) {
+    private Map<Integer, PolylineOptions> sortedRoutesSegment(List<SegmentEntity> segmentEntities) {
         List<LatLng> listDirection1 = new ArrayList<>();
         List<LatLng> listDirection2 = new ArrayList<>();
         LatLng first = null;
@@ -132,17 +151,42 @@ public class MapsFragmentPresenterImpl implements MapsFragmentPresenter {
         }
         List<LatLng> listRes = new ArrayList<>(listDirection1);
         listRes.addAll(listDirection2);
-        return listRes;
+
+        PolylineOptions polylineOptions = new PolylineOptions().addAll(listRes);
+
+        if (mIsSelectRoute) {
+            mAllCurrentRoutesOnMap.put(mTransportNumber, polylineOptions);
+        } else {
+            for (Map.Entry<Integer, PolylineOptions> entry : mAllCurrentRoutesOnMap.entrySet()) {
+                Integer key = entry.getKey();
+                if (key == mTransportNumber) {
+                    mAllCurrentRoutesOnMap.remove(mTransportNumber);
+                }
+            }
+        }
+
+        return mAllCurrentRoutesOnMap;
     }
 
-    private List<LatLng> getStopsOnRoute(List<StopEntity> stopEntities) {
-        List<LatLng> listRes = new ArrayList<>();
+    private Map<Integer, List<MarkerOptions>> getStopsOnRoute(List<StopEntity> stopEntities) {
+        List<MarkerOptions> markerOption = new ArrayList<>();
         for (int i = 0; i < stopEntities.size(); i++) {
             double lat = stopEntities.get(i).getLatitude();
             double lng = stopEntities.get(i).getLongitude();
-            listRes.add(new LatLng(lat, lng));
+            markerOption.add(new MarkerOptions().position(new LatLng(lat, lng)));
         }
-        return listRes;
+
+        if (mIsSelectRoute) {
+            mAllCurrentMarkerOnMap.put(mTransportNumber, markerOption);
+        } else {
+            for (Map.Entry<Integer, List<MarkerOptions>> entry : mAllCurrentMarkerOnMap.entrySet()) {
+                Integer key = entry.getKey();
+                if (key == mTransportNumber) {
+                    mAllCurrentMarkerOnMap.remove(mTransportNumber);
+                }
+            }
+        }
+        return mAllCurrentMarkerOnMap;
     }
 
 }

@@ -16,19 +16,20 @@ import com.provectus.public_transport.service.retrofit.RetrofitProvider;
 import org.greenrobot.eventbus.EventBus;
 
 import java.io.IOException;
+import java.net.HttpURLConnection;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+import java.util.TimeZone;
 
 import retrofit2.Call;
+import retrofit2.Response;
 
-/**
- * Created by Psihey on 20.08.2017.
- */
 public class TransportRoutesService extends IntentService {
 
+    private static final String RFC_1123_DATE_TIME = "EEE, dd MMM 2016 HH:mm:ss z";
     private List<TransportEntity> mTransportEntity = new ArrayList<>();
     private List<SegmentEntity> mSegmentEntity = new ArrayList<>();
     private List<PointEntity> mPointEntity = new ArrayList<>();
@@ -48,7 +49,7 @@ public class TransportRoutesService extends IntentService {
     public void onDestroy() {
         super.onDestroy();
         Logger.d("Service is Destroyed");
-
+        EventBus.getDefault().post(new BusEvents.ServiceEndWorked());
     }
 
     @Override
@@ -57,38 +58,50 @@ public class TransportRoutesService extends IntentService {
     }
 
     private void getRoutesFromServer() {
-        SimpleDateFormat dateFormat = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss z", Locale.ENGLISH);
-        Call<List<TransportEntity>> call = RetrofitProvider.getRetrofit().getAllRoutes(dateFormat.format(new Date()));
+
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat(RFC_1123_DATE_TIME, Locale.ENGLISH);
+        simpleDateFormat.setTimeZone(TimeZone.getTimeZone("GMT"));
+        Call<List<TransportEntity>> call = RetrofitProvider.getRetrofit().getAllRoutes(simpleDateFormat.format(new Date()));
+        Logger.d(simpleDateFormat.format(new Date()));
         try {
-            for (TransportEntity currentRoutes : call.execute().body()) {
-                TransportEntity currentTransportEntity = new TransportEntity(currentRoutes.getServerId(),
-                        currentRoutes.getNumber(),
-                        currentRoutes.getType(),
-                        currentRoutes.getDistance());
-                mTransportEntity.add(currentTransportEntity);
-                for (SegmentEntity currentSegment : currentRoutes.getSegments()) {
-                    SegmentEntity currentSegmentEntity = new SegmentEntity(currentSegment.getServerId(),
-                            currentSegment.getDirection(),
-                            currentSegment.getPosition(),
-                            currentTransportEntity.getServerId());
-                    mSegmentEntity.add(currentSegmentEntity);
-                    for (PointEntity currentPoint : currentSegment.getPoints()) {
-                        mPointEntity.add(new PointEntity(currentPoint.getLatitude(),
-                                currentPoint.getLongitude(), currentPoint.getPosition(),
+            Response<List<TransportEntity>> response = call.execute();
+            Logger.d(response.code());
+            if (response.isSuccessful() && response.code() == HttpURLConnection.HTTP_NOT_MODIFIED) {
+                Logger.d("There are no updates");
+            } else if (response.isSuccessful() && response.body() != null) {
+                for (TransportEntity currentRoutes : response.body()) {
+                    TransportEntity currentTransportEntity = new TransportEntity(currentRoutes.getServerId(),
+                            currentRoutes.getNumber(),
+                            currentRoutes.getType(),
+                            currentRoutes.getDistance());
+                    mTransportEntity.add(currentTransportEntity);
+                    for (SegmentEntity currentSegment : currentRoutes.getSegments()) {
+                        SegmentEntity currentSegmentEntity = new SegmentEntity(currentSegment.getServerId(),
+                                currentSegment.getDirection(),
+                                currentSegment.getPosition(),
+                                currentTransportEntity.getServerId());
+                        mSegmentEntity.add(currentSegmentEntity);
+                        for (PointEntity currentPoint : currentSegment.getPoints()) {
+                            mPointEntity.add(new PointEntity(currentPoint.getLatitude(),
+                                    currentPoint.getLongitude(), currentPoint.getPosition(),
+                                    currentSegmentEntity.getServerId()));
+                        }
+                        mStopEntity.add(new StopEntity(currentSegment.getStopEntity().getLatitude(),
+                                currentSegment.getStopEntity().getLongitude(),
+                                currentSegment.getStopEntity().getTitle(),
                                 currentSegmentEntity.getServerId()));
                     }
-                    mStopEntity.add(new StopEntity(currentSegment.getStopEntity().getLatitude(),
-                            currentSegment.getStopEntity().getLongitude(),
-                            currentSegment.getStopEntity().getTitle(),
-                            currentSegmentEntity.getServerId()));
                 }
+                removeAllFromTables();
+                initDataToDataBase();
+            } else {
+                Logger.d("Response is failed");
             }
+
         } catch (IOException e) {
             Logger.d(e.getMessage());
         }
 
-        removeAllFromTables();
-        initDataToDataBase();
     }
 
     private void removeAllFromTables() {
@@ -98,13 +111,13 @@ public class TransportRoutesService extends IntentService {
         DatabaseHelper.getPublicTransportDatabase().stopDao().deleteAll(mStopEntity);
     }
 
-
     private void initDataToDataBase() {
         DatabaseHelper.getPublicTransportDatabase().transportDao().insertAll(mTransportEntity);
         DatabaseHelper.getPublicTransportDatabase().segmentDao().insertAll(mSegmentEntity);
         DatabaseHelper.getPublicTransportDatabase().pointDao().insertAll(mPointEntity);
         DatabaseHelper.getPublicTransportDatabase().stopDao().insertAll(mStopEntity);
         EventBus.getDefault().post(new BusEvents.DataBaseInitialized());
+        Logger.d("Database is initialized");
     }
 
 }
