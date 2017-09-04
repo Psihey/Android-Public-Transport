@@ -98,7 +98,6 @@ public class TransportRoutesService extends IntentService {
         DatabaseHelper.getPublicTransportDatabase().stopDao().deleteAll(mStopEntity);
     }
 
-
     private void initDataToDataBase() {
         DatabaseHelper.getPublicTransportDatabase().transportDao().insertAll(mTransportEntity);
         DatabaseHelper.getPublicTransportDatabase().segmentDao().insertAll(mSegmentEntity);

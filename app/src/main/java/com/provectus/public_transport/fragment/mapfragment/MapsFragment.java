@@ -12,6 +12,6 @@ import java.util.Map;
 
 public interface MapsFragment {
 
-    void drawRotes(Map<Integer,PolylineOptions> routes, Map<Integer,List<MarkerOptions>> stops);
+    void drawSelectedPosition(Map<Integer, PolylineOptions> routes, Map<Integer, List<MarkerOptions>> stopping);
 
 }

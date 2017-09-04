@@ -28,7 +28,6 @@ import com.provectus.public_transport.fragment.mapfragment.MapsFragment;
 import com.provectus.public_transport.fragment.mapfragment.MapsFragmentPresenter;
 import com.provectus.public_transport.utils.Const;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -45,9 +44,8 @@ import static com.provectus.public_transport.utils.Utils.getRandomColor;
 
 public class MapsFragmentImpl extends Fragment implements MapsFragment, OnMapReadyCallback {
 
-    public final static String TAG_MAP_FRAGMENT = "fragment_map";
+    public static final String TAG_MAP_FRAGMENT = "fragment_map";
     private static final int REQUEST_LOCATION_PERMISSIONS = 1;
-
 
     @BindView(R.id.bottom_sheet_view_pager)
     ViewPager mViewPagerTransportAndParking;
@@ -58,9 +56,7 @@ public class MapsFragmentImpl extends Fragment implements MapsFragment, OnMapRea
     private MapsFragmentPresenter mMapsPresenter;
     private Unbinder mUnbinder;
     private GoogleMap mMap;
-    private List<PolylineOptions> currentPolylineForDraw = new ArrayList<>();
-    private boolean isMapReady;
-    private List<Polyline> polylines = new ArrayList<>();
+    private boolean mIsMapReady;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -98,19 +94,18 @@ public class MapsFragmentImpl extends Fragment implements MapsFragment, OnMapRea
 
     @Override
     public void onMapReady(GoogleMap googleMap) {
-        isMapReady = true;
+        mIsMapReady = true;
         mMap = googleMap;
         setDefaultCameraPosition();
         setMyLocationButton();
     }
 
     @Override
-    public void drawRotes(Map<Integer, PolylineOptions> sortedRoutes, Map<Integer,List<MarkerOptions>> stops) {
-        if (!isMapReady || mMap == null || sortedRoutes == null) {
+    public void drawSelectedPosition(Map<Integer, PolylineOptions> sortedRoutes, Map<Integer, List<MarkerOptions>> stopping) {
+        if (!mIsMapReady || mMap == null || sortedRoutes == null) {
             return;
         }
-        drawRoutesWithStopOnMap(sortedRoutes, stops);
-
+        drawRoutesWithStopOnMap(sortedRoutes, stopping);
     }
 
     @Override
@@ -121,7 +116,7 @@ public class MapsFragmentImpl extends Fragment implements MapsFragment, OnMapRea
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
     }
 
-    private void drawRoutesWithStopOnMap(Map<Integer, PolylineOptions> listDirection, Map<Integer,List<MarkerOptions>> stops) {
+    private void drawRoutesWithStopOnMap(Map<Integer, PolylineOptions> listDirection, Map<Integer, List<MarkerOptions>> stopping) {
         mMap.clear();
         for (Map.Entry<Integer, PolylineOptions> entry : listDirection.entrySet()) {
             PolylineOptions value = entry.getValue();
@@ -129,13 +124,11 @@ public class MapsFragmentImpl extends Fragment implements MapsFragment, OnMapRea
             polyline.setColor(getRandomColor());
             polyline.setWidth(5);
         }
-        for (Map.Entry<Integer,List<MarkerOptions>> entry : stops.entrySet()){
+        for (Map.Entry<Integer, List<MarkerOptions>> entry : stopping.entrySet()) {
             for (MarkerOptions value : entry.getValue()) {
-                    mMap.addMarker(value);
+                mMap.addMarker(value);
             }
         }
-
-
     }
 
     private void initViewPager() {

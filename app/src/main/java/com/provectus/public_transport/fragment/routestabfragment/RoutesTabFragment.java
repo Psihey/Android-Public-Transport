@@ -13,5 +13,4 @@ public interface RoutesTabFragment {
     void initRecyclerView(List<TransportEntity> transportEntity);
 
     void checkMyServiceRunning();
-
 }

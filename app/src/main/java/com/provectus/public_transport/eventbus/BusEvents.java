@@ -2,9 +2,6 @@ package com.provectus.public_transport.eventbus;
 
 import com.provectus.public_transport.model.TransportEntity;
 
-/**
- * Created by Psihey on 18.08.2017.
- */
 
 public class BusEvents {
 

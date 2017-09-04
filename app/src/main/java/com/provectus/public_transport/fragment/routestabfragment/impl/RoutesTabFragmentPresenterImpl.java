@@ -1,5 +1,6 @@
 package com.provectus.public_transport.fragment.routestabfragment.impl;
 
+import com.orhanobut.logger.Logger;
 import com.provectus.public_transport.eventbus.BusEvents;
 import com.provectus.public_transport.fragment.routestabfragment.RoutesTabFragment;
 import com.provectus.public_transport.fragment.routestabfragment.RoutesTabFragmentPresenter;
@@ -45,6 +46,11 @@ public class RoutesTabFragmentPresenterImpl implements RoutesTabFragmentPresente
         getDataFromDB();
     }
 
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void getUpdateDBEvent(BusEvents.DataBaseInitialized routesEvent) {
+        getDataFromDB();
+    }
+
     private void getDataFromDB() {
         if (mTransportType == TransportType.TRAM_TYPE) {
             DatabaseHelper.getPublicTransportDatabase().transportDao().getAllTram()
@@ -54,6 +60,7 @@ public class RoutesTabFragmentPresenterImpl implements RoutesTabFragmentPresente
                     })
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
+                    .doOnError(throwable -> Logger.d(throwable.getMessage()))
                     .subscribe(this::getTransportFromDB);
         } else if (mTransportType == TransportType.TROLLEYBUSES_TYPE) {
             DatabaseHelper.getPublicTransportDatabase().transportDao().getAllTrolleybuses()
@@ -63,17 +70,13 @@ public class RoutesTabFragmentPresenterImpl implements RoutesTabFragmentPresente
                     })
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
+                    .doOnError(throwable -> Logger.d(throwable.getMessage()))
                     .subscribe(this::getTransportFromDB);
         }
     }
 
-    @Subscribe(threadMode = ThreadMode.MAIN)
-    public void getUpdateDBEvent(BusEvents.DataBaseInitialized routesEvent) {
-        getDataFromDB();
-    }
-
     private void getTransportFromDB(List<TransportEntity> transportEntities) {
-        if (mRoutesTabFragment == null){
+        if (mRoutesTabFragment == null) {
             return;
         }
         if (transportEntities != null && !transportEntities.isEmpty()) {

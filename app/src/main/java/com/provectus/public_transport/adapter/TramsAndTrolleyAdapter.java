@@ -20,11 +20,6 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-
-/**
- * Created by Psihey on 11.08.2017.
- */
-
 public class TramsAndTrolleyAdapter extends RecyclerView.Adapter<TramsAndTrolleyAdapter.TramsAndTrolleyViewHolder> {
     private List<TransportEntity> mTransportRoutesData;
 
