@@ -15,11 +15,14 @@ import android.widget.TextView;
 
 import com.provectus.public_transport.R;
 import com.provectus.public_transport.adapter.TramsAndTrolleyAdapter;
+import com.provectus.public_transport.eventbus.BusEvents;
 import com.provectus.public_transport.fragment.routestabfragment.RoutesTabFragment;
 import com.provectus.public_transport.model.TransportEntity;
 import com.provectus.public_transport.model.TransportType;
 import com.provectus.public_transport.service.TransportRoutesService;
 import com.provectus.public_transport.utils.Utils;
+
+import org.greenrobot.eventbus.EventBus;
 
 import java.util.List;
 
@@ -43,6 +46,8 @@ public class RoutesTabFragmentImpl extends Fragment implements RoutesTabFragment
     TextView mTextViewNoData;
     @BindView(R.id.bottom_sheet_btn_update)
     Button mBtnUpdate;
+    @BindView(R.id.tv_wait_for_loading)
+    TextView mBtnLoading;
 
     private RoutesTabFragmentPresenterImpl mTabFragmentPresenter;
     private TransportType mType;
@@ -71,6 +76,7 @@ public class RoutesTabFragmentImpl extends Fragment implements RoutesTabFragment
         }
         mTabFragmentPresenter.bindView(this);
         mTabFragmentPresenter.setTransportType(mType);
+        mRoutesRecyclerView.setVisibility(View.GONE);
         return view;
     }
 
@@ -94,7 +100,6 @@ public class RoutesTabFragmentImpl extends Fragment implements RoutesTabFragment
         mRoutesRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         TramsAndTrolleyAdapter mAdapter = new TramsAndTrolleyAdapter(transportEntity);
         mRoutesRecyclerView.setAdapter(mAdapter);
-        mProgressBarNoItem.setVisibility(View.GONE);
         setErrorVisible(View.GONE);
     }
 
@@ -110,6 +115,14 @@ public class RoutesTabFragmentImpl extends Fragment implements RoutesTabFragment
             });
 
         }
+    }
+
+    @Override
+    public void serviceEndWorked() {
+        mProgressBarNoItem.setVisibility(View.GONE);
+        mBtnLoading.setVisibility(View.GONE);
+        mRoutesRecyclerView.setVisibility(View.VISIBLE);
+        EventBus.getDefault().post(new BusEvents.DataBaseInitialized());
     }
 
     private void setErrorVisible(int visible) {

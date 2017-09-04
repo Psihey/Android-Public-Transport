@@ -27,4 +27,10 @@ public class BusEvents {
         }
 
     }
+
+    public static class ServiceEndWorked{
+        public ServiceEndWorked(){
+
+        }
+    }
 }

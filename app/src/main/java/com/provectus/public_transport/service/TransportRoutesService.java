@@ -49,7 +49,7 @@ public class TransportRoutesService extends IntentService {
     public void onDestroy() {
         super.onDestroy();
         Logger.d("Service is Destroyed");
-
+        EventBus.getDefault().post(new BusEvents.ServiceEndWorked());
     }
 
     @Override

@@ -55,6 +55,11 @@ public class RoutesTabFragmentPresenterImpl implements RoutesTabFragmentPresente
         getDataFromDB();
     }
 
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void getUpdateDBEvent(BusEvents.ServiceEndWorked service) {
+       mRoutesTabFragment.serviceEndWorked();
+    }
+
     private void getDataFromDB() {
         if (mTransportType == TransportType.TRAM_TYPE) {
             DatabaseHelper.getPublicTransportDatabase().transportDao().getAllTram()
@@ -88,6 +93,7 @@ public class RoutesTabFragmentPresenterImpl implements RoutesTabFragmentPresente
         } else {
             mRoutesTabFragment.checkMyServiceRunning();
         }
+
     }
 
     private Comparator<TransportEntity> sortByNumber = (t1, t2) -> t1.getNumber() > t2.getNumber() ? 1 : -1;
