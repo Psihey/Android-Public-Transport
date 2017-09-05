@@ -4,6 +4,8 @@ import android.Manifest;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.design.widget.CoordinatorLayout;
+import android.support.design.widget.Snackbar;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
@@ -49,9 +51,10 @@ public class MapsFragmentImpl extends Fragment implements MapsFragment, OnMapRea
 
     @BindView(R.id.bottom_sheet_view_pager)
     ViewPager mViewPagerTransportAndParking;
-
     @BindView(R.id.bottom_sheet_tab_layout)
     TabLayout mBottomSheetTabLayout;
+    @BindView(R.id.coordinator_layout_fragment_container)
+    CoordinatorLayout mContainerLayout;
 
     private MapsFragmentPresenter mMapsPresenter;
     private Unbinder mUnbinder;
@@ -107,6 +110,12 @@ public class MapsFragmentImpl extends Fragment implements MapsFragment, OnMapRea
             return;
         }
         drawRoutesWithStopOnMap(sortedRoutes, stopping);
+    }
+
+    @Override
+    public void showErrorSnackbar() {
+        Snackbar snackbar = Snackbar.make(mContainerLayout, R.string.snack_bar_no_data_for_this_route,Snackbar.LENGTH_LONG);
+        snackbar.show();
     }
 
     @Override

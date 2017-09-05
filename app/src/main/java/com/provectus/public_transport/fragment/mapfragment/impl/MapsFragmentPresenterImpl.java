@@ -91,6 +91,12 @@ public class MapsFragmentPresenterImpl implements MapsFragmentPresenter {
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void connectPointsToSegments(BusEvents.DataForCurrentRouteFetched event) {
+        if (mIsSelectRoute) {
+            if (mSegmentsDataForCurrentRoute.isEmpty() || mPointsDataForCurrentRoute.isEmpty() || mStopsDataForCurrentRoute.isEmpty()) {
+                mMapsFragment.showErrorSnackbar();
+            }
+        }
+
         for (SegmentEntity currentSegment : mSegmentsDataForCurrentRoute) {
             List<PointEntity> finals = new ArrayList<>();
             for (PointEntity currentPoint : mPointsDataForCurrentRoute) {
@@ -101,6 +107,7 @@ public class MapsFragmentPresenterImpl implements MapsFragmentPresenter {
             mSegmentsWithPointsForCurrentRoute.add(new SegmentEntity(currentSegment.getDirection(), currentSegment.getPosition(), finals));
         }
         mMapsFragment.drawSelectedPosition(sortedRoutesSegment(mSegmentsWithPointsForCurrentRoute), getStopsOnRoute(mStopsDataForCurrentRoute));
+
     }
 
     private void getSegmentsFromDB(List<SegmentEntity> segmentEntities) {

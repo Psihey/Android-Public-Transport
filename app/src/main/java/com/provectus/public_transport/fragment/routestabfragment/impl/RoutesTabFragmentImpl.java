@@ -15,14 +15,11 @@ import android.widget.TextView;
 
 import com.provectus.public_transport.R;
 import com.provectus.public_transport.adapter.TramsAndTrolleyAdapter;
-import com.provectus.public_transport.eventbus.BusEvents;
 import com.provectus.public_transport.fragment.routestabfragment.RoutesTabFragment;
 import com.provectus.public_transport.model.TransportEntity;
 import com.provectus.public_transport.model.TransportType;
 import com.provectus.public_transport.service.TransportRoutesService;
 import com.provectus.public_transport.utils.Utils;
-
-import org.greenrobot.eventbus.EventBus;
 
 import java.util.List;
 
@@ -122,7 +119,6 @@ public class RoutesTabFragmentImpl extends Fragment implements RoutesTabFragment
         mProgressBarNoItem.setVisibility(View.GONE);
         mBtnLoading.setVisibility(View.GONE);
         mRoutesRecyclerView.setVisibility(View.VISIBLE);
-        EventBus.getDefault().post(new BusEvents.DataBaseInitialized());
     }
 
     private void setErrorVisible(int visible) {
