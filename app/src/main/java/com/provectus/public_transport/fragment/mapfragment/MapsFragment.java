@@ -14,4 +14,6 @@ public interface MapsFragment {
 
     void drawSelectedPosition(Map<Integer, PolylineOptions> routes, Map<Integer, List<MarkerOptions>> stopping);
 
+    void showErrorSnackbar();
+
 }

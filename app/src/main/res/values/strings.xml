@@ -10,6 +10,7 @@
     <string name="progress_dialog_network_message">Please wait some seconds! fetching data from the server</string>
     <string name="text_view_tab_fragment_no_data">Error, no data</string>
     <string name="btn_update_name">Update</string>
-    <string name="database_working_yet">Please, Wait some seconds Data Base working</string>
+    <string name="text_view_database_working_yet">Please, Wait some seconds Data Base working</string>
+    <string name="snack_bar_no_data_for_this_route">Unavailable the route or stoppings. Some problems on the server with this route.</string>
 
 </resources>

@@ -27,7 +27,7 @@
         android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"
         android:layout_centerVertical="true"
-        android:text="@string/database_working_yet"
+        android:text="@string/text_view_database_working_yet"
         android:textColor="@android:color/black" />
 
     <Button
