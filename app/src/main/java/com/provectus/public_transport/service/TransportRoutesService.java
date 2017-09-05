@@ -30,7 +30,6 @@ import retrofit2.Response;
 
 public class TransportRoutesService extends IntentService {
 
-    private static final String RFC_1123_DATE_TIME_FOR_GET_200_CODE = "EEE, dd MMM 2016 HH:mm:ss z";
     private static final String RFC_1123_DATE_TIME = "EEE, dd MMM yyyy HH:mm:ss z";
     private static final String TIME_ZONE_GMT = "GMT";
     private static final String PREFS_NAME = "HttpCodePrefs";
@@ -63,9 +62,9 @@ public class TransportRoutesService extends IntentService {
     }
 
     private void getRoutesFromServer() {
-        SharedPreferences mLastGetModified = getSharedPreferences(PREFS_NAME, 0);
 
-        String date = getDateForRequest(mLastGetModified);
+
+        String date = getDateForRequest();
 
         Call<List<TransportEntity>> call = RetrofitProvider.getRetrofit().getAllRoutes(date);
 
@@ -76,7 +75,7 @@ public class TransportRoutesService extends IntentService {
                 Logger.d("There are no updates");
                 EventBus.getDefault().post(new BusEvents.DataBaseInitialized());
             } else if (response.isSuccessful() && response.body() != null) {
-                putLastModifiedDateToPreference(mLastGetModified);
+                putLastModifiedDateToPreference();
                 for (TransportEntity currentRoutes : response.body()) {
                     TransportEntity currentTransportEntity = new TransportEntity(currentRoutes.getServerId(),
                             currentRoutes.getNumber(),
@@ -109,21 +108,21 @@ public class TransportRoutesService extends IntentService {
 
     }
 
-    private String getDateForRequest(SharedPreferences mLastGetModified) {
-        if (mLastGetModified.getString(PREFS_KEY, "").isEmpty()) {
-            SimpleDateFormat simpleDateFormat = new SimpleDateFormat(RFC_1123_DATE_TIME_FOR_GET_200_CODE, Locale.ENGLISH);
-            simpleDateFormat.setTimeZone(TimeZone.getTimeZone(TIME_ZONE_GMT));
-            return simpleDateFormat.format(new Date());
+    private String getDateForRequest() {
+        SharedPreferences PREF_DATA_LAST_MODIFIED = getSharedPreferences(PREFS_NAME, 0);
+        if (PREF_DATA_LAST_MODIFIED.getString(PREFS_KEY, "").isEmpty()) {
+            return null;
         } else {
-            return mLastGetModified.getString(PREFS_KEY, "");
+            return PREF_DATA_LAST_MODIFIED.getString(PREFS_KEY, "");
         }
     }
 
-    private void putLastModifiedDateToPreference(SharedPreferences mLastGetModified) {
-        SimpleDateFormat simpleDateFormat2 = new SimpleDateFormat(RFC_1123_DATE_TIME, Locale.ENGLISH);
-        simpleDateFormat2.setTimeZone(TimeZone.getTimeZone(TIME_ZONE_GMT));
-        SharedPreferences.Editor editor = mLastGetModified.edit();
-        editor.putString(PREFS_KEY, simpleDateFormat2.format(new Date()));
+    private void putLastModifiedDateToPreference() {
+        SharedPreferences PREF_DATA_LAST_MODIFIED = getSharedPreferences(PREFS_NAME, 0);
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat(RFC_1123_DATE_TIME, Locale.ENGLISH);
+        simpleDateFormat.setTimeZone(TimeZone.getTimeZone(TIME_ZONE_GMT));
+        SharedPreferences.Editor editor = PREF_DATA_LAST_MODIFIED.edit();
+        editor.putString(PREFS_KEY, simpleDateFormat.format(new Date()));
         editor.apply();
     }
 
