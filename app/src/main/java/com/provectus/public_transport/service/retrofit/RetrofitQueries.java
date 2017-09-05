@@ -1,5 +1,7 @@
 package com.provectus.public_transport.service.retrofit;
 
+import android.support.annotation.Nullable;
+
 import com.google.common.net.HttpHeaders;
 import com.provectus.public_transport.model.TransportEntity;
 
@@ -12,5 +14,5 @@ import retrofit2.http.Header;
 public interface RetrofitQueries {
 
     @GET("routes")
-    Call<List<TransportEntity>> getAllRoutes(@Header(HttpHeaders.IF_MODIFIED_SINCE) String date);
+    Call<List<TransportEntity>> getAllRoutes( @Nullable @Header(HttpHeaders.IF_MODIFIED_SINCE) String date);
 }

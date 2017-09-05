@@ -108,20 +108,21 @@ public class TransportRoutesService extends IntentService {
 
     }
 
-    private String getDateForRequest() {
-        SharedPreferences PREF_DATA_LAST_MODIFIED = getSharedPreferences(PREFS_NAME, 0);
-        if (PREF_DATA_LAST_MODIFIED.getString(PREFS_KEY, "").isEmpty()) {
+    private @Nullable String getDateForRequest() {
+        SharedPreferences settingCodeResponse = getSharedPreferences(PREFS_NAME, 0);
+        String dateLastModified = settingCodeResponse.getString(PREFS_KEY, "");
+        if (dateLastModified.isEmpty()) {
             return null;
         } else {
-            return PREF_DATA_LAST_MODIFIED.getString(PREFS_KEY, "");
+            return dateLastModified;
         }
     }
 
     private void putLastModifiedDateToPreference() {
-        SharedPreferences PREF_DATA_LAST_MODIFIED = getSharedPreferences(PREFS_NAME, 0);
+        SharedPreferences settingCodeResponse = getSharedPreferences(PREFS_NAME, 0);
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat(RFC_1123_DATE_TIME, Locale.ENGLISH);
         simpleDateFormat.setTimeZone(TimeZone.getTimeZone(TIME_ZONE_GMT));
-        SharedPreferences.Editor editor = PREF_DATA_LAST_MODIFIED.edit();
+        SharedPreferences.Editor editor = settingCodeResponse.edit();
         editor.putString(PREFS_KEY, simpleDateFormat.format(new Date()));
         editor.apply();
     }
