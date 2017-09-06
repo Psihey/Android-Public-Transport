@@ -85,12 +85,14 @@ public class RoutesTabFragmentPresenterImpl implements RoutesTabFragmentPresente
     }
 
     private void getTransportFromDB(List<TransportEntity> transportEntities) {
+
         if (mRoutesTabFragment == null) {
             return;
         }
         if (transportEntities != null && !transportEntities.isEmpty()) {
             mRoutesTabFragment.initRecyclerView(transportEntities);
             mRoutesTabFragment.serviceEndWorked();
+
         } else {
             mRoutesTabFragment.checkMyServiceRunning();
         }

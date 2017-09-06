@@ -84,11 +84,16 @@ public class RoutesTabFragmentImpl extends Fragment implements RoutesTabFragment
     }
 
     @Override
-    public void onDestroy() {
-        super.onDestroy();
+    public void onDestroyView() {
+        super.onDestroyView();
         if (mUnbinder != null) {
             mUnbinder.unbind();
         }
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
         mTabFragmentPresenter.unbindView();
     }
 
@@ -97,6 +102,7 @@ public class RoutesTabFragmentImpl extends Fragment implements RoutesTabFragment
         mRoutesRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         TramsAndTrolleyAdapter mAdapter = new TramsAndTrolleyAdapter(transportEntity);
         mRoutesRecyclerView.setAdapter(mAdapter);
+        mProgressBarNoItem.setVisibility(View.GONE);
         setErrorVisible(View.GONE);
     }
 
@@ -116,7 +122,6 @@ public class RoutesTabFragmentImpl extends Fragment implements RoutesTabFragment
 
     @Override
     public void serviceEndWorked() {
-        mProgressBarNoItem.setVisibility(View.GONE);
         mBtnLoading.setVisibility(View.GONE);
         mRoutesRecyclerView.setVisibility(View.VISIBLE);
     }

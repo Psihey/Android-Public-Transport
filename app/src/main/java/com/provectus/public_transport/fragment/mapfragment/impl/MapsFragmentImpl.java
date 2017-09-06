@@ -20,6 +20,8 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.UiSettings;
+import com.google.android.gms.maps.model.BitmapDescriptor;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polyline;
@@ -60,6 +62,7 @@ public class MapsFragmentImpl extends Fragment implements MapsFragment, OnMapRea
     private Unbinder mUnbinder;
     private GoogleMap mMap;
     private boolean mIsMapReady;
+    private BitmapDescriptor mStopIcon;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -69,6 +72,7 @@ public class MapsFragmentImpl extends Fragment implements MapsFragment, OnMapRea
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
         initViewPager();
+        mStopIcon = BitmapDescriptorFactory.fromResource(R.drawable.ic_temp_stop);
         return view;
     }
 
@@ -87,6 +91,7 @@ public class MapsFragmentImpl extends Fragment implements MapsFragment, OnMapRea
         mMapsPresenter.unregisteredEventBus();
     }
 
+
     @Override
     public void onDestroyView() {
         super.onDestroyView();
@@ -95,6 +100,7 @@ public class MapsFragmentImpl extends Fragment implements MapsFragment, OnMapRea
         }
         mMapsPresenter.unbindView();
     }
+
 
     @Override
     public void onMapReady(GoogleMap googleMap) {
@@ -114,7 +120,7 @@ public class MapsFragmentImpl extends Fragment implements MapsFragment, OnMapRea
 
     @Override
     public void showErrorSnackbar() {
-        Snackbar snackbar = Snackbar.make(mContainerLayout, R.string.snack_bar_no_data_for_this_route,Snackbar.LENGTH_LONG);
+        Snackbar snackbar = Snackbar.make(mContainerLayout, R.string.snack_bar_no_data_for_this_route, Snackbar.LENGTH_LONG);
         snackbar.show();
     }
 
@@ -127,6 +133,7 @@ public class MapsFragmentImpl extends Fragment implements MapsFragment, OnMapRea
     }
 
     private void drawRoutesWithStopOnMap(Map<Integer, PolylineOptions> listDirection, Map<Integer, List<MarkerOptions>> stopping) {
+
         mMap.clear();
         for (Map.Entry<Integer, PolylineOptions> entry : listDirection.entrySet()) {
             PolylineOptions value = entry.getValue();
@@ -136,7 +143,7 @@ public class MapsFragmentImpl extends Fragment implements MapsFragment, OnMapRea
         }
         for (Map.Entry<Integer, List<MarkerOptions>> entry : stopping.entrySet()) {
             for (MarkerOptions value : entry.getValue()) {
-                mMap.addMarker(value);
+                mMap.addMarker(value).setIcon(mStopIcon);
             }
         }
     }
@@ -160,25 +167,30 @@ public class MapsFragmentImpl extends Fragment implements MapsFragment, OnMapRea
             }
         });
         mBottomSheetTabLayout.setupWithViewPager(mViewPagerTransportAndParking);
-        mBottomSheetTabLayout.getTabAt(TransportAndParkingViewPagerAdapter.POSITION_BUS).setIcon(R.drawable.ic_front_bus_blue);
-        mBottomSheetTabLayout.getTabAt(TransportAndParkingViewPagerAdapter.POSITION_TRAM).setIcon(R.drawable.ic_tram_public_gray);
-        mBottomSheetTabLayout.getTabAt(TransportAndParkingViewPagerAdapter.POSITION_PARKING).setIcon(R.drawable.ic_parking_gray);
+        mBottomSheetTabLayout.getTabAt(TransportAndParkingViewPagerAdapter.POSITION_BUS).setIcon(R.drawable.ic_trolley_blue_24_dp);
+        mBottomSheetTabLayout.getTabAt(TransportAndParkingViewPagerAdapter.POSITION_TRAM).setIcon(R.drawable.ic_tram_gray_24_dp);
+        mBottomSheetTabLayout.getTabAt(TransportAndParkingViewPagerAdapter.POSITION_PARKING).setIcon(R.drawable.ic_local_parking_gray_24_dp);
+        mBottomSheetTabLayout.getTabAt(TransportAndParkingViewPagerAdapter.POSITION_FAVOURITES).setIcon(R.drawable.ic_favorite_gray_24_dp);
         BottomSheetUtils.setupViewPager(mViewPagerTransportAndParking);
     }
 
     private void changeIconInTabLayout(int position) {
-        mBottomSheetTabLayout.getTabAt(TransportAndParkingViewPagerAdapter.POSITION_BUS).setIcon(R.drawable.ic_front_bus_gray);
-        mBottomSheetTabLayout.getTabAt(TransportAndParkingViewPagerAdapter.POSITION_TRAM).setIcon(R.drawable.ic_tram_public_gray);
-        mBottomSheetTabLayout.getTabAt(TransportAndParkingViewPagerAdapter.POSITION_PARKING).setIcon(R.drawable.ic_parking_gray);
+        mBottomSheetTabLayout.getTabAt(TransportAndParkingViewPagerAdapter.POSITION_BUS).setIcon(R.drawable.ic_trolley_gray_24_dp);
+        mBottomSheetTabLayout.getTabAt(TransportAndParkingViewPagerAdapter.POSITION_TRAM).setIcon(R.drawable.ic_tram_gray_24_dp);
+        mBottomSheetTabLayout.getTabAt(TransportAndParkingViewPagerAdapter.POSITION_PARKING).setIcon(R.drawable.ic_local_parking_gray_24_dp);
+        mBottomSheetTabLayout.getTabAt(TransportAndParkingViewPagerAdapter.POSITION_FAVOURITES).setIcon(R.drawable.ic_favorite_gray_24_dp);
         switch (position) {
             case TransportAndParkingViewPagerAdapter.POSITION_BUS:
-                mBottomSheetTabLayout.getTabAt(TransportAndParkingViewPagerAdapter.POSITION_BUS).setIcon(R.drawable.ic_front_bus_blue);
+                mBottomSheetTabLayout.getTabAt(TransportAndParkingViewPagerAdapter.POSITION_BUS).setIcon(R.drawable.ic_trolley_blue_24_dp);
                 break;
             case TransportAndParkingViewPagerAdapter.POSITION_TRAM:
-                mBottomSheetTabLayout.getTabAt(TransportAndParkingViewPagerAdapter.POSITION_TRAM).setIcon(R.drawable.ic_tram_public_blue);
+                mBottomSheetTabLayout.getTabAt(TransportAndParkingViewPagerAdapter.POSITION_TRAM).setIcon(R.drawable.ic_tram_blue_24_dp);
                 break;
             case TransportAndParkingViewPagerAdapter.POSITION_PARKING:
-                mBottomSheetTabLayout.getTabAt(TransportAndParkingViewPagerAdapter.POSITION_PARKING).setIcon(R.drawable.ic_parking_blue);
+                mBottomSheetTabLayout.getTabAt(TransportAndParkingViewPagerAdapter.POSITION_PARKING).setIcon(R.drawable.ic_local_parking_blue_24_dp);
+                break;
+            case TransportAndParkingViewPagerAdapter.POSITION_FAVOURITES:
+                mBottomSheetTabLayout.getTabAt(TransportAndParkingViewPagerAdapter.POSITION_FAVOURITES).setIcon(R.drawable.ic_favorite_blue_24_dp);
                 break;
         }
     }

@@ -40,10 +40,10 @@ public class TramsAndTrolleyAdapter extends RecyclerView.Adapter<TramsAndTrolley
 
         switch (transportRoutes.getType()) {
             case TRAM_TYPE:
-                holder.ivLogoTransport.setImageResource(R.drawable.ic_tram_public_gray);
+                holder.ivLogoTransport.setImageResource(R.drawable.ic_tram_gray_24_dp);
                 break;
             case TROLLEYBUSES_TYPE:
-                holder.ivLogoTransport.setImageResource(R.drawable.ic_front_bus_gray);
+                holder.ivLogoTransport.setImageResource(R.drawable.ic_trolley_gray_24_dp);
                 break;
             default:
                 Logger.d("TransportEntity Type is Invalid");

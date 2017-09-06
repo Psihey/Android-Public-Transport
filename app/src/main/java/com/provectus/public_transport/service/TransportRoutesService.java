@@ -71,7 +71,7 @@ public class TransportRoutesService extends IntentService {
         try {
             Response<List<TransportEntity>> response = call.execute();
             Logger.d(response.code());
-            if (response.isSuccessful() && response.code() == HttpURLConnection.HTTP_NOT_MODIFIED) {
+            if (response.code() == HttpURLConnection.HTTP_NOT_MODIFIED) {
                 Logger.d("There are no updates");
                 EventBus.getDefault().post(new BusEvents.DataBaseInitialized());
             } else if (response.isSuccessful() && response.body() != null) {
