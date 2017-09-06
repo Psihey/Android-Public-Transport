@@ -150,49 +150,14 @@ public class MapsFragmentImpl extends Fragment implements MapsFragment, OnMapRea
 
     private void initViewPager() {
         TransportAndParkingViewPagerAdapter mPagerAdapter = new TransportAndParkingViewPagerAdapter(getFragmentManager());
-        mViewPagerTransportAndParking.setOffscreenPageLimit(3);
+        mViewPagerTransportAndParking.setOffscreenPageLimit(4);
         mViewPagerTransportAndParking.setAdapter(mPagerAdapter);
-        mViewPagerTransportAndParking.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
-            @Override
-            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-            }
-
-            @Override
-            public void onPageSelected(int position) {
-                changeIconInTabLayout(position);
-            }
-
-            @Override
-            public void onPageScrollStateChanged(int state) {
-            }
-        });
         mBottomSheetTabLayout.setupWithViewPager(mViewPagerTransportAndParking);
-        mBottomSheetTabLayout.getTabAt(TransportAndParkingViewPagerAdapter.POSITION_BUS).setIcon(R.drawable.ic_trolley_blue_24_dp);
-        mBottomSheetTabLayout.getTabAt(TransportAndParkingViewPagerAdapter.POSITION_TRAM).setIcon(R.drawable.ic_tram_gray_24_dp);
-        mBottomSheetTabLayout.getTabAt(TransportAndParkingViewPagerAdapter.POSITION_PARKING).setIcon(R.drawable.ic_local_parking_gray_24_dp);
-        mBottomSheetTabLayout.getTabAt(TransportAndParkingViewPagerAdapter.POSITION_FAVOURITES).setIcon(R.drawable.ic_favorite_gray_24_dp);
+        mBottomSheetTabLayout.getTabAt(TransportAndParkingViewPagerAdapter.POSITION_BUS).setIcon(R.drawable.trolleybus_tab_drawable_state);
+        mBottomSheetTabLayout.getTabAt(TransportAndParkingViewPagerAdapter.POSITION_TRAM).setIcon(R.drawable.tram_tab_drawable_state);
+        mBottomSheetTabLayout.getTabAt(TransportAndParkingViewPagerAdapter.POSITION_PARKING).setIcon(R.drawable.parking_tab_drawable_state);
+        mBottomSheetTabLayout.getTabAt(TransportAndParkingViewPagerAdapter.POSITION_FAVOURITES).setIcon(R.drawable.favourites_tab_drawable_state);
         BottomSheetUtils.setupViewPager(mViewPagerTransportAndParking);
-    }
-
-    private void changeIconInTabLayout(int position) {
-        mBottomSheetTabLayout.getTabAt(TransportAndParkingViewPagerAdapter.POSITION_BUS).setIcon(R.drawable.ic_trolley_gray_24_dp);
-        mBottomSheetTabLayout.getTabAt(TransportAndParkingViewPagerAdapter.POSITION_TRAM).setIcon(R.drawable.ic_tram_gray_24_dp);
-        mBottomSheetTabLayout.getTabAt(TransportAndParkingViewPagerAdapter.POSITION_PARKING).setIcon(R.drawable.ic_local_parking_gray_24_dp);
-        mBottomSheetTabLayout.getTabAt(TransportAndParkingViewPagerAdapter.POSITION_FAVOURITES).setIcon(R.drawable.ic_favorite_gray_24_dp);
-        switch (position) {
-            case TransportAndParkingViewPagerAdapter.POSITION_BUS:
-                mBottomSheetTabLayout.getTabAt(TransportAndParkingViewPagerAdapter.POSITION_BUS).setIcon(R.drawable.ic_trolley_blue_24_dp);
-                break;
-            case TransportAndParkingViewPagerAdapter.POSITION_TRAM:
-                mBottomSheetTabLayout.getTabAt(TransportAndParkingViewPagerAdapter.POSITION_TRAM).setIcon(R.drawable.ic_tram_blue_24_dp);
-                break;
-            case TransportAndParkingViewPagerAdapter.POSITION_PARKING:
-                mBottomSheetTabLayout.getTabAt(TransportAndParkingViewPagerAdapter.POSITION_PARKING).setIcon(R.drawable.ic_local_parking_blue_24_dp);
-                break;
-            case TransportAndParkingViewPagerAdapter.POSITION_FAVOURITES:
-                mBottomSheetTabLayout.getTabAt(TransportAndParkingViewPagerAdapter.POSITION_FAVOURITES).setIcon(R.drawable.ic_favorite_blue_24_dp);
-                break;
-        }
     }
 
     private void setDefaultCameraPosition() {
