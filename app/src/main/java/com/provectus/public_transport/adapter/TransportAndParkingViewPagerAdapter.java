@@ -12,14 +12,16 @@ public class TransportAndParkingViewPagerAdapter extends FragmentPagerAdapter {
     public static final int POSITION_BUS = 0;
     public static final int POSITION_TRAM = 1;
     public static final int POSITION_PARKING = 2;
+    public static final int POSITION_FAVOURITES = 3;
 
-    private final Fragment[] fragments = new Fragment[3];
+    private final Fragment[] fragments = new Fragment[4];
 
     public TransportAndParkingViewPagerAdapter(FragmentManager fm) {
         super(fm);
         fragments[POSITION_BUS] = RoutesTabFragmentImpl.newInstance(TransportType.TROLLEYBUSES_TYPE);
         fragments[POSITION_TRAM] = RoutesTabFragmentImpl.newInstance(TransportType.TRAM_TYPE);
         fragments[POSITION_PARKING] = RoutesTabFragmentImpl.newInstance(TransportType.PARKING_TYPE);
+        fragments[POSITION_FAVOURITES] = RoutesTabFragmentImpl.newInstance(TransportType.PARKING_TYPE);
     }
 
     @Override

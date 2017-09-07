@@ -20,7 +20,6 @@ import java.util.List;
                 onDelete = ForeignKey.CASCADE))
 public class SegmentEntity {
 
-
     @SerializedName("id")
     @ColumnInfo(name = "segment_id")
     @PrimaryKey()
