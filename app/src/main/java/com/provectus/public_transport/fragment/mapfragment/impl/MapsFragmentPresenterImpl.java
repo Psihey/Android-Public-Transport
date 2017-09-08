@@ -91,10 +91,9 @@ public class MapsFragmentPresenterImpl implements MapsFragmentPresenter {
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void connectPointsToSegments(BusEvents.DataForCurrentRouteFetched event) {
-        if (mIsSelectRoute) {
-            if (mSegmentsDataForCurrentRoute.isEmpty() || mPointsDataForCurrentRoute.isEmpty() || mStopsDataForCurrentRoute.isEmpty()) {
-                mMapsFragment.showErrorSnackbar();
-            }
+
+        if (mIsSelectRoute && mStopsDataForCurrentRoute.isEmpty()) {
+            mMapsFragment.showErrorSnackbar();
         }
 
         for (SegmentEntity currentSegment : mSegmentsDataForCurrentRoute) {

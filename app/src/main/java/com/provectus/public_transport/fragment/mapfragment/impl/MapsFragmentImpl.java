@@ -50,6 +50,7 @@ public class MapsFragmentImpl extends Fragment implements MapsFragment, OnMapRea
 
     public static final String TAG_MAP_FRAGMENT = "fragment_map";
     private static final int REQUEST_LOCATION_PERMISSIONS = 1;
+    private static final int VIEW_PAGER_PAGE_IN_MEMORY = 3;
 
     @BindView(R.id.bottom_sheet_view_pager)
     ViewPager mViewPagerTransportAndParking;
@@ -143,14 +144,14 @@ public class MapsFragmentImpl extends Fragment implements MapsFragment, OnMapRea
         }
         for (Map.Entry<Integer, List<MarkerOptions>> entry : stopping.entrySet()) {
             for (MarkerOptions value : entry.getValue()) {
-                mMap.addMarker(value).setIcon(mStopIcon);
+                mMap.addMarker(value);
             }
         }
     }
 
     private void initViewPager() {
         TransportAndParkingViewPagerAdapter mPagerAdapter = new TransportAndParkingViewPagerAdapter(getFragmentManager());
-        mViewPagerTransportAndParking.setOffscreenPageLimit(4);
+        mViewPagerTransportAndParking.setOffscreenPageLimit(VIEW_PAGER_PAGE_IN_MEMORY);
         mViewPagerTransportAndParking.setAdapter(mPagerAdapter);
         mBottomSheetTabLayout.setupWithViewPager(mViewPagerTransportAndParking);
         mBottomSheetTabLayout.getTabAt(TransportAndParkingViewPagerAdapter.POSITION_BUS).setIcon(R.drawable.trolleybus_tab_drawable_state);

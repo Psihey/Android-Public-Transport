@@ -30,7 +30,7 @@ public enum TransportType {
     }
 
     @TypeConverter
-    public static String transportTypeToString(TransportType date) {
-        return date == null ? null : date.name();
+    public static String transportTypeToString(TransportType type) {
+        return type == null ? null : type.name();
     }
 }

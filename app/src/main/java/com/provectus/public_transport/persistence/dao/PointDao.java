@@ -22,6 +22,6 @@ public interface PointDao {
     Flowable<List<PointEntity>> getAllPoint();
 
     @Delete()
-    void deleteAll(List<PointEntity> pointEntities);;
+    void deleteAll(List<PointEntity> pointEntities);
 
 }

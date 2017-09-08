@@ -34,18 +34,31 @@ public class TransportEntity {
     @ColumnInfo(name = "transport_distance")
     private double mDistance;
 
+    @ColumnInfo(name = "available")
+    @TypeConverters({AvailableBooleanConverters.class})
+    private boolean available;
+
     @SerializedName("segments")
     @Ignore
-    private List<SegmentEntity> segments;
+    private List<SegmentEntity> mSegments;
 
     @Ignore
     private boolean mIsSelected;
 
-    public TransportEntity(long serverId, int number, TransportType type, double distance) {
+    public TransportEntity(long serverId, int number, TransportType type, double distance, boolean available) {
         mServerId = serverId;
         mNumber = number;
         mType = type;
         mDistance = distance;
+        this.available = available;
+    }
+
+    public boolean getAvailable() {
+        return available;
+    }
+
+    public void setAvailable(boolean available) {
+        this.available = available;
     }
 
     public long getServerId() {
@@ -73,7 +86,7 @@ public class TransportEntity {
     }
 
     public List<SegmentEntity> getSegments() {
-        return segments;
+        return mSegments;
     }
 
 
@@ -84,7 +97,7 @@ public class TransportEntity {
                 ", Number=" + mNumber +
                 ", Type=" + mType +
                 ", Distance=" + mDistance +
-                ", segments=" + segments +
+                ", segments=" + mSegments +
                 '}';
     }
 }

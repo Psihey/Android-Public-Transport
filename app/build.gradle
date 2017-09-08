@@ -9,10 +9,23 @@ buildscript {
 }
 apply plugin: 'com.android.application'
 apply plugin: 'io.fabric'
+apply plugin: 'org.sonarqube'
 
 repositories {
     maven { url 'https://maven.fabric.io/public' }
     maven { url "https://raw.github.com/laenger/maven-releases/master/releases" }
+}
+
+sonarqube {
+    properties {
+        property "sonar.projectName", "PublicTransport"
+        property "sonar.projectKey", "ce27acf067b39a0835114d94a412e66aba264e83"
+        property "sonar.host.url", "http://localhost:9000"
+        property "sonar.language", "java"
+        property "sonar.sources", "src/main/"
+        property "sonar.login", "admin"
+        property "sonar.password", "admin"
+    }
 }
 
 apply plugin: 'me.tatarka.retrolambda'
@@ -30,7 +43,11 @@ android {
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
+        debug{
+            buildConfigField "String", "SERVER_URL", "\"http://46.101.220.157:8080/\""
+        }
         release {
+            buildConfigField "String", "SERVER_URL", "\"http://46.101.220.157:8080/\""
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
@@ -77,6 +94,8 @@ dependencies {
     compile 'org.greenrobot:eventbus:3.0.0'
     //ViewPagerBottomSheet
     compile "biz.laenger.android:vpbs:0.0.2"
+
+
 
     androidTestCompile 'com.android.support:support-annotations:25.3.1'
     testCompile 'junit:junit:4.12'

@@ -77,11 +77,13 @@ public class TransportRoutesService extends IntentService {
             } else if (response.isSuccessful() && response.body() != null) {
                 putLastModifiedDateToPreference();
                 for (TransportEntity currentRoutes : response.body()) {
+                    boolean available = true;
+                    List<PointEntity> pointsForCurrentRoute = new ArrayList<>();
                     TransportEntity currentTransportEntity = new TransportEntity(currentRoutes.getServerId(),
                             currentRoutes.getNumber(),
                             currentRoutes.getType(),
-                            currentRoutes.getDistance());
-                    mTransportEntity.add(currentTransportEntity);
+                            currentRoutes.getDistance(),available);
+
                     for (SegmentEntity currentSegment : currentRoutes.getSegments()) {
                         SegmentEntity currentSegmentEntity = new SegmentEntity(currentSegment.getServerId(),
                                 currentSegment.getDirection(),
@@ -89,6 +91,7 @@ public class TransportRoutesService extends IntentService {
                                 currentTransportEntity.getServerId());
                         mSegmentEntity.add(currentSegmentEntity);
                         for (PointEntity currentPoint : currentSegment.getPoints()) {
+                            pointsForCurrentRoute.add(currentPoint);
                             mPointEntity.add(new PointEntity(currentPoint.getLatitude(),
                                     currentPoint.getLongitude(), currentPoint.getPosition(),
                                     currentSegmentEntity.getServerId()));
@@ -98,6 +101,11 @@ public class TransportRoutesService extends IntentService {
                                 currentSegment.getStopEntity().getTitle(),
                                 currentSegmentEntity.getServerId()));
                     }
+                    if(pointsForCurrentRoute.isEmpty()){
+                        available = false;
+                        currentTransportEntity.setAvailable(available);
+                    }
+                    mTransportEntity.add(currentTransportEntity);
                 }
                 removeAllFromTables();
                 initDataToDataBase();
