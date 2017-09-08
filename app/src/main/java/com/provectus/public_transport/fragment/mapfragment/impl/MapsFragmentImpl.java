@@ -113,10 +113,7 @@ public class MapsFragmentImpl extends Fragment implements MapsFragment, OnMapRea
 
     @Override
     public void drawSelectedPosition(Map<Integer, PolylineOptions> sortedRoutes, Map<Integer, List<MarkerOptions>> stopping) {
-        if (!mIsMapReady || mMap == null || sortedRoutes == null) {
-            return;
-        }
-        drawRoutesWithStopOnMap(sortedRoutes, stopping);
+        if (checkOnReadyMap()) drawRoutesWithStopOnMap(sortedRoutes, stopping);
     }
 
     @Override
@@ -125,12 +122,17 @@ public class MapsFragmentImpl extends Fragment implements MapsFragment, OnMapRea
         snackbar.show();
     }
 
+
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         if (grantResults.length == 2 && requestCode == REQUEST_LOCATION_PERMISSIONS) {
             setMyLocationButton();
         }
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+    }
+
+    private boolean checkOnReadyMap() {
+        return !(!mIsMapReady || mMap == null);
     }
 
     private void drawRoutesWithStopOnMap(Map<Integer, PolylineOptions> listDirection, Map<Integer, List<MarkerOptions>> stopping) {
@@ -144,7 +146,7 @@ public class MapsFragmentImpl extends Fragment implements MapsFragment, OnMapRea
         }
         for (Map.Entry<Integer, List<MarkerOptions>> entry : stopping.entrySet()) {
             for (MarkerOptions value : entry.getValue()) {
-                mMap.addMarker(value);
+                mMap.addMarker(value).setIcon(mStopIcon);
             }
         }
     }

@@ -1,6 +1,7 @@
 package com.provectus.public_transport.model;
 
 import android.arch.persistence.room.ColumnInfo;
+import android.arch.persistence.room.Embedded;
 import android.arch.persistence.room.Entity;
 import android.arch.persistence.room.Ignore;
 import android.arch.persistence.room.PrimaryKey;
@@ -40,6 +41,7 @@ public class TransportEntity {
 
     @SerializedName("segments")
     @Ignore
+    @Embedded
     private List<SegmentEntity> mSegments;
 
     @Ignore

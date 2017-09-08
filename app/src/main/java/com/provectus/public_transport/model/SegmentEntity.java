@@ -1,6 +1,7 @@
 package com.provectus.public_transport.model;
 
 import android.arch.persistence.room.ColumnInfo;
+import android.arch.persistence.room.Embedded;
 import android.arch.persistence.room.Entity;
 import android.arch.persistence.room.ForeignKey;
 import android.arch.persistence.room.Ignore;
@@ -39,6 +40,10 @@ public class SegmentEntity {
     @SerializedName("points")
     @Ignore
     private List<PointEntity> mPoints;
+
+    @Embedded
+    @Ignore
+    private PointEntity pointEntity;
 
     @SerializedName("stoppingId")
     @Ignore
@@ -86,6 +91,10 @@ public class SegmentEntity {
         return mStopEntity;
     }
 
+    public PointEntity getPointEntity() {
+        return pointEntity;
+    }
+
     @Override
     public String toString() {
         return "SegmentEntity{" +
@@ -93,7 +102,7 @@ public class SegmentEntity {
                 ", Direction=" + mDirection +
                 ", Position=" + mPosition +
                 ", TransportId=" + mTransportId +
-                ", Points=" + mPoints +
+                ", Points=" + pointEntity +
                 '}';
     }
 }

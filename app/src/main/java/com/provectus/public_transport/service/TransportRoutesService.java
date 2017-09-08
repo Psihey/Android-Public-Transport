@@ -83,7 +83,6 @@ public class TransportRoutesService extends IntentService {
                             currentRoutes.getNumber(),
                             currentRoutes.getType(),
                             currentRoutes.getDistance(),available);
-
                     for (SegmentEntity currentSegment : currentRoutes.getSegments()) {
                         SegmentEntity currentSegmentEntity = new SegmentEntity(currentSegment.getServerId(),
                                 currentSegment.getDirection(),
