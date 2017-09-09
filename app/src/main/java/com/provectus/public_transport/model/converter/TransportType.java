@@ -1,4 +1,4 @@
-package com.provectus.public_transport.model;
+package com.provectus.public_transport.model.converter;
 
 import android.arch.persistence.room.TypeConverter;
 
@@ -6,9 +6,6 @@ import com.google.gson.annotations.SerializedName;
 
 import java.util.Objects;
 
-/**
- * Created by Psihey on 15.08.2017.
- */
 
 public enum TransportType {
 

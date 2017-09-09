@@ -5,7 +5,7 @@ import com.provectus.public_transport.eventbus.BusEvents;
 import com.provectus.public_transport.fragment.routestabfragment.RoutesTabFragment;
 import com.provectus.public_transport.fragment.routestabfragment.RoutesTabFragmentPresenter;
 import com.provectus.public_transport.model.TransportEntity;
-import com.provectus.public_transport.model.TransportType;
+import com.provectus.public_transport.model.converter.TransportType;
 import com.provectus.public_transport.persistence.database.DatabaseHelper;
 
 import org.greenrobot.eventbus.EventBus;

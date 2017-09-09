@@ -32,13 +32,13 @@ public interface TransportDao {
     void deleteAll(List<TransportEntity> transportEntities);
 
     @Query("SELECT * FROM transports "
-            + "INNER JOIN segments ON segments.transport_id = transports.transport_id "
+            + "INNER JOIN segments ON segments.segment_transport_id = transports.transport_id "
             + "INNER JOIN points ON points.point_segment_id = segments.segment_id "
             + "WHERE transports.transport_number = :transportNumber AND transports.transport_type = :transportType")
     Flowable<List<SegmentWithPointsModel>> getSegmentForCurrentTransport(int transportNumber, String transportType);
 
     @Query("SELECT * FROM transports "
-            + "INNER JOIN segments ON segments.transport_id = transports.transport_id "
+            + "INNER JOIN segments ON segments.segment_transport_id = transports.transport_id "
             + "INNER JOIN stopping ON stopping.stop_segment_id = segments.segment_id "
             + "WHERE transports.transport_number = :transportNumber AND transports.transport_type = :transportType")
     Flowable<List<StopEntity>> getStopsForCurrentTransport(int transportNumber, String transportType);

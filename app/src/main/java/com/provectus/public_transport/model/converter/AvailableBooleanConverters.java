@@ -1,10 +1,7 @@
-package com.provectus.public_transport.model;
+package com.provectus.public_transport.model.converter;
 
 import android.arch.persistence.room.TypeConverter;
 
-/**
- * Created by Psihey on 07.09.2017.
- */
 
 public class AvailableBooleanConverters {
     private AvailableBooleanConverters() {

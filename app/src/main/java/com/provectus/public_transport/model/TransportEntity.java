@@ -1,20 +1,19 @@
 package com.provectus.public_transport.model;
 
 import android.arch.persistence.room.ColumnInfo;
-import android.arch.persistence.room.Embedded;
 import android.arch.persistence.room.Entity;
 import android.arch.persistence.room.Ignore;
+import android.arch.persistence.room.Index;
 import android.arch.persistence.room.PrimaryKey;
 import android.arch.persistence.room.TypeConverters;
 
 import com.google.gson.annotations.SerializedName;
+import com.provectus.public_transport.model.converter.AvailableBooleanConverters;
+import com.provectus.public_transport.model.converter.TransportType;
 
 import java.util.List;
 
-/**
- * Created by Psihey on 11.08.2017.
- */
-@Entity(tableName = "transports")
+@Entity(tableName = "transports", indices = {@Index(value = {"transport_id"})})
 public class TransportEntity {
 
     @SerializedName("id")
@@ -37,42 +36,40 @@ public class TransportEntity {
 
     @ColumnInfo(name = "available")
     @TypeConverters({AvailableBooleanConverters.class})
-    private boolean available;
+    private boolean mIsAvailable;
 
     @SerializedName("segments")
     @Ignore
-    @Embedded
     private List<SegmentEntity> mSegments;
 
     @Ignore
     private boolean mIsSelected;
 
+    public TransportEntity() {
+    }
+
     public TransportEntity(long serverId, int number, TransportType type, double distance, boolean available) {
-        mServerId = serverId;
-        mNumber = number;
-        mType = type;
-        mDistance = distance;
-        this.available = available;
+        this.mServerId = serverId;
+        this.mNumber = number;
+        this.mType = type;
+        this.mDistance = distance;
+        this.mIsAvailable = available;
     }
 
-    public boolean getAvailable() {
-        return available;
+    public boolean isAvailable() {
+        return mIsAvailable;
     }
 
-    public void setAvailable(boolean available) {
-        this.available = available;
+    public void setIsAvailable(boolean mIsAvailable) {
+        this.mIsAvailable = mIsAvailable;
     }
 
     public long getServerId() {
         return mServerId;
     }
 
-    public boolean isIsSelected() {
+    public boolean isSelected() {
         return mIsSelected;
-    }
-
-    public void setIsSelected(boolean mIsSelected) {
-        this.mIsSelected = mIsSelected;
     }
 
     public int getNumber() {
@@ -91,6 +88,25 @@ public class TransportEntity {
         return mSegments;
     }
 
+    public void setServerId(long mServerId) {
+        this.mServerId = mServerId;
+    }
+
+    public void setNumber(int mNumber) {
+        this.mNumber = mNumber;
+    }
+
+    public void setType(TransportType mType) {
+        this.mType = mType;
+    }
+
+    public void setDistance(double mDistance) {
+        this.mDistance = mDistance;
+    }
+
+    public void setIsSelected(boolean mIsSelected) {
+        this.mIsSelected = mIsSelected;
+    }
 
     @Override
     public String toString() {

@@ -102,7 +102,7 @@ public class TransportRoutesService extends IntentService {
                     }
                     if(pointsForCurrentRoute.isEmpty()){
                         available = false;
-                        currentTransportEntity.setAvailable(available);
+                        currentTransportEntity.setIsAvailable(available);
                     }
                     mTransportEntity.add(currentTransportEntity);
                 }

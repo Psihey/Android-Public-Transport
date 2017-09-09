@@ -5,7 +5,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 
 import com.provectus.public_transport.fragment.routestabfragment.impl.RoutesTabFragmentImpl;
-import com.provectus.public_transport.model.TransportType;
+import com.provectus.public_transport.model.converter.TransportType;
 
 public class TransportAndParkingViewPagerAdapter extends FragmentPagerAdapter {
 

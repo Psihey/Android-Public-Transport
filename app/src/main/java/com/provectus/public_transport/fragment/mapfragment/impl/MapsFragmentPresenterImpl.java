@@ -11,7 +11,7 @@ import com.provectus.public_transport.fragment.mapfragment.MapsFragmentPresenter
 import com.provectus.public_transport.model.PointEntity;
 import com.provectus.public_transport.model.SegmentWithPointsModel;
 import com.provectus.public_transport.model.StopEntity;
-import com.provectus.public_transport.model.TransportType;
+import com.provectus.public_transport.model.converter.TransportType;
 import com.provectus.public_transport.persistence.database.DatabaseHelper;
 
 import org.greenrobot.eventbus.EventBus;
@@ -60,7 +60,7 @@ public class MapsFragmentPresenterImpl implements MapsFragmentPresenter {
     public void onMessageEvent(BusEvents.SendChosenRouter event) {
         mStopsDataForCurrentRoute.clear();
         mSegmentWithPointForCurrentRoute.clear();
-        mIsSelectRoute = event.getSelectRout().isIsSelected();
+        mIsSelectRoute = event.getSelectRout().isSelected();
         String transportType = event.getSelectRout().getType().toString();
         if (transportType.equals(TransportType.TROLLEYBUSES_TYPE.name())) {
             mTransportNumber = event.getSelectRout().getNumber() + TROLLEY_NUMBER_INCREMENT;

@@ -5,9 +5,6 @@ import android.arch.persistence.room.Relation;
 
 import java.util.List;
 
-/**
- * Created by Psihey on 08.09.2017.
- */
 
 public class SegmentWithPointsModel {
 
