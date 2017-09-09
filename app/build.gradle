@@ -15,7 +15,6 @@ repositories {
     maven { url "https://raw.github.com/laenger/maven-releases/master/releases" }
 }
 
-
 apply plugin: 'me.tatarka.retrolambda'
 
 android {
@@ -31,13 +30,14 @@ android {
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
-        debug{
-            buildConfigField "String", "SERVER_URL", "\"http://46.101.220.157:8080/\""
-        }
         release {
-            buildConfigField "String", "SERVER_URL", "\"http://46.101.220.157:8080/\""
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+    productFlavors{
+        full{
+            buildConfigField "String", "SERVER_URL", "\"http://46.101.220.157:8080/\""
         }
     }
     compileOptions {

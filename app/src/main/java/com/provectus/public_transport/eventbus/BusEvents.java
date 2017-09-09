@@ -8,14 +8,18 @@ public class BusEvents {
     }
 
     public static class DataBaseInitialized {
+        /**
+         * A method which says to the subscriber that Database has initialized
+         */
         public DataBaseInitialized() {
-            // Say to the subscriber that Database have initialized
         }
     }
 
     public static class DataForCurrentRouteFetched {
+        /**
+         * A method which says to the subscriber that data has fetched from Database and we can connect them
+         */
         public DataForCurrentRouteFetched() {
-            //Say to the subscriber that data have fetched from Database and we can connect them
         }
     }
 
@@ -33,8 +37,10 @@ public class BusEvents {
     }
 
     public static class ServiceEndWorked {
+        /**
+         * A method which says to the subscriber that service has ended work
+         */
         public ServiceEndWorked() {
-            // Say to the subscriber that service have ended work
         }
     }
 }
