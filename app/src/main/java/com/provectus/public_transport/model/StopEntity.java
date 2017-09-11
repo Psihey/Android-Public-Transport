@@ -3,19 +3,17 @@ package com.provectus.public_transport.model;
 import android.arch.persistence.room.ColumnInfo;
 import android.arch.persistence.room.Entity;
 import android.arch.persistence.room.ForeignKey;
+import android.arch.persistence.room.Index;
 import android.arch.persistence.room.PrimaryKey;
 
 import com.google.gson.annotations.SerializedName;
 
-/**
- * Created by Psihey on 28.08.2017.
- */
 
 @Entity(tableName = "stopping",
         foreignKeys = @ForeignKey(entity = SegmentEntity.class,
                 parentColumns = "segment_id",
-                childColumns = "segment_id",
-                onDelete = ForeignKey.CASCADE))
+                childColumns = "stop_segment_id",
+                onDelete = ForeignKey.CASCADE),indices = {@Index(value = {"stop_segment_id"})})
 public class StopEntity {
 
     @SerializedName("id")
@@ -34,7 +32,7 @@ public class StopEntity {
     @ColumnInfo(name = "title")
     private String mTitle;
 
-    @ColumnInfo(name = "segment_id")
+    @ColumnInfo(name = "stop_segment_id")
     private long mSegmentId;
 
     public StopEntity(double mLatitude, double mLongitude, String mTitle, long mSegmentId) {

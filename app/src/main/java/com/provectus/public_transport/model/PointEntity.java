@@ -3,20 +3,18 @@ package com.provectus.public_transport.model;
 import android.arch.persistence.room.ColumnInfo;
 import android.arch.persistence.room.Entity;
 import android.arch.persistence.room.ForeignKey;
+import android.arch.persistence.room.Index;
 import android.arch.persistence.room.PrimaryKey;
 
 import com.google.gson.annotations.SerializedName;
 
 import static android.R.attr.id;
 
-/**
- * Created by Psihey on 18.08.2017.
- */
 @Entity(tableName = "points",
         foreignKeys = @ForeignKey(entity = SegmentEntity.class,
                 parentColumns = "segment_id",
-                childColumns = "segment_id",
-                onDelete = ForeignKey.CASCADE))
+                childColumns = "point_segment_id",
+                onDelete = ForeignKey.CASCADE),indices = {@Index(value = {"point_segment_id"})})
 
 public class PointEntity {
 
@@ -35,7 +33,7 @@ public class PointEntity {
     @ColumnInfo(name = "point_position")
     private int mPosition;
 
-    @ColumnInfo(name = "segment_id")
+    @ColumnInfo(name = "point_segment_id")
     private long mSegmentId;
 
     public PointEntity(double latitude, double longitude, int position, long segmentId) {

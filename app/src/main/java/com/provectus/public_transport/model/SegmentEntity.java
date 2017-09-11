@@ -1,23 +1,22 @@
 package com.provectus.public_transport.model;
 
 import android.arch.persistence.room.ColumnInfo;
+import android.arch.persistence.room.Embedded;
 import android.arch.persistence.room.Entity;
 import android.arch.persistence.room.ForeignKey;
 import android.arch.persistence.room.Ignore;
+import android.arch.persistence.room.Index;
 import android.arch.persistence.room.PrimaryKey;
 
 import com.google.gson.annotations.SerializedName;
 
 import java.util.List;
 
-/**
- * Created by Psihey on 18.08.2017.
- */
 @Entity(tableName = "segments",
         foreignKeys = @ForeignKey(entity = TransportEntity.class,
                 parentColumns = "transport_id",
-                childColumns = "transport_id",
-                onDelete = ForeignKey.CASCADE))
+                childColumns = "segment_transport_id",
+                onDelete = ForeignKey.CASCADE),indices = {@Index(value = {"segment_transport_id"})})
 public class SegmentEntity {
 
     @SerializedName("id")
@@ -33,12 +32,16 @@ public class SegmentEntity {
     @ColumnInfo(name = "segment_position")
     private int mPosition;
 
-    @ColumnInfo(name = "transport_id")
+    @ColumnInfo(name = "segment_transport_id")
     private long mTransportId;
 
     @SerializedName("points")
     @Ignore
     private List<PointEntity> mPoints;
+
+    @Embedded
+    @Ignore
+    private PointEntity pointEntity;
 
     @SerializedName("stoppingId")
     @Ignore
@@ -86,6 +89,10 @@ public class SegmentEntity {
         return mStopEntity;
     }
 
+    public PointEntity getPointEntity() {
+        return pointEntity;
+    }
+
     @Override
     public String toString() {
         return "SegmentEntity{" +
@@ -93,7 +100,7 @@ public class SegmentEntity {
                 ", Direction=" + mDirection +
                 ", Position=" + mPosition +
                 ", TransportId=" + mTransportId +
-                ", Points=" + mPoints +
+                ", Points=" + pointEntity +
                 '}';
     }
 }

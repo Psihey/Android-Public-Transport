@@ -35,6 +35,11 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+    productFlavors{
+        full{
+            buildConfigField "String", "SERVER_URL", "\"http://46.101.220.157:8080/\""
+        }
+    }
     compileOptions {
         targetCompatibility 1.8
         sourceCompatibility 1.8

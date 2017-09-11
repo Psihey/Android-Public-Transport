@@ -17,7 +17,7 @@ import com.provectus.public_transport.R;
 import com.provectus.public_transport.adapter.TramsAndTrolleyAdapter;
 import com.provectus.public_transport.fragment.routestabfragment.RoutesTabFragment;
 import com.provectus.public_transport.model.TransportEntity;
-import com.provectus.public_transport.model.TransportType;
+import com.provectus.public_transport.model.converter.TransportType;
 import com.provectus.public_transport.service.TransportRoutesService;
 import com.provectus.public_transport.utils.Utils;
 

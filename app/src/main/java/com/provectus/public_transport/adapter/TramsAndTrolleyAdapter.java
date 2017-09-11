@@ -52,9 +52,13 @@ public class TramsAndTrolleyAdapter extends RecyclerView.Adapter<TramsAndTrolley
 
         holder.tvRoutesNumber.setText(String.valueOf(mTransportRoutesData.get(position).getNumber()));
 
+
         holder.checkBoxSelectRout.setOnCheckedChangeListener(null);
-        holder.checkBoxSelectRout.setChecked(transportRoutes.isIsSelected());
+        holder.checkBoxSelectRout.setChecked(transportRoutes.isSelected());
         holder.checkBoxSelectRout.setOnCheckedChangeListener((buttonView, isChecked) -> transportRoutes.setIsSelected(isChecked));
+        if (!transportRoutes.isAvailable()){
+            holder.checkBoxSelectRout.setVisibility(View.INVISIBLE);
+        }else  holder.checkBoxSelectRout.setVisibility(View.VISIBLE);
         holder.checkBoxSelectRout.setOnClickListener(view -> EventBus.getDefault().post(new BusEvents.SendChosenRouter(transportRoutes)));
     }
 

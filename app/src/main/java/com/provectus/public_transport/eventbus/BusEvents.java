@@ -4,13 +4,21 @@ import com.provectus.public_transport.model.TransportEntity;
 
 
 public class BusEvents {
+    private BusEvents() {
+    }
 
     public static class DataBaseInitialized {
+        /**
+         * A method which says to the subscriber that Database has initialized
+         */
         public DataBaseInitialized() {
         }
     }
 
     public static class DataForCurrentRouteFetched {
+        /**
+         * A method which says to the subscriber that data has fetched from Database and we can connect them
+         */
         public DataForCurrentRouteFetched() {
         }
     }
@@ -28,9 +36,11 @@ public class BusEvents {
 
     }
 
-    public static class ServiceEndWorked{
-        public ServiceEndWorked(){
-
+    public static class ServiceEndWorked {
+        /**
+         * A method which says to the subscriber that service has ended work
+         */
+        public ServiceEndWorked() {
         }
     }
 }
