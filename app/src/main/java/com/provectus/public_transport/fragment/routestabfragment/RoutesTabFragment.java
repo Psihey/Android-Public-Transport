@@ -1,7 +1,6 @@
 package com.provectus.public_transport.fragment.routestabfragment;
 
 import com.provectus.public_transport.model.TransportEntity;
-import com.provectus.public_transport.model.converter.TransportType;
 import com.provectus.public_transport.service.TransportRoutesService;
 
 import java.util.List;
@@ -9,6 +8,7 @@ import java.util.List;
 public interface RoutesTabFragment {
     /**
      * A method which creates recyclerview
+     *
      * @param transportEntity a receiving collection for recyclerview
      */
     void initRecyclerView(List<TransportEntity> transportEntity);
@@ -23,10 +23,4 @@ public interface RoutesTabFragment {
      * A method which hides loading button, and show recyclerview
      */
     void serviceEndWorked();
-
-    /**
-     * A method which gets transport type
-     */
-    TransportType getTransportType();
-
 }

@@ -76,6 +76,7 @@ public class RoutesTabFragmentImpl extends Fragment implements RoutesTabFragment
             mTabFragmentPresenter = new RoutesTabFragmentPresenterImpl();
         }
         mTabFragmentPresenter.bindView(this);
+        mTabFragmentPresenter.setTransportType(mType);
     }
 
     @Override
@@ -116,11 +117,6 @@ public class RoutesTabFragmentImpl extends Fragment implements RoutesTabFragment
     public void serviceEndWorked() {
         mBtnLoading.setVisibility(View.GONE);
         mRoutesRecyclerView.setVisibility(View.VISIBLE);
-    }
-
-    @Override
-    public TransportType getTransportType() {
-        return mType;
     }
 
     private void setErrorVisible(int visible) {

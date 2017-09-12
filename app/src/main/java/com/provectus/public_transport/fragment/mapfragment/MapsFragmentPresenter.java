@@ -1,7 +1,6 @@
 package com.provectus.public_transport.fragment.mapfragment;
 
 
-
 public interface MapsFragmentPresenter {
 
     /**

@@ -1,11 +1,8 @@
 package com.provectus.public_transport.service;
 
 import android.app.IntentService;
-import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
 import android.support.annotation.Nullable;
 
 import com.orhanobut.logger.Logger;
@@ -112,7 +109,6 @@ public class TransportRoutesService extends IntentService {
             }
         } catch (IOException e) {
             Logger.d(e.getMessage());
-            EventBus.getDefault().post(new BusEvents.DataBaseInitialized());
         }
 
     }
@@ -151,11 +147,4 @@ public class TransportRoutesService extends IntentService {
         EventBus.getDefault().post(new BusEvents.DataBaseInitialized());
         Logger.d("Database is initialized");
     }
-
-    public static boolean isOnline(Context context) {
-        ConnectivityManager connectivityManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo netInfo = connectivityManager.getActiveNetworkInfo();
-        return (netInfo != null && netInfo.isConnected());
-    }
-
 }

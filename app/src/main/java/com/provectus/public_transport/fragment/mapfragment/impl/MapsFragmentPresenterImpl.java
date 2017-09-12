@@ -23,8 +23,6 @@ import java.util.List;
 
 import io.reactivex.android.schedulers.AndroidSchedulers;
 
-
-
 public class MapsFragmentPresenterImpl implements MapsFragmentPresenter {
     private static final int TRAM_NUMBER_INCREMENT = 1000;
     private static final int TROLLEY_NUMBER_INCREMENT = 100;

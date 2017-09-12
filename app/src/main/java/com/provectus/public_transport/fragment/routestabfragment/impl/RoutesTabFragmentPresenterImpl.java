@@ -29,7 +29,6 @@ public class RoutesTabFragmentPresenterImpl implements RoutesTabFragmentPresente
     public void bindView(RoutesTabFragment routesTabFragment) {
         mRoutesTabFragment = routesTabFragment;
         EventBus.getDefault().register(this);
-        Logger.d("2222222222222222222222222222222");
     }
 
     @Override
@@ -38,9 +37,14 @@ public class RoutesTabFragmentPresenterImpl implements RoutesTabFragmentPresente
         EventBus.getDefault().unregister(this);
     }
 
+    @Override
+    public void setTransportType(TransportType transportType) {
+        mTransportType = transportType;
+        getDataFromDB();
+    }
+
     @Subscribe(threadMode = ThreadMode.MAIN)
-    public void getUpdateDBEvent(BusEvents.DataBaseInitialized code) {
-        mTransportType = mRoutesTabFragment.getTransportType();
+    public void getUpdateDBEvent(BusEvents.DataBaseInitialized routesEvent) {
         getDataFromDB();
     }
 
@@ -80,9 +84,9 @@ public class RoutesTabFragmentPresenterImpl implements RoutesTabFragmentPresente
         if (transportEntities != null && !transportEntities.isEmpty()) {
             mRoutesTabFragment.initRecyclerView(transportEntities);
             mRoutesTabFragment.serviceEndWorked();
-
         } else {
             mRoutesTabFragment.checkMyServiceRunning();
+
         }
 
     }
