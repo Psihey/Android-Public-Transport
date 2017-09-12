@@ -3,10 +3,6 @@ package com.provectus.public_transport.persistence.database;
 import android.arch.persistence.room.Room;
 import android.content.Context;
 
-/**
- * Created by Psihey on 20.08.2017.
- */
-
 public class DatabaseHelper {
 
     private DatabaseHelper() {

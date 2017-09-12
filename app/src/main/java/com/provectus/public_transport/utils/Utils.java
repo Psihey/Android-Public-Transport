@@ -7,10 +7,6 @@ import android.support.annotation.ColorInt;
 
 import java.util.Random;
 
-/**
- * Created by Evgeniy on 8/23/2017.
- */
-
 public class Utils {
 
     private Utils() {

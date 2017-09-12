@@ -27,9 +27,6 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
 
-/**
- * Created by Evgeniy on 8/17/2017.
- */
 
 public class RoutesTabFragmentImpl extends Fragment implements RoutesTabFragment {
 
@@ -68,19 +65,24 @@ public class RoutesTabFragmentImpl extends Fragment implements RoutesTabFragment
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.tab_fragment, container, false);
         mUnbinder = ButterKnife.bind(this, view);
-        if (mTabFragmentPresenter == null) {
-            mTabFragmentPresenter = new RoutesTabFragmentPresenterImpl();
-        }
-        mTabFragmentPresenter.bindView(this);
-        mTabFragmentPresenter.setTransportType(mType);
         mRoutesRecyclerView.setVisibility(View.GONE);
         return view;
     }
 
     @Override
+    public void onResume() {
+        super.onResume();
+        if (mTabFragmentPresenter == null) {
+            mTabFragmentPresenter = new RoutesTabFragmentPresenterImpl();
+        }
+        mTabFragmentPresenter.bindView(this);
+        mTabFragmentPresenter.setTransportType(mType);
+    }
+
+    @Override
     public void onPause() {
         super.onPause();
-        mTabFragmentPresenter.unregisteredEventBus();
+        mTabFragmentPresenter.unbindView();
     }
 
     @Override
@@ -89,12 +91,6 @@ public class RoutesTabFragmentImpl extends Fragment implements RoutesTabFragment
         if (mUnbinder != null) {
             mUnbinder.unbind();
         }
-    }
-
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-        mTabFragmentPresenter.unbindView();
     }
 
     @Override
@@ -112,11 +108,8 @@ public class RoutesTabFragmentImpl extends Fragment implements RoutesTabFragment
             mProgressBarNoItem.setVisibility(View.GONE);
             setErrorVisible(View.VISIBLE);
             mBtnUpdate.setOnClickListener(view -> {
-                setErrorVisible(View.GONE);
-                getActivity().startService(new Intent(getActivity(), TransportRoutesService.class));
-                mProgressBarNoItem.setVisibility(View.VISIBLE);
+                startService();
             });
-
         }
     }
 
@@ -129,6 +122,12 @@ public class RoutesTabFragmentImpl extends Fragment implements RoutesTabFragment
     private void setErrorVisible(int visible) {
         mTextViewNoData.setVisibility(visible);
         mBtnUpdate.setVisibility(visible);
+    }
+
+    private void startService() {
+        setErrorVisible(View.GONE);
+        getActivity().startService(new Intent(getActivity(), TransportRoutesService.class));
+        mProgressBarNoItem.setVisibility(View.VISIBLE);
     }
 
 }

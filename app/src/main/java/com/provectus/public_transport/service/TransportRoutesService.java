@@ -62,8 +62,6 @@ public class TransportRoutesService extends IntentService {
     }
 
     private void getRoutesFromServer() {
-
-
         String date = getDateForRequest();
 
         Call<List<TransportEntity>> call = RetrofitProvider.getRetrofit().getAllRoutes(date);
@@ -74,7 +72,7 @@ public class TransportRoutesService extends IntentService {
             if (response.code() == HttpURLConnection.HTTP_NOT_MODIFIED) {
                 Logger.d("There are no updates");
                 EventBus.getDefault().post(new BusEvents.DataBaseInitialized());
-            } else if (response.isSuccessful() && response.body() != null) {
+            } else if (response.isSuccessful() && response.body() != null && !response.body().isEmpty()) {
                 putLastModifiedDateToPreference();
                 for (TransportEntity currentRoutes : response.body()) {
                     boolean available = true;
@@ -149,5 +147,4 @@ public class TransportRoutesService extends IntentService {
         EventBus.getDefault().post(new BusEvents.DataBaseInitialized());
         Logger.d("Database is initialized");
     }
-
 }

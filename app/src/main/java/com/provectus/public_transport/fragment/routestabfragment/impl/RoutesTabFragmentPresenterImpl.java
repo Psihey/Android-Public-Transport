@@ -19,9 +19,6 @@ import java.util.List;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
 
-/**
- * Created by Evgeniy on 8/23/2017.
- */
 
 public class RoutesTabFragmentPresenterImpl implements RoutesTabFragmentPresenter {
 
@@ -37,17 +34,13 @@ public class RoutesTabFragmentPresenterImpl implements RoutesTabFragmentPresente
     @Override
     public void unbindView() {
         mRoutesTabFragment = null;
+        EventBus.getDefault().unregister(this);
     }
 
     @Override
     public void setTransportType(TransportType transportType) {
         mTransportType = transportType;
         getDataFromDB();
-    }
-
-    @Override
-    public void unregisteredEventBus() {
-        EventBus.getDefault().unregister(this);
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
@@ -85,16 +78,15 @@ public class RoutesTabFragmentPresenterImpl implements RoutesTabFragmentPresente
     }
 
     private void getTransportFromDB(List<TransportEntity> transportEntities) {
-
         if (mRoutesTabFragment == null) {
             return;
         }
         if (transportEntities != null && !transportEntities.isEmpty()) {
             mRoutesTabFragment.initRecyclerView(transportEntities);
             mRoutesTabFragment.serviceEndWorked();
-
         } else {
             mRoutesTabFragment.checkMyServiceRunning();
+
         }
 
     }
