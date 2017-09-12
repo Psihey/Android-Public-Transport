@@ -6,8 +6,8 @@
 
     <item>
         <bitmap
-            android:gravity="center"
-            android:src="@drawable/temp_splash_screen"/>
+            android:gravity="fill_horizontal|fill_vertical"
+            android:src="@drawable/splash_ver_2"/>
     </item>
 
 </layer-list>

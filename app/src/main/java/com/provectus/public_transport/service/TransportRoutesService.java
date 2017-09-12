@@ -1,8 +1,11 @@
 package com.provectus.public_transport.service;
 
 import android.app.IntentService;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.support.annotation.Nullable;
 
 import com.orhanobut.logger.Logger;
@@ -62,8 +65,6 @@ public class TransportRoutesService extends IntentService {
     }
 
     private void getRoutesFromServer() {
-
-
         String date = getDateForRequest();
 
         Call<List<TransportEntity>> call = RetrofitProvider.getRetrofit().getAllRoutes(date);
@@ -74,7 +75,7 @@ public class TransportRoutesService extends IntentService {
             if (response.code() == HttpURLConnection.HTTP_NOT_MODIFIED) {
                 Logger.d("There are no updates");
                 EventBus.getDefault().post(new BusEvents.DataBaseInitialized());
-            } else if (response.isSuccessful() && response.body() != null) {
+            } else if (response.isSuccessful() && response.body() != null && !response.body().isEmpty()) {
                 putLastModifiedDateToPreference();
                 for (TransportEntity currentRoutes : response.body()) {
                     boolean available = true;
@@ -111,6 +112,7 @@ public class TransportRoutesService extends IntentService {
             }
         } catch (IOException e) {
             Logger.d(e.getMessage());
+            EventBus.getDefault().post(new BusEvents.DataBaseInitialized());
         }
 
     }
@@ -148,6 +150,12 @@ public class TransportRoutesService extends IntentService {
         DatabaseHelper.getPublicTransportDatabase().stopDao().insertAll(mStopEntity);
         EventBus.getDefault().post(new BusEvents.DataBaseInitialized());
         Logger.d("Database is initialized");
+    }
+
+    public static boolean isOnline(Context context) {
+        ConnectivityManager connectivityManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo netInfo = connectivityManager.getActiveNetworkInfo();
+        return (netInfo != null && netInfo.isConnected());
     }
 
 }

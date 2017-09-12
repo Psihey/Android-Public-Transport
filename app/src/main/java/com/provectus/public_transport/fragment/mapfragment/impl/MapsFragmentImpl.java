@@ -45,9 +45,6 @@ import butterknife.Unbinder;
 
 import static com.provectus.public_transport.utils.Utils.getRandomColor;
 
-/**
- * Created by Evgeniy on 8/10/2017.
- */
 
 public class MapsFragmentImpl extends Fragment implements MapsFragment, OnMapReadyCallback {
 
@@ -97,7 +94,7 @@ public class MapsFragmentImpl extends Fragment implements MapsFragment, OnMapRea
     @Override
     public void onPause() {
         super.onPause();
-        mMapsPresenter.unregisteredEventBus();
+        mMapsPresenter.unbindView();
     }
 
     @Override
@@ -106,7 +103,6 @@ public class MapsFragmentImpl extends Fragment implements MapsFragment, OnMapRea
         if (mUnbinder != null) {
             mUnbinder.unbind();
         }
-        mMapsPresenter.unbindView();
     }
 
     @Override

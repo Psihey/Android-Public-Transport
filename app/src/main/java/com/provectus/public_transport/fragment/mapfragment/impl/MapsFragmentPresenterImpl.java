@@ -24,9 +24,6 @@ import java.util.List;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 
 
-/**
- * Created by Evgeniy on 8/10/2017.
- */
 
 public class MapsFragmentPresenterImpl implements MapsFragmentPresenter {
     private static final int TRAM_NUMBER_INCREMENT = 1000;
@@ -47,13 +44,9 @@ public class MapsFragmentPresenterImpl implements MapsFragmentPresenter {
 
     @Override
     public void unbindView() {
+        EventBus.getDefault().unregister(this);
         mMapsFragment = null;
         Logger.d("Maps is unbind from presenter");
-    }
-
-    @Override
-    public void unregisteredEventBus() {
-        EventBus.getDefault().unregister(this);
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
