@@ -66,23 +66,18 @@ public class RoutesTabFragmentImpl extends Fragment implements RoutesTabFragment
         View view = inflater.inflate(R.layout.tab_fragment, container, false);
         mUnbinder = ButterKnife.bind(this, view);
         mRoutesRecyclerView.setVisibility(View.GONE);
-        return view;
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
         if (mTabFragmentPresenter == null) {
             mTabFragmentPresenter = new RoutesTabFragmentPresenterImpl();
         }
         mTabFragmentPresenter.bindView(this);
         mTabFragmentPresenter.setTransportType(mType);
+        return view;
     }
 
     @Override
     public void onPause() {
         super.onPause();
-        mTabFragmentPresenter.unbindView();
+        mTabFragmentPresenter.unregisteredEventBus();
     }
 
     @Override
@@ -91,6 +86,7 @@ public class RoutesTabFragmentImpl extends Fragment implements RoutesTabFragment
         if (mUnbinder != null) {
             mUnbinder.unbind();
         }
+        mTabFragmentPresenter.unbindView();
     }
 
     @Override
