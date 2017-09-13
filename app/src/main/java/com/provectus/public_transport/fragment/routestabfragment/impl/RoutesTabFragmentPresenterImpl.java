@@ -29,18 +29,25 @@ public class RoutesTabFragmentPresenterImpl implements RoutesTabFragmentPresente
     public void bindView(RoutesTabFragment routesTabFragment) {
         mRoutesTabFragment = routesTabFragment;
         EventBus.getDefault().register(this);
+        Logger.d("RoutesTab is binded to its presenter.");
     }
 
     @Override
     public void unbindView() {
         mRoutesTabFragment = null;
-        EventBus.getDefault().unregister(this);
+
+        Logger.d("RoutesTab is unbind from presenter");
     }
 
     @Override
     public void setTransportType(TransportType transportType) {
         mTransportType = transportType;
         getDataFromDB();
+    }
+
+    @Override
+    public void unregisteredEventBus() {
+        EventBus.getDefault().unregister(this);
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
@@ -50,7 +57,7 @@ public class RoutesTabFragmentPresenterImpl implements RoutesTabFragmentPresente
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void getUpdateDBEvent(BusEvents.ServiceEndWorked service) {
-       mRoutesTabFragment.serviceEndWorked();
+        mRoutesTabFragment.serviceEndWorked();
     }
 
     private void getDataFromDB() {

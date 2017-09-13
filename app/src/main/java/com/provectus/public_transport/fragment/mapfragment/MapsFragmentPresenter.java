@@ -15,4 +15,8 @@ public interface MapsFragmentPresenter {
      */
     void unbindView();
 
+    /**
+     * A method which unregistered Event Bus event
+     */
+    void unregisteredEventBus();
 }

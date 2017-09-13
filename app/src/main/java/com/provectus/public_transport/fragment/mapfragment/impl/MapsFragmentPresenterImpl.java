@@ -42,9 +42,13 @@ public class MapsFragmentPresenterImpl implements MapsFragmentPresenter {
 
     @Override
     public void unbindView() {
-        EventBus.getDefault().unregister(this);
         mMapsFragment = null;
         Logger.d("Maps is unbind from presenter");
+    }
+
+    @Override
+    public void unregisteredEventBus() {
+        EventBus.getDefault().unregister(this);
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
@@ -73,7 +77,7 @@ public class MapsFragmentPresenterImpl implements MapsFragmentPresenter {
         if (mIsSelectRoute && mStopsDataForCurrentRoute.isEmpty()) {
             mMapsFragment.showErrorSnackbar();
         }
-        mMapsFragment.drawSelectedPosition(sortedRoutesSegment(mSegmentWithPointForCurrentRoute), getStopsOnRoute(mStopsDataForCurrentRoute),mTransportNumber,mIsSelectRoute);
+        mMapsFragment.drawSelectedPosition(sortedRoutesSegment(mSegmentWithPointForCurrentRoute), getStopsOnRoute(mStopsDataForCurrentRoute), mTransportNumber, mIsSelectRoute);
     }
 
     private void getSegmentsFromDB(List<SegmentWithPointsModel> segmentEntities) {
