@@ -11,8 +11,11 @@ import com.provectus.public_transport.fragment.mapfragment.MapsFragmentPresenter
 import com.provectus.public_transport.model.PointEntity;
 import com.provectus.public_transport.model.SegmentWithPointsModel;
 import com.provectus.public_transport.model.StopEntity;
+import com.provectus.public_transport.model.TransportEntity;
+import com.provectus.public_transport.model.VehiclesModel;
 import com.provectus.public_transport.model.converter.TransportType;
 import com.provectus.public_transport.persistence.database.DatabaseHelper;
+import com.provectus.public_transport.service.retrofit.RetrofitProvider;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -20,8 +23,11 @@ import org.greenrobot.eventbus.ThreadMode;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.schedulers.Schedulers;
 
 public class MapsFragmentPresenterImpl implements MapsFragmentPresenter {
     private static final int TRAM_NUMBER_INCREMENT = 1000;
@@ -32,10 +38,14 @@ public class MapsFragmentPresenterImpl implements MapsFragmentPresenter {
     private List<SegmentWithPointsModel> mSegmentWithPointForCurrentRoute = new ArrayList<>();
     private boolean mIsSelectRoute;
     private int mTransportNumber;
+    private long mCurrentRouteServerId;
+    private CompositeDisposable mCompositeDisposable;
+    private ArrayList<Long> mCurrentVehicles = new ArrayList();
 
     @Override
     public void bindView(MapsFragment mapsFragment) {
         mMapsFragment = mapsFragment;
+        mCompositeDisposable = new CompositeDisposable();
         Logger.d("Maps is binded to its presenter.");
         EventBus.getDefault().register(this);
     }
@@ -43,6 +53,9 @@ public class MapsFragmentPresenterImpl implements MapsFragmentPresenter {
     @Override
     public void unbindView() {
         mMapsFragment = null;
+        if (!mCompositeDisposable.isDisposed()) {
+            mCompositeDisposable.dispose();
+        }
         Logger.d("Maps is unbind from presenter");
     }
 
@@ -62,6 +75,11 @@ public class MapsFragmentPresenterImpl implements MapsFragmentPresenter {
         } else if (transportType.equals(TransportType.TRAM_TYPE.name())) {
             mTransportNumber = event.getSelectRout().getNumber() + TRAM_NUMBER_INCREMENT;
         }
+
+        DatabaseHelper.getPublicTransportDatabase().transportDao().getTransportEntity(event.getSelectRout().getNumber(), transportType)
+                .observeOn(AndroidSchedulers.mainThread())
+                .doOnError(throwable -> Logger.d(throwable.getMessage()))
+                .subscribe(this::getTransportFromDB);
         DatabaseHelper.getPublicTransportDatabase().transportDao().getStopsForCurrentTransport(event.getSelectRout().getNumber(), transportType)
                 .observeOn(AndroidSchedulers.mainThread())
                 .doOnError(throwable -> Logger.d(throwable.getMessage()))
@@ -70,6 +88,7 @@ public class MapsFragmentPresenterImpl implements MapsFragmentPresenter {
                 .observeOn(AndroidSchedulers.mainThread())
                 .doOnError(throwable -> Logger.d(throwable.getMessage()))
                 .subscribe(this::getSegmentsFromDB);
+
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
@@ -87,6 +106,11 @@ public class MapsFragmentPresenterImpl implements MapsFragmentPresenter {
 
     private void getStopsFromDB(List<StopEntity> stopEntities) {
         mStopsDataForCurrentRoute.addAll(stopEntities);
+    }
+
+    private void getTransportFromDB(TransportEntity transportEntity) {
+        mCurrentRouteServerId = transportEntity.getServerId();
+        getVehiclesPosition();
     }
 
     // TODO: 23.08.17 Use Rx
@@ -136,6 +160,29 @@ public class MapsFragmentPresenterImpl implements MapsFragmentPresenter {
             markerOption.add(new MarkerOptions().position(new LatLng(lat, lng)));
         }
         return markerOption;
+    }
+
+    private void getVehiclesPosition() {
+
+        if (mIsSelectRoute) {
+            mCurrentVehicles.add(mCurrentRouteServerId);
+        } else {
+            mCurrentVehicles.remove(mCurrentRouteServerId);
+        }
+
+        mCompositeDisposable.add(RetrofitProvider.getRetrofit().getAllVehiclesForRoute(mCurrentVehicles)
+                .subscribeOn(Schedulers.io())
+                .repeatWhen(completed -> completed.delay(30, TimeUnit.SECONDS))
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(this::handleResponse, this::handleError));
+    }
+
+    private void handleResponse(List<VehiclesModel> userList) {
+        mMapsFragment.drawVehicles(userList);
+    }
+
+    private void handleError(Throwable error) {
+        Logger.d(error.getMessage());
     }
 }
 

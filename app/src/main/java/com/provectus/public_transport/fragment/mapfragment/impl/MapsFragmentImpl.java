@@ -22,6 +22,7 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.UiSettings;
 import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
@@ -31,6 +32,7 @@ import com.provectus.public_transport.R;
 import com.provectus.public_transport.adapter.TransportAndParkingViewPagerAdapter;
 import com.provectus.public_transport.fragment.mapfragment.MapsFragment;
 import com.provectus.public_transport.fragment.mapfragment.MapsFragmentPresenter;
+import com.provectus.public_transport.model.VehiclesModel;
 import com.provectus.public_transport.utils.Const;
 
 import java.util.ArrayList;
@@ -51,7 +53,7 @@ public class MapsFragmentImpl extends Fragment implements MapsFragment, OnMapRea
     public static final String TAG_MAP_FRAGMENT = "fragment_map";
     private static final int REQUEST_LOCATION_PERMISSIONS = 1;
     private static final int VIEW_PAGER_PAGE_IN_MEMORY = 3;
-    private static final int POLYLINE_WIDTH =5;
+    private static final int POLYLINE_WIDTH = 5;
 
     @BindView(R.id.bottom_sheet_view_pager)
     ViewPager mViewPagerTransportAndParking;
@@ -65,8 +67,11 @@ public class MapsFragmentImpl extends Fragment implements MapsFragment, OnMapRea
     private GoogleMap mMap;
     private boolean mIsMapReady;
     private BitmapDescriptor mStopIcon;
+    private BitmapDescriptor mTransportIcon;
+
     private Map<Integer, Polyline> mAllCurrentRoutesOnMap = new ConcurrentHashMap<>();
     private Map<Integer, List<Marker>> mAllCurrentMarkerOnMap = new ConcurrentHashMap<>();
+    List<Marker> mAllVehicles = new ArrayList<>();
     private boolean mIsSelectRoute;
     private int mTransportNumber;
 
@@ -79,6 +84,7 @@ public class MapsFragmentImpl extends Fragment implements MapsFragment, OnMapRea
         mapFragment.getMapAsync(this);
         initViewPager();
         mStopIcon = BitmapDescriptorFactory.fromResource(R.drawable.ic_temp_stop);
+        mTransportIcon = BitmapDescriptorFactory.fromResource(R.drawable.ic_temp_transport);
         return view;
     }
 
@@ -127,6 +133,28 @@ public class MapsFragmentImpl extends Fragment implements MapsFragment, OnMapRea
         snackbar.show();
     }
 
+
+    @Override
+    public void drawVehicles(List<VehiclesModel> vehiclesModels) {
+        removeVehiclesFromMap();
+        mAllVehicles.clear();
+        for (VehiclesModel vehiclesModel : vehiclesModels) {
+            double lat = vehiclesModel.getLatitude();
+            double lng = vehiclesModel.getLongitude();
+            LatLng latLn = new LatLng(lat, lng);
+            Marker marker = mMap.addMarker(new MarkerOptions().position(latLn));
+            marker.setIcon(mTransportIcon);
+            mAllVehicles.add(marker);
+        }
+    }
+
+    @Override
+    public void removeVehiclesFromMap() {
+        for (Marker marker : mAllVehicles) {
+            marker.remove();
+        }
+    }
+
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         if (grantResults.length == 2 && requestCode == REQUEST_LOCATION_PERMISSIONS) {
@@ -155,6 +183,7 @@ public class MapsFragmentImpl extends Fragment implements MapsFragment, OnMapRea
             mAllCurrentRoutesOnMap.put(mTransportNumber, polyline);
             mAllCurrentMarkerOnMap.put(mTransportNumber, currentMarkers);
         } else {
+            removeVehiclesFromMap();
             for (Map.Entry<Integer, Polyline> entry : mAllCurrentRoutesOnMap.entrySet()) {
                 Integer key = entry.getKey();
                 Polyline value = entry.getValue();
@@ -174,6 +203,7 @@ public class MapsFragmentImpl extends Fragment implements MapsFragment, OnMapRea
                 }
             }
         }
+
     }
 
     private void initViewPager() {
