@@ -175,13 +175,9 @@ public class MapsFragmentPresenterImpl implements MapsFragmentPresenter {
                 .repeatWhen(completed -> completed.delay(30, TimeUnit.SECONDS))
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(this::handleResponse, this::handleError));
-
     }
 
     private void handleResponse(List<VehiclesModel> userList) {
-//        List<VehiclesModel> vehiclesModels = new ArrayList<>();
-//        vehiclesModels.addAll(userList);
-
         mMapsFragment.drawVehicles(userList);
     }
 
