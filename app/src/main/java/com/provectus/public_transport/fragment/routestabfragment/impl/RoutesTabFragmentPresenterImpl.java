@@ -35,7 +35,6 @@ public class RoutesTabFragmentPresenterImpl implements RoutesTabFragmentPresente
     @Override
     public void unbindView() {
         mRoutesTabFragment = null;
-
         Logger.d("RoutesTab is unbind from presenter");
     }
 

@@ -32,6 +32,10 @@ public interface TransportDao {
     void deleteAll(List<TransportEntity> transportEntities);
 
     @Query("SELECT * FROM transports "
+            + "WHERE transports.transport_number = :transportNumber AND transports.transport_type = :transportType")
+    Flowable<TransportEntity> getTransportEntity(int transportNumber, String transportType);
+
+    @Query("SELECT * FROM transports "
             + "INNER JOIN segments ON segments.segment_transport_id = transports.transport_id "
             + "INNER JOIN points ON points.point_segment_id = segments.segment_id "
             + "WHERE transports.transport_number = :transportNumber AND transports.transport_type = :transportType")
