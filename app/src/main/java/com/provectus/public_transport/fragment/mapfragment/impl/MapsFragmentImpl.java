@@ -128,11 +128,10 @@ public class MapsFragmentImpl extends Fragment implements MapsFragment, OnMapRea
     }
 
     @Override
-    public void showErrorSnackbar() {
-        Snackbar snackbar = Snackbar.make(mContainerLayout, R.string.snack_bar_no_data_for_this_route, Snackbar.LENGTH_LONG);
+    public void showErrorSnackbar(int message) {
+        Snackbar snackbar = Snackbar.make(mContainerLayout, message, Snackbar.LENGTH_LONG);
         snackbar.show();
     }
-
 
     @Override
     public void drawVehicles(List<VehiclesModel> vehiclesModels) {

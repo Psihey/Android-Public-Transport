@@ -11,6 +11,7 @@
     <string name="text_view_tab_fragment_no_data">Error, no data</string>
     <string name="btn_update_name">Update</string>
     <string name="text_view_database_working_yet">Please, Wait some seconds Data Base working</string>
-    <string name="snack_bar_no_data_for_this_route">No data on stops</string>
+    <string name="snack_bar_no_stops_for_this_route">No data on stops</string>
+    <string name="snack_bar_no_vehicles_server_not_response">Failed to update</string>
 
 </resources>

@@ -21,10 +21,9 @@ public interface MapsFragment {
     /**
      * A method which shows snackbar with some information
      */
-    void showErrorSnackbar();
+    void showErrorSnackbar(int message);
 
     void drawVehicles(List<VehiclesModel> vehiclesModels);
 
     void removeVehiclesFromMap();
-
 }
