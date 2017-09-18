@@ -5,6 +5,7 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.orhanobut.logger.Logger;
+import com.provectus.public_transport.R;
 import com.provectus.public_transport.eventbus.BusEvents;
 import com.provectus.public_transport.fragment.mapfragment.MapsFragment;
 import com.provectus.public_transport.fragment.mapfragment.MapsFragmentPresenter;
@@ -21,6 +22,8 @@ import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
+import java.net.ConnectException;
+import java.net.SocketTimeoutException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -28,6 +31,7 @@ import java.util.concurrent.TimeUnit;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.schedulers.Schedulers;
+import retrofit2.Response;
 
 public class MapsFragmentPresenterImpl implements MapsFragmentPresenter {
     private static final int TRAM_NUMBER_INCREMENT = 1000;
@@ -40,12 +44,12 @@ public class MapsFragmentPresenterImpl implements MapsFragmentPresenter {
     private int mTransportNumber;
     private long mCurrentRouteServerId;
     private CompositeDisposable mCompositeDisposable;
-    private ArrayList<Long> mCurrentVehicles = new ArrayList();
+    private List<Long> mCurrentVehicles = new ArrayList<>();
 
     @Override
     public void bindView(MapsFragment mapsFragment) {
         mMapsFragment = mapsFragment;
-        mCompositeDisposable = new CompositeDisposable();
+
         Logger.d("Maps is binded to its presenter.");
         EventBus.getDefault().register(this);
     }
@@ -53,9 +57,7 @@ public class MapsFragmentPresenterImpl implements MapsFragmentPresenter {
     @Override
     public void unbindView() {
         mMapsFragment = null;
-        if (!mCompositeDisposable.isDisposed()) {
-            mCompositeDisposable.dispose();
-        }
+
         Logger.d("Maps is unbind from presenter");
     }
 
@@ -94,7 +96,7 @@ public class MapsFragmentPresenterImpl implements MapsFragmentPresenter {
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void getAllInformationForDrawRoute(BusEvents.DataForCurrentRouteFetched event) {
         if (mIsSelectRoute && mStopsDataForCurrentRoute.isEmpty()) {
-            mMapsFragment.showErrorSnackbar();
+            mMapsFragment.showErrorSnackbar(R.string.snack_bar_no_stops_for_this_route);
         }
         mMapsFragment.drawSelectedPosition(sortedRoutesSegment(mSegmentWithPointForCurrentRoute), getStopsOnRoute(mStopsDataForCurrentRoute), mTransportNumber, mIsSelectRoute);
     }
@@ -170,19 +172,34 @@ public class MapsFragmentPresenterImpl implements MapsFragmentPresenter {
             mCurrentVehicles.remove(mCurrentRouteServerId);
         }
 
+        if (mCompositeDisposable != null && !mCompositeDisposable.isDisposed()) {
+            mCompositeDisposable.dispose();
+        }
+        mCompositeDisposable = new CompositeDisposable();
         mCompositeDisposable.add(RetrofitProvider.getRetrofit().getAllVehiclesForRoute(mCurrentVehicles)
                 .subscribeOn(Schedulers.io())
                 .repeatWhen(completed -> completed.delay(30, TimeUnit.SECONDS))
+                .doOnError(this::errorHandle)
+                .retryWhen(retryHandler -> retryHandler.delay(30, TimeUnit.SECONDS))
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(this::handleResponse, this::handleError));
+                .subscribe(this::handleResponse));
     }
 
-    private void handleResponse(List<VehiclesModel> userList) {
-        mMapsFragment.drawVehicles(userList);
+    private void handleResponse(Response<List<VehiclesModel>> vehicles) {
+            mMapsFragment.drawVehicles(vehicles.body());
     }
 
-    private void handleError(Throwable error) {
-        Logger.d(error.getMessage());
+    private void errorHandle(Throwable throwable) {
+        if (mCurrentVehicles.isEmpty()) {
+            mCompositeDisposable.dispose();
+        }
+        if (mIsSelectRoute) {
+            if (throwable instanceof SocketTimeoutException) {
+                mMapsFragment.showErrorSnackbar(R.string.snack_bar_no_vehicles_no_internet_connection);
+            } else if (throwable instanceof ConnectException) {
+                mMapsFragment.showErrorSnackbar(R.string.snack_bar_no_vehicles_no_internet_connection);
+            }
+        }
     }
 }
 

@@ -128,23 +128,24 @@ public class MapsFragmentImpl extends Fragment implements MapsFragment, OnMapRea
     }
 
     @Override
-    public void showErrorSnackbar() {
-        Snackbar snackbar = Snackbar.make(mContainerLayout, R.string.snack_bar_no_data_for_this_route, Snackbar.LENGTH_LONG);
+    public void showErrorSnackbar(int message) {
+        Snackbar snackbar = Snackbar.make(mContainerLayout, message, Snackbar.LENGTH_LONG);
         snackbar.show();
     }
-
 
     @Override
     public void drawVehicles(List<VehiclesModel> vehiclesModels) {
         removeVehiclesFromMap();
         mAllVehicles.clear();
-        for (VehiclesModel vehiclesModel : vehiclesModels) {
-            double lat = vehiclesModel.getLatitude();
-            double lng = vehiclesModel.getLongitude();
-            LatLng latLn = new LatLng(lat, lng);
-            Marker marker = mMap.addMarker(new MarkerOptions().position(latLn));
-            marker.setIcon(mTransportIcon);
-            mAllVehicles.add(marker);
+        if (vehiclesModels != null){
+            for (VehiclesModel vehiclesModel : vehiclesModels) {
+                double lat = vehiclesModel.getLatitude();
+                double lng = vehiclesModel.getLongitude();
+                LatLng latLn = new LatLng(lat, lng);
+                Marker marker = mMap.addMarker(new MarkerOptions().position(latLn));
+                marker.setIcon(mTransportIcon);
+                mAllVehicles.add(marker);
+            }
         }
     }
 
