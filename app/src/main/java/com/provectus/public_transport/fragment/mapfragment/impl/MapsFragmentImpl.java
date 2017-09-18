@@ -67,7 +67,9 @@ public class MapsFragmentImpl extends Fragment implements MapsFragment, OnMapRea
     private GoogleMap mMap;
     private boolean mIsMapReady;
     private BitmapDescriptor mStopIcon;
-    private BitmapDescriptor mTransportIcon;
+    private BitmapDescriptor mTransportStaticIcon;
+    private BitmapDescriptor mTransportDirectIcon;
+    private BitmapDescriptor mTransportIndirectIcon;
 
     private Map<Integer, Polyline> mAllCurrentRoutesOnMap = new ConcurrentHashMap<>();
     private Map<Integer, List<Marker>> mAllCurrentMarkerOnMap = new ConcurrentHashMap<>();
@@ -84,7 +86,9 @@ public class MapsFragmentImpl extends Fragment implements MapsFragment, OnMapRea
         mapFragment.getMapAsync(this);
         initViewPager();
         mStopIcon = BitmapDescriptorFactory.fromResource(R.drawable.ic_temp_stop);
-        mTransportIcon = BitmapDescriptorFactory.fromResource(R.drawable.ic_temp_transport);
+        mTransportStaticIcon = BitmapDescriptorFactory.fromResource(R.drawable.ic_temp_transport);
+        mTransportDirectIcon = BitmapDescriptorFactory.fromResource(R.drawable.temp_direction);
+        mTransportIndirectIcon = BitmapDescriptorFactory.fromResource(R.drawable.temp_indirection);
         return view;
     }
 
@@ -139,12 +143,19 @@ public class MapsFragmentImpl extends Fragment implements MapsFragment, OnMapRea
         mAllVehicles.clear();
         if (vehiclesModels != null){
             for (VehiclesModel vehiclesModel : vehiclesModels) {
+                int azimuth = vehiclesModel.getAzimuth();
                 double lat = vehiclesModel.getLatitude();
                 double lng = vehiclesModel.getLongitude();
                 LatLng latLn = new LatLng(lat, lng);
                 Marker marker = mMap.addMarker(new MarkerOptions().position(latLn));
-                marker.setIcon(mTransportIcon);
                 mAllVehicles.add(marker);
+                if (azimuth == 0){
+                    marker.setIcon(mTransportStaticIcon);
+                }else if (azimuth > 315 || azimuth < 135){
+                    marker.setIcon(mTransportDirectIcon);
+                }else {
+                    marker.setIcon(mTransportIndirectIcon);
+                }
             }
         }
     }

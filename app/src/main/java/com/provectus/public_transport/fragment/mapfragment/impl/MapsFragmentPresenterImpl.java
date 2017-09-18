@@ -57,7 +57,9 @@ public class MapsFragmentPresenterImpl implements MapsFragmentPresenter {
     @Override
     public void unbindView() {
         mMapsFragment = null;
-
+        if (mCompositeDisposable != null) {
+            mCompositeDisposable.dispose();
+        }
         Logger.d("Maps is unbind from presenter");
     }
 
@@ -181,12 +183,16 @@ public class MapsFragmentPresenterImpl implements MapsFragmentPresenter {
                 .repeatWhen(completed -> completed.delay(30, TimeUnit.SECONDS))
                 .doOnError(this::errorHandle)
                 .retryWhen(retryHandler -> retryHandler.delay(30, TimeUnit.SECONDS))
+                .filter(listResponse -> !listResponse.equals(null))
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(this::handleResponse));
     }
 
     private void handleResponse(Response<List<VehiclesModel>> vehicles) {
-            mMapsFragment.drawVehicles(vehicles.body());
+        List<VehiclesModel> currentVehicles = vehicles.body();
+        if (currentVehicles != null){
+            mMapsFragment.drawVehicles(currentVehicles);
+        }
     }
 
     private void errorHandle(Throwable throwable) {
