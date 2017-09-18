@@ -23,6 +23,7 @@ import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
 import java.net.ConnectException;
+import java.net.SocketTimeoutException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -170,6 +171,7 @@ public class MapsFragmentPresenterImpl implements MapsFragmentPresenter {
         } else {
             mCurrentVehicles.remove(mCurrentRouteServerId);
         }
+
         if (mCompositeDisposable != null && !mCompositeDisposable.isDisposed()) {
             mCompositeDisposable.dispose();
         }
@@ -177,23 +179,28 @@ public class MapsFragmentPresenterImpl implements MapsFragmentPresenter {
         mCompositeDisposable.add(RetrofitProvider.getRetrofit().getAllVehiclesForRoute(mCurrentVehicles)
                 .subscribeOn(Schedulers.io())
                 .repeatWhen(completed -> completed.delay(30, TimeUnit.SECONDS))
+                .doOnError(this::errorHandle)
+                .retryWhen(retryHandler -> retryHandler.delay(30, TimeUnit.SECONDS))
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(this::handleResponse, this::handleError));
+                .subscribe(this::handleResponse));
     }
 
     private void handleResponse(Response<List<VehiclesModel>> vehicles) {
-        mMapsFragment.drawVehicles(vehicles.body());
+            mMapsFragment.drawVehicles(vehicles.body());
     }
 
-    private void handleError(Throwable error) {
+    private void errorHandle(Throwable throwable) {
+        if (mCurrentVehicles.isEmpty()) {
+            mCompositeDisposable.dispose();
+        }
         if (mIsSelectRoute) {
-            if (error instanceof ConnectException) {
-                mMapsFragment.showErrorSnackbar(R.string.snack_bar_no_vehicles_server_not_response);
+            if (throwable instanceof SocketTimeoutException) {
+                mMapsFragment.showErrorSnackbar(R.string.snack_bar_no_vehicles_no_internet_connection);
+            } else if (throwable instanceof ConnectException) {
+                mMapsFragment.showErrorSnackbar(R.string.snack_bar_no_vehicles_no_internet_connection);
             }
         }
     }
-
-
 }
 
 

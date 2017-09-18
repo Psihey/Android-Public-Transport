@@ -137,13 +137,15 @@ public class MapsFragmentImpl extends Fragment implements MapsFragment, OnMapRea
     public void drawVehicles(List<VehiclesModel> vehiclesModels) {
         removeVehiclesFromMap();
         mAllVehicles.clear();
-        for (VehiclesModel vehiclesModel : vehiclesModels) {
-            double lat = vehiclesModel.getLatitude();
-            double lng = vehiclesModel.getLongitude();
-            LatLng latLn = new LatLng(lat, lng);
-            Marker marker = mMap.addMarker(new MarkerOptions().position(latLn));
-            marker.setIcon(mTransportIcon);
-            mAllVehicles.add(marker);
+        if (vehiclesModels != null){
+            for (VehiclesModel vehiclesModel : vehiclesModels) {
+                double lat = vehiclesModel.getLatitude();
+                double lng = vehiclesModel.getLongitude();
+                LatLng latLn = new LatLng(lat, lng);
+                Marker marker = mMap.addMarker(new MarkerOptions().position(latLn));
+                marker.setIcon(mTransportIcon);
+                mAllVehicles.add(marker);
+            }
         }
     }
 
