@@ -54,6 +54,10 @@ public class MapsFragmentImpl extends Fragment implements MapsFragment, OnMapRea
     private static final int REQUEST_LOCATION_PERMISSIONS = 1;
     private static final int VIEW_PAGER_PAGE_IN_MEMORY = 3;
     private static final int POLYLINE_WIDTH = 5;
+    private static final int AZIMUTH_ANGLE_VEHICLE_STOP = 0;
+    private static final int AZIMUTH_ANGLE_VEHICLE_DIRECTION_1 = 315;
+    private static final int AZIMUTH_ANGLE_VEHICLE_DIRECTION_2 = 135;
+
 
     @BindView(R.id.bottom_sheet_view_pager)
     ViewPager mViewPagerTransportAndParking;
@@ -149,9 +153,9 @@ public class MapsFragmentImpl extends Fragment implements MapsFragment, OnMapRea
                 LatLng latLn = new LatLng(lat, lng);
                 Marker marker = mMap.addMarker(new MarkerOptions().position(latLn));
                 mAllVehicles.add(marker);
-                if (azimuth == 0){
+                if (azimuth == AZIMUTH_ANGLE_VEHICLE_STOP){
                     marker.setIcon(mTransportStaticIcon);
-                }else if (azimuth > 315 || azimuth < 135){
+                }else if (azimuth > AZIMUTH_ANGLE_VEHICLE_DIRECTION_1 || azimuth < AZIMUTH_ANGLE_VEHICLE_DIRECTION_2){
                     marker.setIcon(mTransportDirectIcon);
                 }else {
                     marker.setIcon(mTransportIndirectIcon);
