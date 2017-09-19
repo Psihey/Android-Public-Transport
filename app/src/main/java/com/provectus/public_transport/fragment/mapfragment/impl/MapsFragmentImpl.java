@@ -54,6 +54,10 @@ public class MapsFragmentImpl extends Fragment implements MapsFragment, OnMapRea
     private static final int REQUEST_LOCATION_PERMISSIONS = 1;
     private static final int VIEW_PAGER_PAGE_IN_MEMORY = 3;
     private static final int POLYLINE_WIDTH = 5;
+    private static final int AZIMUTH_ANGLE_VEHICLE_STOP = 0;
+    private static final int AZIMUTH_ANGLE_VEHICLE_DIRECTION_1 = 315;
+    private static final int AZIMUTH_ANGLE_VEHICLE_DIRECTION_2 = 135;
+
 
     @BindView(R.id.bottom_sheet_view_pager)
     ViewPager mViewPagerTransportAndParking;
@@ -67,7 +71,9 @@ public class MapsFragmentImpl extends Fragment implements MapsFragment, OnMapRea
     private GoogleMap mMap;
     private boolean mIsMapReady;
     private BitmapDescriptor mStopIcon;
-    private BitmapDescriptor mTransportIcon;
+    private BitmapDescriptor mTransportStaticIcon;
+    private BitmapDescriptor mTransportDirectIcon;
+    private BitmapDescriptor mTransportIndirectIcon;
 
     private Map<Integer, Polyline> mAllCurrentRoutesOnMap = new ConcurrentHashMap<>();
     private Map<Integer, List<Marker>> mAllCurrentMarkerOnMap = new ConcurrentHashMap<>();
@@ -84,23 +90,14 @@ public class MapsFragmentImpl extends Fragment implements MapsFragment, OnMapRea
         mapFragment.getMapAsync(this);
         initViewPager();
         mStopIcon = BitmapDescriptorFactory.fromResource(R.drawable.ic_temp_stop);
-        mTransportIcon = BitmapDescriptorFactory.fromResource(R.drawable.ic_temp_transport);
-        return view;
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
+        mTransportStaticIcon = BitmapDescriptorFactory.fromResource(R.drawable.temp_transport);
+        mTransportDirectIcon = BitmapDescriptorFactory.fromResource(R.drawable.temp_direction_1);
+        mTransportIndirectIcon = BitmapDescriptorFactory.fromResource(R.drawable.temp_direction_2);
         if (mMapsPresenter == null) {
             mMapsPresenter = new MapsFragmentPresenterImpl();
         }
         mMapsPresenter.bindView(this);
-    }
-
-    @Override
-    public void onPause() {
-        super.onPause();
-        mMapsPresenter.unregisteredEventBus();
+        return view;
     }
 
     @Override
@@ -109,6 +106,7 @@ public class MapsFragmentImpl extends Fragment implements MapsFragment, OnMapRea
         if (mUnbinder != null) {
             mUnbinder.unbind();
         }
+        mMapsPresenter.unregisteredEventBus();
         mMapsPresenter.unbindView();
     }
 
@@ -139,12 +137,19 @@ public class MapsFragmentImpl extends Fragment implements MapsFragment, OnMapRea
         mAllVehicles.clear();
         if (vehiclesModels != null){
             for (VehiclesModel vehiclesModel : vehiclesModels) {
+                int azimuth = vehiclesModel.getAzimuth();
                 double lat = vehiclesModel.getLatitude();
                 double lng = vehiclesModel.getLongitude();
                 LatLng latLn = new LatLng(lat, lng);
                 Marker marker = mMap.addMarker(new MarkerOptions().position(latLn));
-                marker.setIcon(mTransportIcon);
                 mAllVehicles.add(marker);
+                if (azimuth == AZIMUTH_ANGLE_VEHICLE_STOP){
+                    marker.setIcon(mTransportStaticIcon);
+                }else if (azimuth > AZIMUTH_ANGLE_VEHICLE_DIRECTION_1 || azimuth < AZIMUTH_ANGLE_VEHICLE_DIRECTION_2){
+                    marker.setIcon(mTransportDirectIcon);
+                }else {
+                    marker.setIcon(mTransportIndirectIcon);
+                }
             }
         }
     }
@@ -168,7 +173,7 @@ public class MapsFragmentImpl extends Fragment implements MapsFragment, OnMapRea
         return !(!mIsMapReady || mMap == null);
     }
 
-    private void drawRoutesWithStopOnMap(PolylineOptions listDirection, List<MarkerOptions> stopping) {
+    private void drawRoutesWithStopOnMap(PolylineOptions currentPolyline, List<MarkerOptions> stopping) {
         List<Marker> currentMarkers = new ArrayList<>();
         if (mIsSelectRoute) {
             for (MarkerOptions markerOptions : stopping) {
@@ -177,7 +182,7 @@ public class MapsFragmentImpl extends Fragment implements MapsFragment, OnMapRea
                 currentMarkers.add(marker);
             }
 
-            Polyline polyline = mMap.addPolyline(listDirection);
+            Polyline polyline = mMap.addPolyline(currentPolyline);
             polyline.setWidth(POLYLINE_WIDTH);
             polyline.setColor(getRandomColor());
 

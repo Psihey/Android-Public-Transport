@@ -7,6 +7,8 @@ import android.support.annotation.Nullable;
 
 import com.orhanobut.logger.Logger;
 import com.provectus.public_transport.eventbus.BusEvents;
+import com.provectus.public_transport.model.DirectEntity;
+import com.provectus.public_transport.model.IndirectionModel;
 import com.provectus.public_transport.model.PointEntity;
 import com.provectus.public_transport.model.SegmentEntity;
 import com.provectus.public_transport.model.StopEntity;
@@ -38,6 +40,7 @@ public class TransportRoutesService extends IntentService {
     private List<SegmentEntity> mSegmentEntity = new ArrayList<>();
     private List<PointEntity> mPointEntity = new ArrayList<>();
     private List<StopEntity> mStopEntity = new ArrayList<>();
+    private List<DirectEntity> mDirectionEntity = new ArrayList<>();
 
     public TransportRoutesService() {
         super(TransportRoutesService.class.getSimpleName());
@@ -81,6 +84,21 @@ public class TransportRoutesService extends IntentService {
                             currentRoutes.getNumber(),
                             currentRoutes.getType(),
                             currentRoutes.getDistance(),available);
+                    Logger.d(currentTransportEntity);
+                    for (DirectEntity directionEntity : currentRoutes.getDirectionEntity()){
+                        DirectEntity currentDirection = new DirectEntity(directionEntity.getLatitude(),
+                                directionEntity.getLongitude(),
+                                directionEntity.getPosition(),
+                                currentTransportEntity.getServerId());
+                        mDirectionEntity.add(currentDirection);
+                    }
+                    for (IndirectionModel indirectionEntity : currentRoutes.getIndirectionEntity()){
+                        DirectEntity currentIndirection = new DirectEntity(indirectionEntity.getLatitude(),
+                                indirectionEntity.getLongitude(),
+                                indirectionEntity.getPosition(),
+                                currentTransportEntity.getServerId());
+                        mDirectionEntity.add(currentIndirection);
+                    }
                     for (SegmentEntity currentSegment : currentRoutes.getSegments()) {
                         SegmentEntity currentSegmentEntity = new SegmentEntity(currentSegment.getServerId(),
                                 currentSegment.getDirection(),
@@ -137,6 +155,7 @@ public class TransportRoutesService extends IntentService {
         DatabaseHelper.getPublicTransportDatabase().segmentDao().deleteAll(mSegmentEntity);
         DatabaseHelper.getPublicTransportDatabase().pointDao().deleteAll(mPointEntity);
         DatabaseHelper.getPublicTransportDatabase().stopDao().deleteAll(mStopEntity);
+        DatabaseHelper.getPublicTransportDatabase().directionDao().deleteAll(mDirectionEntity);
     }
 
     private void initDataToDataBase() {
@@ -144,6 +163,7 @@ public class TransportRoutesService extends IntentService {
         DatabaseHelper.getPublicTransportDatabase().segmentDao().insertAll(mSegmentEntity);
         DatabaseHelper.getPublicTransportDatabase().pointDao().insertAll(mPointEntity);
         DatabaseHelper.getPublicTransportDatabase().stopDao().insertAll(mStopEntity);
+        DatabaseHelper.getPublicTransportDatabase().directionDao().insertAll(mDirectionEntity);
         EventBus.getDefault().post(new BusEvents.DataBaseInitialized());
         Logger.d("Database is initialized");
     }

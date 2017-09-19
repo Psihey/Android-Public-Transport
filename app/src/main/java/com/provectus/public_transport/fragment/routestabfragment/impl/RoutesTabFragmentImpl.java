@@ -77,7 +77,7 @@ public class RoutesTabFragmentImpl extends Fragment implements RoutesTabFragment
     @Override
     public void onPause() {
         super.onPause();
-        mTabFragmentPresenter.unregisteredEventBus();
+
     }
 
     @Override
@@ -86,6 +86,7 @@ public class RoutesTabFragmentImpl extends Fragment implements RoutesTabFragment
         if (mUnbinder != null) {
             mUnbinder.unbind();
         }
+        mTabFragmentPresenter.unregisteredEventBus();
         mTabFragmentPresenter.unbindView();
     }
 
