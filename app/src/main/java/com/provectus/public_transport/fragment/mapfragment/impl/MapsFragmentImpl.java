@@ -75,7 +75,7 @@ public class MapsFragmentImpl extends Fragment implements MapsFragment, OnMapRea
     private BitmapDescriptor mTransportDirectIcon;
     private BitmapDescriptor mTransportIndirectIcon;
 
-    private Map<Integer, Polyline> mAllCurrentRoutesOnMap = new ConcurrentHashMap<>();
+    private Map<Integer, List<Polyline>> mAllCurrentRoutesOnMap = new ConcurrentHashMap<>();
     private Map<Integer, List<Marker>> mAllCurrentMarkerOnMap = new ConcurrentHashMap<>();
     List<Marker> mAllVehicles = new ArrayList<>();
     private boolean mIsSelectRoute;
@@ -90,25 +90,14 @@ public class MapsFragmentImpl extends Fragment implements MapsFragment, OnMapRea
         mapFragment.getMapAsync(this);
         initViewPager();
         mStopIcon = BitmapDescriptorFactory.fromResource(R.drawable.ic_temp_stop);
-        mTransportStaticIcon = BitmapDescriptorFactory.fromResource(R.drawable.ic_temp_transport);
-        mTransportDirectIcon = BitmapDescriptorFactory.fromResource(R.drawable.temp_direction);
-        mTransportIndirectIcon = BitmapDescriptorFactory.fromResource(R.drawable.temp_indirection);
-        return view;
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
+        mTransportStaticIcon = BitmapDescriptorFactory.fromResource(R.drawable.temp_transport);
+        mTransportDirectIcon = BitmapDescriptorFactory.fromResource(R.drawable.temp_direction_1);
+        mTransportIndirectIcon = BitmapDescriptorFactory.fromResource(R.drawable.temp_direction_2);
         if (mMapsPresenter == null) {
             mMapsPresenter = new MapsFragmentPresenterImpl();
         }
         mMapsPresenter.bindView(this);
-    }
-
-    @Override
-    public void onPause() {
-        super.onPause();
-        mMapsPresenter.unregisteredEventBus();
+        return view;
     }
 
     @Override
@@ -117,6 +106,7 @@ public class MapsFragmentImpl extends Fragment implements MapsFragment, OnMapRea
         if (mUnbinder != null) {
             mUnbinder.unbind();
         }
+        mMapsPresenter.unregisteredEventBus();
         mMapsPresenter.unbindView();
     }
 
@@ -129,7 +119,7 @@ public class MapsFragmentImpl extends Fragment implements MapsFragment, OnMapRea
     }
 
     @Override
-    public void drawSelectedPosition(PolylineOptions sortedRoutes, List<MarkerOptions> stopping, int transportNumber, boolean isChecked) {
+    public void drawSelectedPosition(List<PolylineOptions> sortedRoutes, List<MarkerOptions> stopping, int transportNumber, boolean isChecked) {
         mIsSelectRoute = isChecked;
         mTransportNumber = transportNumber;
         if (checkOnReadyMap()) drawRoutesWithStopOnMap(sortedRoutes, stopping);
@@ -183,8 +173,9 @@ public class MapsFragmentImpl extends Fragment implements MapsFragment, OnMapRea
         return !(!mIsMapReady || mMap == null);
     }
 
-    private void drawRoutesWithStopOnMap(PolylineOptions listDirection, List<MarkerOptions> stopping) {
+    private void drawRoutesWithStopOnMap(List<PolylineOptions> listDirection, List<MarkerOptions> stopping) {
         List<Marker> currentMarkers = new ArrayList<>();
+        List<Polyline> currentPolyline = new ArrayList<>();
         if (mIsSelectRoute) {
             for (MarkerOptions markerOptions : stopping) {
                 Marker marker = mMap.addMarker(markerOptions);
@@ -192,19 +183,25 @@ public class MapsFragmentImpl extends Fragment implements MapsFragment, OnMapRea
                 currentMarkers.add(marker);
             }
 
-            Polyline polyline = mMap.addPolyline(listDirection);
-            polyline.setWidth(POLYLINE_WIDTH);
-            polyline.setColor(getRandomColor());
+            for (PolylineOptions polylineOptions : listDirection){
+                Polyline polyline = mMap.addPolyline(polylineOptions);
+                polyline.setWidth(POLYLINE_WIDTH);
+                polyline.setColor(getRandomColor());
+                currentPolyline.add(polyline);
+            }
 
-            mAllCurrentRoutesOnMap.put(mTransportNumber, polyline);
+            mAllCurrentRoutesOnMap.put(mTransportNumber, currentPolyline);
             mAllCurrentMarkerOnMap.put(mTransportNumber, currentMarkers);
         } else {
             removeVehiclesFromMap();
-            for (Map.Entry<Integer, Polyline> entry : mAllCurrentRoutesOnMap.entrySet()) {
+            for (Map.Entry<Integer, List<Polyline>> entry : mAllCurrentRoutesOnMap.entrySet()) {
                 Integer key = entry.getKey();
-                Polyline value = entry.getValue();
+                List<Polyline> value = entry.getValue();
                 if (key == mTransportNumber) {
-                    value.remove();
+                    for (Polyline polyline : value){
+                        polyline.remove();
+                    }
+
                     mAllCurrentRoutesOnMap.remove(mTransportNumber);
                 }
             }

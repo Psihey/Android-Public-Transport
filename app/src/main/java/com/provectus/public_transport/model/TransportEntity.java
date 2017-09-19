@@ -42,18 +42,23 @@ public class TransportEntity {
     @Ignore
     private List<SegmentEntity> mSegments;
 
+    @SerializedName("direction0")
+    @Ignore
+    private List<DirectionEntity> mDirectionEntity;
+
+    @SerializedName("direction1")
+    @Ignore
+    private List<IndirectionEntity> mIndirectionEntity;
+
     @Ignore
     private boolean mIsSelected;
 
-    public TransportEntity() {
-    }
-
-    public TransportEntity(long serverId, int number, TransportType type, double distance, boolean available) {
-        this.mServerId = serverId;
-        this.mNumber = number;
-        this.mType = type;
-        this.mDistance = distance;
-        this.mIsAvailable = available;
+    public TransportEntity(long mServerId, int mNumber, TransportType mType, double mDistance, boolean mIsAvailable) {
+        this.mServerId = mServerId;
+        this.mNumber = mNumber;
+        this.mType = mType;
+        this.mDistance = mDistance;
+        this.mIsAvailable = mIsAvailable;
     }
 
     public boolean isAvailable() {
@@ -108,6 +113,14 @@ public class TransportEntity {
         this.mIsSelected = mIsSelected;
     }
 
+    public List<DirectionEntity> getDirectionEntity() {
+        return mDirectionEntity;
+    }
+
+    public List<IndirectionEntity> getIndirectionEntity() {
+        return mIndirectionEntity;
+    }
+
     @Override
     public String toString() {
         return "TransportEntity{" +
@@ -118,4 +131,5 @@ public class TransportEntity {
                 ", segments=" + mSegments +
                 '}';
     }
+
 }
