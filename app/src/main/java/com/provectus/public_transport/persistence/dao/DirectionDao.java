@@ -4,7 +4,7 @@ import android.arch.persistence.room.Dao;
 import android.arch.persistence.room.Delete;
 import android.arch.persistence.room.Insert;
 
-import com.provectus.public_transport.model.DirectionEntity;
+import com.provectus.public_transport.model.DirectEntity;
 
 import java.util.List;
 
@@ -14,8 +14,8 @@ import java.util.List;
 @Dao
 public interface DirectionDao {
     @Insert
-    void insertAll(List<DirectionEntity> direction);
+    void insertAll(List<DirectEntity> direction);
 
     @Delete()
-    void deleteAll(List<DirectionEntity> directionEntities);
+    void deleteAll(List<DirectEntity> directionEntities);
 }

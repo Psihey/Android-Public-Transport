@@ -44,11 +44,11 @@ public class TransportEntity {
 
     @SerializedName("direction0")
     @Ignore
-    private List<DirectionEntity> mDirectionEntity;
+    private List<DirectEntity> mDirectionEntity;
 
     @SerializedName("direction1")
     @Ignore
-    private List<IndirectionEntity> mIndirectionEntity;
+    private List<IndirectionModel> mIndirectionEntity;
 
     @Ignore
     private boolean mIsSelected;
@@ -113,11 +113,11 @@ public class TransportEntity {
         this.mIsSelected = mIsSelected;
     }
 
-    public List<DirectionEntity> getDirectionEntity() {
+    public List<DirectEntity> getDirectionEntity() {
         return mDirectionEntity;
     }
 
-    public List<IndirectionEntity> getIndirectionEntity() {
+    public List<IndirectionModel> getIndirectionEntity() {
         return mIndirectionEntity;
     }
 

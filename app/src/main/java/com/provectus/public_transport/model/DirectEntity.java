@@ -16,7 +16,7 @@ import com.google.gson.annotations.SerializedName;
                 parentColumns = "transport_id",
                 childColumns = "direction_transport_id",
                 onDelete = ForeignKey.CASCADE),indices = {@Index(value = {"direction_transport_id"})})
-public class DirectionEntity {
+public class DirectEntity {
 
     @PrimaryKey(autoGenerate = true)
     private long mId;
@@ -36,11 +36,11 @@ public class DirectionEntity {
     @ColumnInfo(name = "direction_transport_id")
     private long mTransportId;
 
-    public DirectionEntity(double mLatitude, double mLongitude, int mPosition, long mTransportId) {
-        this.mLatitude = mLatitude;
-        this.mLongitude = mLongitude;
-        this.mPosition = mPosition;
-        this.mTransportId = mTransportId;
+    public DirectEntity(double latitude, double longitude, int position, long transportId) {
+        this.mLatitude = latitude;
+        this.mLongitude = longitude;
+        this.mPosition = position;
+        this.mTransportId = transportId;
     }
 
     public void setId(long mId) {

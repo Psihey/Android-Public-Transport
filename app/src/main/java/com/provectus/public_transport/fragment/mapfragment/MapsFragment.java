@@ -16,7 +16,7 @@ public interface MapsFragment {
      * @param transportNumber a number of selected transport
      * @param isChecked       a state select or not selected of the transport
      */
-    void drawSelectedPosition(List<PolylineOptions> routes, List<MarkerOptions> stopping, int transportNumber, boolean isChecked);
+    void drawSelectedPosition(PolylineOptions routes, List<MarkerOptions> stopping, int transportNumber, boolean isChecked);
 
     /**
      * A method which shows snackbar with some information
