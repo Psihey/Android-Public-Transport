@@ -37,8 +37,6 @@ public class MapsFragmentPresenterImpl implements MapsFragmentPresenter {
     private static final int TROLLEY_NUMBER_INCREMENT = 100;
 
     private MapsFragment mMapsFragment;
-    private List<StopEntity> mStopsDataForCurrentRoute = new ArrayList<>();
-    private List<DirectEntity> mDirectionForCurrentRoute = new ArrayList<>();
     private boolean mIsSelectRoute;
     private int mTransportNumber;
     private long mCurrentRouteServerId;
@@ -68,8 +66,6 @@ public class MapsFragmentPresenterImpl implements MapsFragmentPresenter {
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onMessageEvent(BusEvents.SendChosenRouter event) {
-        mStopsDataForCurrentRoute.clear();
-        mDirectionForCurrentRoute.clear();
         mIsSelectRoute = event.getSelectRout().isSelected();
         String transportType = event.getSelectRout().getType().toString();
         if (transportType.equals(TransportType.TROLLEYBUSES_TYPE.name())) {
@@ -77,41 +73,45 @@ public class MapsFragmentPresenterImpl implements MapsFragmentPresenter {
         } else if (transportType.equals(TransportType.TRAM_TYPE.name())) {
             mTransportNumber = event.getSelectRout().getNumber() + TRAM_NUMBER_INCREMENT;
         }
+        mMapsFragment.getInfoTransport(mTransportNumber, mIsSelectRoute);
 
-        DatabaseHelper.getPublicTransportDatabase().transportDao().getTransportEntity(event.getSelectRout().getNumber(), transportType)
-                .observeOn(AndroidSchedulers.mainThread())
-                .doOnError(throwable -> Logger.d(throwable.getMessage()))
-                .subscribe(this::getTransportFromDB);
-        DatabaseHelper.getPublicTransportDatabase().transportDao().getStopsForCurrentTransport(event.getSelectRout().getNumber(), transportType)
-                .observeOn(AndroidSchedulers.mainThread())
-                .doOnError(throwable -> Logger.d(throwable.getMessage()))
-                .subscribe(this::getStopsFromDB);
-        DatabaseHelper.getPublicTransportDatabase().transportDao().getDirectionEntity(event.getSelectRout().getNumber(), transportType)
-                .observeOn(AndroidSchedulers.mainThread())
-                .doOnError(throwable -> Logger.d(throwable.getMessage()))
-                .subscribe(this::getDirectionFromDB);
-    }
+        if (mMapsFragment.checkOnReadyMap()) {
+            DatabaseHelper.getPublicTransportDatabase().transportDao().getTransportEntity(event.getSelectRout().getNumber(), transportType)
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .doOnError(throwable -> Logger.d(throwable.getMessage()))
+                    .subscribe(this::getTransportFromDB);
+            DatabaseHelper.getPublicTransportDatabase().transportDao().getStopsForCurrentTransport(event.getSelectRout().getNumber(), transportType)
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .doOnError(throwable -> Logger.d(throwable.getMessage()))
+                    .subscribe(this::getStopsFromDB);
+            DatabaseHelper.getPublicTransportDatabase().transportDao().getDirectionEntity(event.getSelectRout().getNumber(), transportType)
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .doOnError(throwable -> Logger.d(throwable.getMessage()))
+                    .subscribe(this::getDirectionFromDB);
 
-    @Subscribe(threadMode = ThreadMode.MAIN)
-    public void getAllInformationForDrawRoute(BusEvents.DataForCurrentRouteFetched event) {
-        PolylineOptions polylineOptions = new PolylineOptions();
-        for (DirectEntity directionEntity : mDirectionForCurrentRoute){
-            polylineOptions.add(new LatLng(directionEntity.getLatitude(),directionEntity.getLongitude()));
         }
-
-        if (mIsSelectRoute && mStopsDataForCurrentRoute.isEmpty()) {
-            mMapsFragment.showErrorSnackbar(R.string.snack_bar_no_stops_for_this_route);
-        }
-         mMapsFragment.drawSelectedPosition(polylineOptions, getStopsOnRoute(mStopsDataForCurrentRoute), mTransportNumber, mIsSelectRoute);
     }
 
     private void getDirectionFromDB(List<DirectEntity> segmentEntities) {
-        mDirectionForCurrentRoute.addAll(segmentEntities);
-        EventBus.getDefault().post(new BusEvents.DataForCurrentRouteFetched());
+        PolylineOptions polylineOptions = new PolylineOptions();
+        for (DirectEntity directionEntity : segmentEntities) {
+            polylineOptions.add(new LatLng(directionEntity.getLatitude(), directionEntity.getLongitude()));
+        }
+        mMapsFragment.drawRoutesWithDirection(polylineOptions);
     }
 
     private void getStopsFromDB(List<StopEntity> stopEntities) {
-        mStopsDataForCurrentRoute.addAll(stopEntities);
+        if (mIsSelectRoute && stopEntities.isEmpty()) {
+            mMapsFragment.showErrorSnackbar(R.string.snack_bar_no_stops_for_this_route);
+        }
+        List<MarkerOptions> markerOption = new ArrayList<>();
+        for (int i = 0; i < stopEntities.size(); i++) {
+            double lat = stopEntities.get(i).getLatitude();
+            double lng = stopEntities.get(i).getLongitude();
+            markerOption.add(new MarkerOptions().position(new LatLng(lat, lng)));
+        }
+
+        mMapsFragment.drawStops(markerOption);
     }
 
     private void getTransportFromDB(TransportEntity transportEntity) {
@@ -119,18 +119,7 @@ public class MapsFragmentPresenterImpl implements MapsFragmentPresenter {
         getVehiclesPosition();
     }
 
-    private List<MarkerOptions> getStopsOnRoute(List<StopEntity> stopEntities) {
-        List<MarkerOptions> markerOption = new ArrayList<>();
-        for (int i = 0; i < stopEntities.size(); i++) {
-            double lat = stopEntities.get(i).getLatitude();
-            double lng = stopEntities.get(i).getLongitude();
-            markerOption.add(new MarkerOptions().position(new LatLng(lat, lng)));
-        }
-        return markerOption;
-    }
-
     private void getVehiclesPosition() {
-
         if (mIsSelectRoute) {
             mCurrentVehicles.add(mCurrentRouteServerId);
         } else {
@@ -153,7 +142,7 @@ public class MapsFragmentPresenterImpl implements MapsFragmentPresenter {
 
     private void handleResponse(Response<List<VehiclesModel>> vehicles) {
         List<VehiclesModel> currentVehicles = vehicles.body();
-        if (currentVehicles != null){
+        if (currentVehicles != null) {
             mMapsFragment.drawVehicles(currentVehicles);
         }
     }
