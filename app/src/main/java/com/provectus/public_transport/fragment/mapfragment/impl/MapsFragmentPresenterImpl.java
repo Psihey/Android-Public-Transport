@@ -90,7 +90,6 @@ public class MapsFragmentPresenterImpl implements MapsFragmentPresenter {
                 .observeOn(AndroidSchedulers.mainThread())
                 .doOnError(throwable -> Logger.d(throwable.getMessage()))
                 .subscribe(this::getDirectionFromDB);
-
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)

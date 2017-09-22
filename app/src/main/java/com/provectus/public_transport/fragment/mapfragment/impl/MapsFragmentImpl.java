@@ -28,6 +28,7 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
+import com.google.maps.android.SphericalUtil;
 import com.provectus.public_transport.R;
 import com.provectus.public_transport.adapter.TransportAndParkingViewPagerAdapter;
 import com.provectus.public_transport.fragment.mapfragment.MapsFragment;
@@ -36,6 +37,7 @@ import com.provectus.public_transport.model.VehiclesModel;
 import com.provectus.public_transport.utils.Const;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -74,10 +76,10 @@ public class MapsFragmentImpl extends Fragment implements MapsFragment, OnMapRea
     private BitmapDescriptor mTransportStaticIcon;
     private BitmapDescriptor mTransportDirectIcon;
     private BitmapDescriptor mTransportIndirectIcon;
-
     private Map<Integer, Polyline> mAllCurrentRoutesOnMap = new ConcurrentHashMap<>();
     private Map<Integer, List<Marker>> mAllCurrentMarkerOnMap = new ConcurrentHashMap<>();
-    List<Marker> mAllVehicles = new ArrayList<>();
+    private Map<Integer, List<Marker>> mAllCurrentArrowOnMap = new ConcurrentHashMap<>();
+    private List<Marker> mAllVehicles = new ArrayList<>();
     private boolean mIsSelectRoute;
     private int mTransportNumber;
 
@@ -135,7 +137,7 @@ public class MapsFragmentImpl extends Fragment implements MapsFragment, OnMapRea
     public void drawVehicles(List<VehiclesModel> vehiclesModels) {
         removeVehiclesFromMap();
         mAllVehicles.clear();
-        if (vehiclesModels != null){
+        if (vehiclesModels != null) {
             for (VehiclesModel vehiclesModel : vehiclesModels) {
                 int azimuth = vehiclesModel.getAzimuth();
                 double lat = vehiclesModel.getLatitude();
@@ -143,11 +145,11 @@ public class MapsFragmentImpl extends Fragment implements MapsFragment, OnMapRea
                 LatLng latLn = new LatLng(lat, lng);
                 Marker marker = mMap.addMarker(new MarkerOptions().position(latLn));
                 mAllVehicles.add(marker);
-                if (azimuth == AZIMUTH_ANGLE_VEHICLE_STOP){
+                if (azimuth == AZIMUTH_ANGLE_VEHICLE_STOP) {
                     marker.setIcon(mTransportStaticIcon);
-                }else if (azimuth > AZIMUTH_ANGLE_VEHICLE_DIRECTION_1 || azimuth < AZIMUTH_ANGLE_VEHICLE_DIRECTION_2){
+                } else if (azimuth > AZIMUTH_ANGLE_VEHICLE_DIRECTION_1 || azimuth < AZIMUTH_ANGLE_VEHICLE_DIRECTION_2) {
                     marker.setIcon(mTransportDirectIcon);
-                }else {
+                } else {
                     marker.setIcon(mTransportIndirectIcon);
                 }
             }
@@ -186,8 +188,25 @@ public class MapsFragmentImpl extends Fragment implements MapsFragment, OnMapRea
             polyline.setWidth(POLYLINE_WIDTH);
             polyline.setColor(getRandomColor());
 
+            LatLng previousLatLng = null;
+            int i = 0;
+            List<Marker> currentArrowDirection = new ArrayList<>();
+            Collections.reverse(currentPolyline.getPoints());
+            for (LatLng currentLatLng : currentPolyline.getPoints()) {
+                i++;
+                if (i % 10 == 0) {
+                    double rotation = SphericalUtil.computeHeading(previousLatLng, currentLatLng);
+                    Marker marker = mMap.addMarker(new MarkerOptions().position((previousLatLng)));
+                    marker.setIcon(BitmapDescriptorFactory.fromResource(R.drawable.temp_direction_triangle));
+                    marker.setRotation((float) rotation);
+                    currentArrowDirection.add(marker);
+                }
+                previousLatLng = currentLatLng;
+            }
+
             mAllCurrentRoutesOnMap.put(mTransportNumber, polyline);
             mAllCurrentMarkerOnMap.put(mTransportNumber, currentMarkers);
+            mAllCurrentArrowOnMap.put(mTransportNumber, currentArrowDirection);
         } else {
             removeVehiclesFromMap();
             for (Map.Entry<Integer, Polyline> entry : mAllCurrentRoutesOnMap.entrySet()) {
@@ -206,6 +225,16 @@ public class MapsFragmentImpl extends Fragment implements MapsFragment, OnMapRea
                         marker.remove();
                     }
                     mAllCurrentMarkerOnMap.remove(mTransportNumber);
+                }
+            }
+            for (Map.Entry<Integer, List<Marker>> entry : mAllCurrentArrowOnMap.entrySet()) {
+                Integer key = entry.getKey();
+                List<Marker> list = entry.getValue();
+                if (key == mTransportNumber) {
+                    for (Marker marker : list) {
+                        marker.remove();
+                    }
+                    mAllCurrentArrowOnMap.remove(mTransportNumber);
                 }
             }
         }
