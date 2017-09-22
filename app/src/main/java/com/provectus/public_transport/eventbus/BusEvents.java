@@ -15,14 +15,6 @@ public class BusEvents {
         }
     }
 
-    public static class DataForCurrentRouteFetched {
-        /**
-         * A method which says to the subscriber that data has fetched from Database and we can connect them
-         */
-        public DataForCurrentRouteFetched() {
-        }
-    }
-
     public static class SendChosenRouter {
         private TransportEntity mSelectRout;
 
