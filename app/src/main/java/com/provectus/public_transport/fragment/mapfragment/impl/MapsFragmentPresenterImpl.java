@@ -89,6 +89,8 @@ public class MapsFragmentPresenterImpl implements MapsFragmentPresenter {
                     .doOnError(throwable -> Logger.d(throwable.getMessage()))
                     .subscribe(this::getDirectionFromDB);
 
+        }else {
+            mMapsFragment.showErrorSnackbar(R.string.snack_bar_map_not_ready);
         }
     }
 
