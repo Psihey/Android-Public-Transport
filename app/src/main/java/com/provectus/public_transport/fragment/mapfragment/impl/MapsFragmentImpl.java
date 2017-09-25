@@ -48,8 +48,6 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
 
-import static com.provectus.public_transport.utils.Utils.getRandomColor;
-
 
 public class MapsFragmentImpl extends Fragment implements MapsFragment, OnMapReadyCallback {
 
@@ -78,6 +76,7 @@ public class MapsFragmentImpl extends Fragment implements MapsFragment, OnMapRea
     private List<Marker> mAllVehicles = new ArrayList<>();
     private boolean mIsSelectRoute;
     private int mTransportNumber;
+    private int mIndexColorRoute;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -194,10 +193,18 @@ public class MapsFragmentImpl extends Fragment implements MapsFragment, OnMapRea
 
     @Override
     public void drawRoutesWithDirection(PolylineOptions routes) {
+        int[] colorList = this.getResources().getIntArray(R.array.route_color_array);
+        if (mIndexColorRoute == colorList.length-1){
+            mIndexColorRoute = 0;
+        }else {
+            mIndexColorRoute++;
+        }
+
+
         if (mIsSelectRoute) {
             Polyline polyline = mMap.addPolyline(routes);
             polyline.setWidth(POLYLINE_WIDTH);
-            polyline.setColor(getRandomColor());
+            polyline.setColor(colorList[mIndexColorRoute]);
 
             LatLng previousLatLng = null;
             int i = 0;
