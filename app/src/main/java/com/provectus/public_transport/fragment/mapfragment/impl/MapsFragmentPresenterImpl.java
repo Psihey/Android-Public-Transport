@@ -74,7 +74,9 @@ public class MapsFragmentPresenterImpl implements MapsFragmentPresenter {
             mTransportNumber = event.getSelectRout().getNumber() + TRAM_NUMBER_INCREMENT;
         }
         mMapsFragment.getInfoTransport(mTransportNumber, mIsSelectRoute);
-
+       if (mIsSelectRoute){
+           mMapsFragment.getColorForRoute();
+       }
         if (mMapsFragment.checkOnReadyMap()) {
             DatabaseHelper.getPublicTransportDatabase().transportDao().getTransportEntity(event.getSelectRout().getNumber(), transportType)
                     .observeOn(AndroidSchedulers.mainThread())
@@ -112,7 +114,6 @@ public class MapsFragmentPresenterImpl implements MapsFragmentPresenter {
             double lng = stopEntities.get(i).getLongitude();
             markerOption.add(new MarkerOptions().position(new LatLng(lat, lng)));
         }
-
         mMapsFragment.drawStops(markerOption);
     }
 

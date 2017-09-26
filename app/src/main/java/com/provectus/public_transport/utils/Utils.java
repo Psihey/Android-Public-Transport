@@ -8,22 +8,13 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Path;
-import android.support.annotation.ColorInt;
 
 import com.provectus.public_transport.R;
 import com.provectus.public_transport.fragment.mapfragment.impl.MapsFragmentImpl;
 
-import java.util.Random;
-
 public class Utils {
 
     private Utils() {
-    }
-
-    @ColorInt
-    public static int getRandomColor() {
-        Random rnd = new Random();
-        return Color.argb(255, rnd.nextInt(256), rnd.nextInt(256), rnd.nextInt(256));
     }
 
     public static boolean isMyServiceRunning(Class<?> serviceClass, Context context) {
@@ -47,7 +38,6 @@ public class Utils {
         paint.setStrokeWidth(4);
         paint.setStyle(Paint.Style.FILL_AND_STROKE);
         paint.setColor(Color.RED);
-
         Bitmap workingBitmap = Bitmap.createBitmap(bitmap);
         Bitmap mutableBitmap = workingBitmap.copy(Bitmap.Config.ARGB_8888, true);
 
@@ -86,7 +76,6 @@ public class Utils {
             path.moveTo(0, height / 2);
             path.lineTo(0, height);
             path.lineTo(width / 2, height);
-            path.close();
             canvas.drawPath(path, paint);
         } else if (angle > 240 && angle <= 300) {
             path.moveTo(0, height / 2);
