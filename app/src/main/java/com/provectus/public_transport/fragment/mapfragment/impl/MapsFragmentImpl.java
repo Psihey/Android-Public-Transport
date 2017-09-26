@@ -253,7 +253,7 @@ public class MapsFragmentImpl extends Fragment implements MapsFragment, OnMapRea
     private Marker drawArrowsRoute(LatLng previousLatLng, LatLng currentLatLng) {
         double rotation = SphericalUtil.computeHeading(previousLatLng, currentLatLng);
         Marker marker = mMap.addMarker(new MarkerOptions().position((previousLatLng)));
-        marker.setIcon(BitmapDescriptorFactory.fromResource(R.drawable.temp_direction_triangle));
+        marker.setIcon(BitmapDescriptorFactory.fromResource(R.drawable.arrow_drirection));
         marker.setRotation((float) rotation);
         marker.setFlat(true);
         return marker;
