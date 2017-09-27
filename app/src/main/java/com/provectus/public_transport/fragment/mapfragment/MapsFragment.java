@@ -24,4 +24,6 @@ public interface MapsFragment {
     boolean checkOnReadyMap();
 
     void drawRoutesWithDirection(PolylineOptions routes);
+
+    void getColorForRoute();
 }

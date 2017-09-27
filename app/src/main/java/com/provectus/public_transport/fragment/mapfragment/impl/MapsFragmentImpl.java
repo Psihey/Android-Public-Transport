@@ -13,6 +13,7 @@ import android.support.v4.view.ViewPager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.RelativeLayout;
 
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -44,6 +45,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import biz.laenger.android.vpbs.BottomSheetUtils;
+import biz.laenger.android.vpbs.ViewPagerBottomSheetBehavior;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
@@ -63,7 +65,8 @@ public class MapsFragmentImpl extends Fragment implements MapsFragment, OnMapRea
     TabLayout mBottomSheetTabLayout;
     @BindView(R.id.coordinator_layout_fragment_container)
     CoordinatorLayout mContainerLayout;
-
+    @BindView(R.id.container_bottom_sheet)
+    RelativeLayout mRelativeLayoutBottomSheet;
     private MapsFragmentPresenter mMapsPresenter;
     private Unbinder mUnbinder;
     private GoogleMap mMap;
@@ -76,7 +79,9 @@ public class MapsFragmentImpl extends Fragment implements MapsFragment, OnMapRea
     private List<Marker> mAllVehicles = new ArrayList<>();
     private boolean mIsSelectRoute;
     private int mTransportNumber;
-    private int mIndexColorRoute;
+    private int mIndexColorRoute = -1;
+    private int[] mColorRouteList;
+    private ViewPagerBottomSheetBehavior mViewPagerBottomSheetBehavior;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -86,6 +91,7 @@ public class MapsFragmentImpl extends Fragment implements MapsFragment, OnMapRea
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
         initViewPager();
+        mColorRouteList = this.getResources().getIntArray(R.array.route_color_array);
         mStopIcon = BitmapDescriptorFactory.fromResource(R.drawable.ic_temp_stop);
         mTransportStaticIcon = BitmapDescriptorFactory.fromResource(R.drawable.temp_transport);
         if (mMapsPresenter == null) {
@@ -193,18 +199,10 @@ public class MapsFragmentImpl extends Fragment implements MapsFragment, OnMapRea
 
     @Override
     public void drawRoutesWithDirection(PolylineOptions routes) {
-        int[] colorList = this.getResources().getIntArray(R.array.route_color_array);
-        if (mIndexColorRoute == colorList.length-1){
-            mIndexColorRoute = 0;
-        }else {
-            mIndexColorRoute++;
-        }
-
-
         if (mIsSelectRoute) {
             Polyline polyline = mMap.addPolyline(routes);
             polyline.setWidth(POLYLINE_WIDTH);
-            polyline.setColor(colorList[mIndexColorRoute]);
+            polyline.setColor(mColorRouteList[mIndexColorRoute]);
 
             LatLng previousLatLng = null;
             int i = 0;
@@ -250,10 +248,19 @@ public class MapsFragmentImpl extends Fragment implements MapsFragment, OnMapRea
         }
     }
 
+    @Override
+    public void getColorForRoute() {
+        if (mIndexColorRoute == mColorRouteList.length - 1) {
+            mIndexColorRoute = 0;
+        } else {
+            mIndexColorRoute++;
+        }
+    }
+
     private Marker drawArrowsRoute(LatLng previousLatLng, LatLng currentLatLng) {
         double rotation = SphericalUtil.computeHeading(previousLatLng, currentLatLng);
         Marker marker = mMap.addMarker(new MarkerOptions().position((previousLatLng)));
-        marker.setIcon(BitmapDescriptorFactory.fromResource(R.drawable.temp_direction_triangle));
+        marker.setIcon(BitmapDescriptorFactory.fromResource(R.drawable.arrow_drirection));
         marker.setRotation((float) rotation);
         marker.setFlat(true);
         return marker;
@@ -269,6 +276,23 @@ public class MapsFragmentImpl extends Fragment implements MapsFragment, OnMapRea
         mBottomSheetTabLayout.getTabAt(TransportAndParkingViewPagerAdapter.POSITION_PARKING).setIcon(R.drawable.parking_tab_drawable_state);
         mBottomSheetTabLayout.getTabAt(TransportAndParkingViewPagerAdapter.POSITION_FAVOURITES).setIcon(R.drawable.favourites_tab_drawable_state);
         BottomSheetUtils.setupViewPager(mViewPagerTransportAndParking);
+        mViewPagerBottomSheetBehavior = ViewPagerBottomSheetBehavior.from(mRelativeLayoutBottomSheet);
+        mBottomSheetTabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
+            @Override
+            public void onTabSelected(TabLayout.Tab tab) {
+                mViewPagerBottomSheetBehavior.setState(ViewPagerBottomSheetBehavior.STATE_EXPANDED);
+            }
+
+            @Override
+            public void onTabUnselected(TabLayout.Tab tab) {
+
+            }
+
+            @Override
+            public void onTabReselected(TabLayout.Tab tab) {
+                mViewPagerBottomSheetBehavior.setState(ViewPagerBottomSheetBehavior.STATE_EXPANDED);
+            }
+        });
     }
 
     private void setDefaultCameraPosition() {
