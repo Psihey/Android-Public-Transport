@@ -26,12 +26,12 @@ public class VehiclesModel {
     private int mSatellite;
 
     @SerializedName("routeId")
-    private int mRouteId;
+    private long mRouteId;
 
     @SerializedName("type")
     private String mType;
 
-    public int getRouteId() {
+    public long getRouteId() {
         return mRouteId;
     }
 

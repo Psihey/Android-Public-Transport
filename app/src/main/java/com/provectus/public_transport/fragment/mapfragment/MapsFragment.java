@@ -19,7 +19,7 @@ public interface MapsFragment {
 
     void drawStops(List<MarkerOptions> stopping);
 
-    void getInfoTransport(int transportNumber, boolean isChecked);
+    void getInfoTransport(int transportNumber, boolean isChecked,long transportId);
 
     boolean checkOnReadyMap();
 
