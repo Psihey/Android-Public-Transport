@@ -144,7 +144,6 @@ public class MapsFragmentPresenterImpl implements MapsFragmentPresenter {
     }
 
     private void handleResponse(Response<List<VehiclesModel>> vehicles) {
-        Logger.d(vehicles.code());
         if (vehicles.code() == 400){
             mMapsFragment.showErrorSnackbar(R.string.snack_bar_no_vehicles_for_this_route);
         }
