@@ -72,7 +72,8 @@ public class MapsFragmentImpl extends Fragment implements MapsFragment, OnMapRea
     private GoogleMap mMap;
     private boolean mIsMapReady;
     private BitmapDescriptor mStopIcon;
-    private BitmapDescriptor mTransportStaticIcon;
+    private BitmapDescriptor mTramStaticIcon;
+    private BitmapDescriptor mTrolleybusStaticIcon;
     private Map<Integer, Polyline> mAllCurrentRoutesOnMap = new ConcurrentHashMap<>();
     private Map<Integer, List<Marker>> mAllCurrentStopsOnMap = new ConcurrentHashMap<>();
     private Map<Integer, List<Marker>> mAllCurrentArrowOnMap = new ConcurrentHashMap<>();
@@ -93,7 +94,8 @@ public class MapsFragmentImpl extends Fragment implements MapsFragment, OnMapRea
         initViewPager();
         mColorRouteList = this.getResources().getIntArray(R.array.route_color_array);
         mStopIcon = BitmapDescriptorFactory.fromResource(R.drawable.ic_temp_stop);
-        mTransportStaticIcon = BitmapDescriptorFactory.fromResource(R.drawable.temp_transport);
+        mTramStaticIcon = BitmapDescriptorFactory.fromResource(R.drawable.temp_transport);
+        mTrolleybusStaticIcon = BitmapDescriptorFactory.fromResource(R.drawable.ic_trolleybus_south);
         if (mMapsPresenter == null) {
             mMapsPresenter = new MapsFragmentPresenterImpl();
         }
@@ -138,9 +140,13 @@ public class MapsFragmentImpl extends Fragment implements MapsFragment, OnMapRea
                 Marker marker = mMap.addMarker(new MarkerOptions().position(latLn));
                 mAllVehicles.add(marker);
                 if (azimuth == AZIMUTH_ANGLE_VEHICLE_STOP) {
-                    marker.setIcon(mTransportStaticIcon);
+                    if (vehiclesModel.getType().equals("tram")){
+                        marker.setIcon(mTramStaticIcon);
+                    }else {
+                        marker.setIcon(mTrolleybusStaticIcon);
+                    }
                 } else {
-                    marker.setIcon(BitmapDescriptorFactory.fromBitmap(Utils.drawVehicleDirection(this, azimuth)));
+                    marker.setIcon(BitmapDescriptorFactory.fromBitmap(Utils.drawVehicleDirection(this, azimuth,vehiclesModel.getType())));
                     marker.setFlat(true);
                 }
             }

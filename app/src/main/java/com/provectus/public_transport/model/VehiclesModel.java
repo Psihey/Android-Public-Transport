@@ -25,6 +25,20 @@ public class VehiclesModel {
     @SerializedName("sats")
     private int mSatellite;
 
+    @SerializedName("routeId")
+    private int mRouteId;
+
+    @SerializedName("type")
+    private String mType;
+
+    public int getRouteId() {
+        return mRouteId;
+    }
+
+    public String getType() {
+        return mType;
+    }
+
     public long getVehicleId() {
         return mVehicleId;
     }
@@ -61,8 +75,10 @@ public class VehiclesModel {
                 ", mLongitude=" + mLongitude +
                 ", mSpeed=" + mSpeed +
                 ", mAzimuth=" + mAzimuth +
-                ", mGsmPower=" + mGsmPower +
+                ", mGsmPower='" + mGsmPower + '\'' +
                 ", mSatellite=" + mSatellite +
+                ", mRouteId=" + mRouteId +
+                ", mType=" + mType +
                 '}';
     }
 }
