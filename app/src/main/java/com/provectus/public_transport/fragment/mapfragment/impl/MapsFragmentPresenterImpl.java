@@ -22,6 +22,7 @@ import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
 import java.net.ConnectException;
+import java.net.HttpURLConnection;
 import java.net.SocketTimeoutException;
 import java.util.ArrayList;
 import java.util.List;
@@ -144,8 +145,10 @@ public class MapsFragmentPresenterImpl implements MapsFragmentPresenter {
     }
 
     private void handleResponse(Response<List<VehiclesModel>> vehicles) {
-        if (vehicles.code() == 400){
-            mMapsFragment.showErrorSnackbar(R.string.snack_bar_no_vehicles_for_this_route);
+        if (mIsSelectRoute){
+            if (vehicles.code() == HttpURLConnection.HTTP_BAD_REQUEST){
+                mMapsFragment.showErrorSnackbar(R.string.snack_bar_no_vehicles_for_this_route);
+            }
         }
         List<VehiclesModel> currentVehicles = vehicles.body();
         if (currentVehicles != null) {

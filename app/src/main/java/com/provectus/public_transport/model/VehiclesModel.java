@@ -1,6 +1,7 @@
 package com.provectus.public_transport.model;
 
 import com.google.gson.annotations.SerializedName;
+import com.provectus.public_transport.model.converter.TransportType;
 
 public class VehiclesModel {
 
@@ -29,13 +30,14 @@ public class VehiclesModel {
     private long mRouteId;
 
     @SerializedName("type")
-    private String mType;
+
+    private TransportType mType;
 
     public long getRouteId() {
         return mRouteId;
     }
 
-    public String getType() {
+    public TransportType getType() {
         return mType;
     }
 

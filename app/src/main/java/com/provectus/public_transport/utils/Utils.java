@@ -11,6 +11,7 @@ import android.graphics.PorterDuffColorFilter;
 
 import com.provectus.public_transport.R;
 import com.provectus.public_transport.fragment.mapfragment.impl.MapsFragmentImpl;
+import com.provectus.public_transport.model.converter.TransportType;
 
 public class Utils {
 
@@ -27,53 +28,53 @@ public class Utils {
         return false;
     }
 
-    public static Bitmap drawVehicleDirection(MapsFragmentImpl context, float angle, String type) {
+    public static Bitmap drawVehicleDirection(MapsFragmentImpl context, float angle, TransportType type) {
         Bitmap bitmap = null;
         if (angle == 0) {
-            if (type.equals("tram")) {
-                bitmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.temp_transport);
+            if (type == TransportType.TRAM_TYPE) {
+                bitmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.ic_tram_static_direction);
             } else
-                bitmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.temp_transport);
+                bitmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.ic_trolleybus_static_direction);
         } else if (angle > 30 && angle <= 60) {
-            if (type.equals("tram")) {
-                bitmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.ic_tram_north_east_direction_48_px_7);
+            if (type == TransportType.TRAM_TYPE) {
+                bitmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.ic_tram_north_east_direction);
             } else
-                bitmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.ic_trolleybus_north_east);
+                bitmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.ic_trolleybus_north_east_direction);
         } else if (angle > 60 && angle <= 120) {
-            if (type.equals("tram")) {
-                bitmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.ic_tram_east_direction_48_px);
+            if (type == TransportType.TRAM_TYPE) {
+                bitmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.ic_tram_east_direction);
             } else
-                bitmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.ic_trolleybus_east);
+                bitmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.ic_trolleybus_east_direction);
         } else if (angle > 120 && angle <= 150) {
-            if (type.equals("tram")) {
-                bitmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.ic_tram_south_east_direction_48_px_6);
+            if (type == TransportType.TRAM_TYPE) {
+                bitmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.ic_tram_south_east_direction);
             } else
-                bitmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.ic_trolleybus_south_east);
+                bitmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.ic_trolleybus_south_east_direction);
         } else if (angle > 150 && angle <= 210) {
-            if (type.equals("tram")) {
-                bitmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.ic_tram_south_direction_48_px_2);
+            if (type == TransportType.TRAM_TYPE) {
+                bitmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.ic_tram_south_direction);
             } else
-                bitmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.ic_trolleybus_south);
+                bitmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.ic_trolleybus_south_direction);
         } else if (angle > 210 && angle <= 240) {
-            if (type.equals("tram")) {
-                bitmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.ic_tram_south_west_direction_48_px_5);
+            if (type == TransportType.TRAM_TYPE) {
+                bitmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.ic_tram_south_west_direction);
             } else
-                bitmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.ic_trolleybus_south_west);
+                bitmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.ic_trolleybus_south_west_direction);
         } else if (angle > 240 && angle <= 300) {
-            if (type.equals("tram")) {
-                bitmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.ic_tram_west_direction_48_px_3);
+            if (type == TransportType.TRAM_TYPE) {
+                bitmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.ic_tram_west_direction);
             } else
-                bitmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.ic_trolleybus_west);
+                bitmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.ic_trolleybus_west_direction);
         } else if (angle > 300 && angle <= 330) {
-            if (type.equals("tram")) {
-                bitmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.ic_tram_north_west_direction_48_px_4);
+            if (type == TransportType.TRAM_TYPE) {
+                bitmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.ic_tram_north_west_direction);
             } else
-                bitmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.ic_trolleybus_north_west);
+                bitmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.ic_trolleybus_north_west_direction);
         } else if (angle > 330 || angle <= 30) {
-            if (type.equals("tram")) {
-                bitmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.ic_tram_north_direction_48_px);
+            if (type == TransportType.TRAM_TYPE) {
+                bitmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.ic_tram_north_direction);
             } else
-                bitmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.ic_trolleybus_north);
+                bitmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.ic_trolleybus_north_direction);
         }
         return bitmap;
     }
