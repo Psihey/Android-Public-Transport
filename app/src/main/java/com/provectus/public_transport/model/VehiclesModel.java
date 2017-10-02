@@ -1,6 +1,7 @@
 package com.provectus.public_transport.model;
 
 import com.google.gson.annotations.SerializedName;
+import com.provectus.public_transport.model.converter.TransportType;
 
 public class VehiclesModel {
 
@@ -24,6 +25,21 @@ public class VehiclesModel {
 
     @SerializedName("sats")
     private int mSatellite;
+
+    @SerializedName("routeId")
+    private long mRouteId;
+
+    @SerializedName("type")
+
+    private TransportType mType;
+
+    public long getRouteId() {
+        return mRouteId;
+    }
+
+    public TransportType getType() {
+        return mType;
+    }
 
     public long getVehicleId() {
         return mVehicleId;
@@ -61,8 +77,10 @@ public class VehiclesModel {
                 ", mLongitude=" + mLongitude +
                 ", mSpeed=" + mSpeed +
                 ", mAzimuth=" + mAzimuth +
-                ", mGsmPower=" + mGsmPower +
+                ", mGsmPower='" + mGsmPower + '\'' +
                 ", mSatellite=" + mSatellite +
+                ", mRouteId=" + mRouteId +
+                ", mType=" + mType +
                 '}';
     }
 }

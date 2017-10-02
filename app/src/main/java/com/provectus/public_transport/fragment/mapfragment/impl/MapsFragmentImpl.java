@@ -2,6 +2,8 @@ package com.provectus.public_transport.fragment.mapfragment.impl;
 
 import android.Manifest;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.CoordinatorLayout;
@@ -57,7 +59,6 @@ public class MapsFragmentImpl extends Fragment implements MapsFragment, OnMapRea
     private static final int REQUEST_LOCATION_PERMISSIONS = 1;
     private static final int VIEW_PAGER_PAGE_IN_MEMORY = 3;
     private static final int POLYLINE_WIDTH = 5;
-    private static final int AZIMUTH_ANGLE_VEHICLE_STOP = 0;
 
     @BindView(R.id.bottom_sheet_view_pager)
     ViewPager mViewPagerTransportAndParking;
@@ -72,13 +73,14 @@ public class MapsFragmentImpl extends Fragment implements MapsFragment, OnMapRea
     private GoogleMap mMap;
     private boolean mIsMapReady;
     private BitmapDescriptor mStopIcon;
-    private BitmapDescriptor mTransportStaticIcon;
     private Map<Integer, Polyline> mAllCurrentRoutesOnMap = new ConcurrentHashMap<>();
     private Map<Integer, List<Marker>> mAllCurrentStopsOnMap = new ConcurrentHashMap<>();
     private Map<Integer, List<Marker>> mAllCurrentArrowOnMap = new ConcurrentHashMap<>();
+    private Map<Long, Integer> mAllCurrentRouteWithColorOnMap = new ConcurrentHashMap<>();
     private List<Marker> mAllVehicles = new ArrayList<>();
     private boolean mIsSelectRoute;
     private int mTransportNumber;
+    private long mTransportId;
     private int mIndexColorRoute = -1;
     private int[] mColorRouteList;
     private ViewPagerBottomSheetBehavior mViewPagerBottomSheetBehavior;
@@ -93,7 +95,6 @@ public class MapsFragmentImpl extends Fragment implements MapsFragment, OnMapRea
         initViewPager();
         mColorRouteList = this.getResources().getIntArray(R.array.route_color_array);
         mStopIcon = BitmapDescriptorFactory.fromResource(R.drawable.ic_temp_stop);
-        mTransportStaticIcon = BitmapDescriptorFactory.fromResource(R.drawable.temp_transport);
         if (mMapsPresenter == null) {
             mMapsPresenter = new MapsFragmentPresenterImpl();
         }
@@ -137,12 +138,8 @@ public class MapsFragmentImpl extends Fragment implements MapsFragment, OnMapRea
                 LatLng latLn = new LatLng(lat, lng);
                 Marker marker = mMap.addMarker(new MarkerOptions().position(latLn));
                 mAllVehicles.add(marker);
-                if (azimuth == AZIMUTH_ANGLE_VEHICLE_STOP) {
-                    marker.setIcon(mTransportStaticIcon);
-                } else {
-                    marker.setIcon(BitmapDescriptorFactory.fromBitmap(Utils.drawVehicleDirection(this, azimuth)));
-                    marker.setFlat(true);
-                }
+                marker.setIcon(BitmapDescriptorFactory.fromBitmap(Utils.tintImage(Utils.drawVehicleDirection(this, azimuth, vehiclesModel.getType()), colorForVehicles(mAllCurrentRouteWithColorOnMap, vehiclesModel.getRouteId()))));
+                marker.setFlat(true);
             }
         }
     }
@@ -179,9 +176,10 @@ public class MapsFragmentImpl extends Fragment implements MapsFragment, OnMapRea
     }
 
     @Override
-    public void getInfoTransport(int transportNumber, boolean isChecked) {
+    public void getInfoTransport(int transportNumber, boolean isChecked, long transportId) {
         mTransportNumber = transportNumber;
         mIsSelectRoute = isChecked;
+        mTransportId = transportId;
     }
 
     @Override
@@ -202,6 +200,7 @@ public class MapsFragmentImpl extends Fragment implements MapsFragment, OnMapRea
         if (mIsSelectRoute) {
             Polyline polyline = mMap.addPolyline(routes);
             polyline.setWidth(POLYLINE_WIDTH);
+            mAllCurrentRouteWithColorOnMap.put(mTransportId, mColorRouteList[mIndexColorRoute]);
             polyline.setColor(mColorRouteList[mIndexColorRoute]);
 
             LatLng previousLatLng = null;
@@ -245,6 +244,7 @@ public class MapsFragmentImpl extends Fragment implements MapsFragment, OnMapRea
                     mAllCurrentArrowOnMap.remove(mTransportNumber);
                 }
             }
+
         }
     }
 
@@ -258,9 +258,10 @@ public class MapsFragmentImpl extends Fragment implements MapsFragment, OnMapRea
     }
 
     private Marker drawArrowsRoute(LatLng previousLatLng, LatLng currentLatLng) {
+        Bitmap bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.arrow_drirection);
         double rotation = SphericalUtil.computeHeading(previousLatLng, currentLatLng);
         Marker marker = mMap.addMarker(new MarkerOptions().position((previousLatLng)));
-        marker.setIcon(BitmapDescriptorFactory.fromResource(R.drawable.arrow_drirection));
+        marker.setIcon(BitmapDescriptorFactory.fromBitmap(Utils.tintImage(bitmap, colorForVehicles(mAllCurrentRouteWithColorOnMap, mTransportId))));
         marker.setRotation((float) rotation);
         marker.setFlat(true);
         return marker;
@@ -314,6 +315,17 @@ public class MapsFragmentImpl extends Fragment implements MapsFragment, OnMapRea
         }
         mMap.setMyLocationEnabled(true);
         settings.setMyLocationButtonEnabled(true);
+    }
+
+    private int colorForVehicles(Map<Long, Integer> allRoutes, long routeId) {
+        final int[] color = new int[1];
+        allRoutes.forEach((aLong, integer) -> {
+            if (aLong == routeId) {
+                color[0] = integer;
+            }
+
+        });
+        return color[0];
     }
 
 }

@@ -15,6 +15,7 @@
     <string name="snack_bar_no_vehicles_server_not_response">Failed to update</string>
     <string name="snack_bar_no_vehicles_no_internet_connection">No internet connection</string>
     <string name="snack_bar_map_not_ready">Map not ready</string>
+    <string name="snack_bar_no_vehicles_for_this_route">No data on vehicles</string>
 
     <integer-array name="route_color_array">
         <item>@color/routeGreenColor</item>
