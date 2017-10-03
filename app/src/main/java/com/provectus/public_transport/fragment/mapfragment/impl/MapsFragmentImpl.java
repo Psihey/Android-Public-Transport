@@ -23,6 +23,7 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.UiSettings;
+import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
@@ -150,11 +151,12 @@ public class MapsFragmentImpl extends Fragment implements MapsFragment, OnMapRea
 
     @Override
     public void drawStops(List<MarkerOptions> stopping) {
+        BitmapDescriptor stopIcon = BitmapDescriptorFactory.fromResource(R.drawable.ic_temp_stop);
         List<Marker> allStops = new ArrayList<>();
         if (mIsSelectRoute) {
             for (MarkerOptions markerOptions : stopping) {
                 Marker marker = mMap.addMarker(markerOptions);
-                marker.setIcon(BitmapDescriptorFactory.fromResource(R.drawable.ic_temp_stop));
+                marker.setIcon(stopIcon);
                 allStops.add(marker);
             }
             mAllCurrentStopsOnMap.put(mTransportNumber, allStops);
