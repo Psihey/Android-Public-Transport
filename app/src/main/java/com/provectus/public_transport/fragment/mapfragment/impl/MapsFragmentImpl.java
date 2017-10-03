@@ -23,7 +23,6 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.UiSettings;
-import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
@@ -72,7 +71,6 @@ public class MapsFragmentImpl extends Fragment implements MapsFragment, OnMapRea
     private Unbinder mUnbinder;
     private GoogleMap mMap;
     private boolean mIsMapReady;
-    private BitmapDescriptor mStopIcon;
     private Map<Integer, Polyline> mAllCurrentRoutesOnMap = new ConcurrentHashMap<>();
     private Map<Integer, List<Marker>> mAllCurrentStopsOnMap = new ConcurrentHashMap<>();
     private Map<Integer, List<Marker>> mAllCurrentArrowOnMap = new ConcurrentHashMap<>();
@@ -94,7 +92,6 @@ public class MapsFragmentImpl extends Fragment implements MapsFragment, OnMapRea
         mapFragment.getMapAsync(this);
         initViewPager();
         mColorRouteList = this.getResources().getIntArray(R.array.route_color_array);
-        mStopIcon = BitmapDescriptorFactory.fromResource(R.drawable.ic_temp_stop);
         if (mMapsPresenter == null) {
             mMapsPresenter = new MapsFragmentPresenterImpl();
         }
@@ -157,7 +154,7 @@ public class MapsFragmentImpl extends Fragment implements MapsFragment, OnMapRea
         if (mIsSelectRoute) {
             for (MarkerOptions markerOptions : stopping) {
                 Marker marker = mMap.addMarker(markerOptions);
-                marker.setIcon(mStopIcon);
+                marker.setIcon(BitmapDescriptorFactory.fromResource(R.drawable.ic_temp_stop));
                 allStops.add(marker);
             }
             mAllCurrentStopsOnMap.put(mTransportNumber, allStops);
@@ -318,14 +315,15 @@ public class MapsFragmentImpl extends Fragment implements MapsFragment, OnMapRea
     }
 
     private int colorForVehicles(Map<Long, Integer> allRoutes, long routeId) {
-        final int[] color = new int[1];
-        allRoutes.forEach((aLong, integer) -> {
-            if (aLong == routeId) {
-                color[0] = integer;
+        int color = 0;
+        for (Map.Entry<Long, Integer> entry : allRoutes.entrySet()) {
+            Long key = entry.getKey();
+            Integer value = entry.getValue();
+            if (key == routeId) {
+                color = value;
             }
-
-        });
-        return color[0];
+        }
+        return color;
     }
 
 }

@@ -84,7 +84,6 @@ public class TransportRoutesService extends IntentService {
                             currentRoutes.getNumber(),
                             currentRoutes.getType(),
                             currentRoutes.getDistance(),available);
-                    Logger.d(currentTransportEntity);
                     for (DirectEntity directionEntity : currentRoutes.getDirectionEntity()){
                         DirectEntity currentDirection = new DirectEntity(directionEntity.getLatitude(),
                                 directionEntity.getLongitude(),

@@ -75,12 +75,6 @@ public class RoutesTabFragmentImpl extends Fragment implements RoutesTabFragment
     }
 
     @Override
-    public void onPause() {
-        super.onPause();
-
-    }
-
-    @Override
     public void onDestroyView() {
         super.onDestroyView();
         if (mUnbinder != null) {
