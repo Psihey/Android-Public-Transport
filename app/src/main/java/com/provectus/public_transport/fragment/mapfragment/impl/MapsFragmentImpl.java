@@ -77,7 +77,6 @@ public class MapsFragmentImpl extends Fragment implements MapsFragment, OnMapRea
     private Map<Integer, List<Marker>> mAllCurrentArrowOnMap = new ConcurrentHashMap<>();
     private Map<Long, Integer> mAllCurrentRouteWithColorOnMap = new ConcurrentHashMap<>();
     private List<Marker> mAllVehicles = new ArrayList<>();
-    private boolean mIsSelectRoute;
     private int mTransportNumber;
     private long mTransportId;
     private int mIndexColorRoute = -1;
@@ -153,31 +152,31 @@ public class MapsFragmentImpl extends Fragment implements MapsFragment, OnMapRea
     public void drawStops(List<MarkerOptions> stopping) {
         BitmapDescriptor stopIcon = BitmapDescriptorFactory.fromResource(R.drawable.ic_temp_stop);
         List<Marker> allStops = new ArrayList<>();
-        if (mIsSelectRoute) {
-            for (MarkerOptions markerOptions : stopping) {
-                Marker marker = mMap.addMarker(markerOptions);
-                marker.setIcon(stopIcon);
-                allStops.add(marker);
-            }
-            mAllCurrentStopsOnMap.put(mTransportNumber, allStops);
-        } else {
-            for (Map.Entry<Integer, List<Marker>> entry : mAllCurrentStopsOnMap.entrySet()) {
-                Integer key = entry.getKey();
-                List<Marker> list = entry.getValue();
-                if (key == mTransportNumber) {
-                    for (Marker marker : list) {
-                        marker.remove();
-                    }
-                    mAllCurrentStopsOnMap.remove(mTransportNumber);
+        for (MarkerOptions markerOptions : stopping) {
+            Marker marker = mMap.addMarker(markerOptions);
+            marker.setIcon(stopIcon);
+            allStops.add(marker);
+        }
+        mAllCurrentStopsOnMap.put(mTransportNumber, allStops);
+    }
+
+    @Override
+    public void removeStopsFromMap() {
+        for (Map.Entry<Integer, List<Marker>> entry : mAllCurrentStopsOnMap.entrySet()) {
+            Integer key = entry.getKey();
+            List<Marker> list = entry.getValue();
+            if (key == mTransportNumber) {
+                for (Marker marker : list) {
+                    marker.remove();
                 }
+                mAllCurrentStopsOnMap.remove(mTransportNumber);
             }
         }
     }
 
     @Override
-    public void getInfoTransport(int transportNumber, boolean isChecked, long transportId) {
+    public void getInfoTransport(int transportNumber, long transportId) {
         mTransportNumber = transportNumber;
-        mIsSelectRoute = isChecked;
         mTransportId = transportId;
     }
 
@@ -196,55 +195,56 @@ public class MapsFragmentImpl extends Fragment implements MapsFragment, OnMapRea
 
     @Override
     public void drawRoutesWithDirection(PolylineOptions routes) {
-        if (mIsSelectRoute) {
-            Polyline polyline = mMap.addPolyline(routes);
-            polyline.setWidth(POLYLINE_WIDTH);
-            mAllCurrentRouteWithColorOnMap.put(mTransportId, mColorRouteList[mIndexColorRoute]);
-            polyline.setColor(mColorRouteList[mIndexColorRoute]);
+        Polyline polyline = mMap.addPolyline(routes);
+        polyline.setWidth(POLYLINE_WIDTH);
+        mAllCurrentRouteWithColorOnMap.put(mTransportId, mColorRouteList[mIndexColorRoute]);
+        polyline.setColor(mColorRouteList[mIndexColorRoute]);
 
-            LatLng previousLatLng = null;
-            int i = 0;
-            List<Marker> currentArrowDirection = new ArrayList<>();
-            Collections.reverse(routes.getPoints());
-            for (LatLng currentLatLng : routes.getPoints()) {
-                i++;
-                if (routes.getPoints().size() > 255) {
-                    if (i % 10 == 0) {
-                        currentArrowDirection.add(drawArrowsRoute(previousLatLng, currentLatLng));
-                    }
-                } else {
-                    if (i % 5 == 0) {
-                        currentArrowDirection.add(drawArrowsRoute(previousLatLng, currentLatLng));
-                    }
+        LatLng previousLatLng = null;
+        int i = 0;
+        List<Marker> currentArrowDirection = new ArrayList<>();
+        Collections.reverse(routes.getPoints());
+        for (LatLng currentLatLng : routes.getPoints()) {
+            i++;
+            if (routes.getPoints().size() > 255) {
+                if (i % 10 == 0) {
+                    currentArrowDirection.add(drawArrowsRoute(previousLatLng, currentLatLng));
                 }
-                previousLatLng = currentLatLng;
-            }
-
-            mAllCurrentRoutesOnMap.put(mTransportNumber, polyline);
-            mAllCurrentArrowOnMap.put(mTransportNumber, currentArrowDirection);
-        } else {
-            removeVehiclesFromMap();
-            for (Map.Entry<Integer, Polyline> entry : mAllCurrentRoutesOnMap.entrySet()) {
-                Integer key = entry.getKey();
-                Polyline value = entry.getValue();
-                if (key == mTransportNumber) {
-                    value.remove();
-                    mAllCurrentRoutesOnMap.remove(mTransportNumber);
+            } else {
+                if (i % 5 == 0) {
+                    currentArrowDirection.add(drawArrowsRoute(previousLatLng, currentLatLng));
                 }
             }
-
-            for (Map.Entry<Integer, List<Marker>> entry : mAllCurrentArrowOnMap.entrySet()) {
-                Integer key = entry.getKey();
-                List<Marker> list = entry.getValue();
-                if (key == mTransportNumber) {
-                    for (Marker marker : list) {
-                        marker.remove();
-                    }
-                    mAllCurrentArrowOnMap.remove(mTransportNumber);
-                }
-            }
-
+            previousLatLng = currentLatLng;
         }
+
+        mAllCurrentRoutesOnMap.put(mTransportNumber, polyline);
+        mAllCurrentArrowOnMap.put(mTransportNumber, currentArrowDirection);
+    }
+
+    @Override
+    public void removeRoutesWithDirectionFromMap() {
+        removeVehiclesFromMap();
+        for (Map.Entry<Integer, Polyline> entry : mAllCurrentRoutesOnMap.entrySet()) {
+            Integer key = entry.getKey();
+            Polyline value = entry.getValue();
+            if (key == mTransportNumber) {
+                value.remove();
+                mAllCurrentRoutesOnMap.remove(mTransportNumber);
+            }
+        }
+
+        for (Map.Entry<Integer, List<Marker>> entry : mAllCurrentArrowOnMap.entrySet()) {
+            Integer key = entry.getKey();
+            List<Marker> list = entry.getValue();
+            if (key == mTransportNumber) {
+                for (Marker marker : list) {
+                    marker.remove();
+                }
+                mAllCurrentArrowOnMap.remove(mTransportNumber);
+            }
+        }
+
     }
 
     @Override
