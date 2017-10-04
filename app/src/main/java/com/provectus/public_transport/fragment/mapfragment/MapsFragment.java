@@ -19,11 +19,15 @@ public interface MapsFragment {
 
     void drawStops(List<MarkerOptions> stopping);
 
-    void getInfoTransport(int transportNumber, boolean isChecked,long transportId);
+    void getInfoTransport(int transportNumber, long transportId);
 
     boolean checkOnReadyMap();
 
     void drawRoutesWithDirection(PolylineOptions routes);
 
     void getColorForRoute();
+
+    void removeStopsFromMap();
+
+    void removeRoutesWithDirectionFromMap();
 }

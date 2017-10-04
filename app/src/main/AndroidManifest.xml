@@ -26,14 +26,19 @@
             android:name="io.fabric.ApiKey"
             android:value="3ee38ffb7243c815e67fba8e096ef05824fb6962" />
 
-        <activity
-            android:name=".activity.MainActivity"
+        <activity android:name=".activity.SplashActivity"
+            android:theme="@style/SplashTheme"
             android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+        </activity>
+
+        <activity
+            android:name=".activity.MainActivity"
+            android:screenOrientation="portrait">
         </activity>
 
         <service android:name=".service.TransportRoutesService"/>

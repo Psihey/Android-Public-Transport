@@ -74,26 +74,29 @@ public class MapsFragmentPresenterImpl implements MapsFragmentPresenter {
         } else if (transportType.equals(TransportType.TRAM_TYPE.name())) {
             mTransportNumber = event.getSelectRout().getNumber() + TRAM_NUMBER_INCREMENT;
         }
-        mMapsFragment.getInfoTransport(mTransportNumber, mIsSelectRoute,event.getSelectRout().getServerId());
-       if (mIsSelectRoute){
-           mMapsFragment.getColorForRoute();
-       }
-        if (mMapsFragment.checkOnReadyMap()) {
-            DatabaseHelper.getPublicTransportDatabase().transportDao().getTransportEntity(event.getSelectRout().getNumber(), transportType)
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .doOnError(throwable -> Logger.d(throwable.getMessage()))
-                    .subscribe(this::getTransportFromDB);
-            DatabaseHelper.getPublicTransportDatabase().transportDao().getStopsForCurrentTransport(event.getSelectRout().getNumber(), transportType)
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .doOnError(throwable -> Logger.d(throwable.getMessage()))
-                    .subscribe(this::getStopsFromDB);
-            DatabaseHelper.getPublicTransportDatabase().transportDao().getDirectionEntity(event.getSelectRout().getNumber(), transportType)
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .doOnError(throwable -> Logger.d(throwable.getMessage()))
-                    .subscribe(this::getDirectionFromDB);
+        mMapsFragment.getInfoTransport(mTransportNumber, event.getSelectRout().getServerId());
+        DatabaseHelper.getPublicTransportDatabase().transportDao().getTransportEntity(event.getSelectRout().getNumber(), transportType)
+                .observeOn(AndroidSchedulers.mainThread())
+                .doOnError(throwable -> Logger.d(throwable.getMessage()))
+                .subscribe(this::getTransportFromDB);
+        if (mIsSelectRoute) {
+            mMapsFragment.getColorForRoute();
+            if (mMapsFragment.checkOnReadyMap()) {
+                DatabaseHelper.getPublicTransportDatabase().transportDao().getStopsForCurrentTransport(event.getSelectRout().getNumber(), transportType)
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .doOnError(throwable -> Logger.d(throwable.getMessage()))
+                        .subscribe(this::getStopsFromDB);
+                DatabaseHelper.getPublicTransportDatabase().transportDao().getDirectionEntity(event.getSelectRout().getNumber(), transportType)
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .doOnError(throwable -> Logger.d(throwable.getMessage()))
+                        .subscribe(this::getDirectionFromDB);
 
-        }else {
-            mMapsFragment.showErrorSnackbar(R.string.snack_bar_map_not_ready);
+            } else {
+                mMapsFragment.showErrorSnackbar(R.string.snack_bar_map_not_ready);
+            }
+        } else {
+            mMapsFragment.removeStopsFromMap();
+            mMapsFragment.removeRoutesWithDirectionFromMap();
         }
     }
 
@@ -145,8 +148,8 @@ public class MapsFragmentPresenterImpl implements MapsFragmentPresenter {
     }
 
     private void handleResponse(Response<List<VehiclesModel>> vehicles) {
-        if (mIsSelectRoute){
-            if (vehicles.code() == HttpURLConnection.HTTP_BAD_REQUEST){
+        if (mIsSelectRoute) {
+            if (vehicles.code() == HttpURLConnection.HTTP_BAD_REQUEST) {
                 mMapsFragment.showErrorSnackbar(R.string.snack_bar_no_vehicles_for_this_route);
             }
         }
@@ -164,7 +167,7 @@ public class MapsFragmentPresenterImpl implements MapsFragmentPresenter {
             if (throwable instanceof SocketTimeoutException) {
                 mMapsFragment.showErrorSnackbar(R.string.snack_bar_no_vehicles_no_internet_connection);
             } else if (throwable instanceof ConnectException) {
-                mMapsFragment.showErrorSnackbar(R.string.snack_bar_no_vehicles_no_internet_connection);
+                mMapsFragment.showErrorSnackbar(R.string.snack_bar_no_vehicles_server_not_response);
             }
         }
     }
