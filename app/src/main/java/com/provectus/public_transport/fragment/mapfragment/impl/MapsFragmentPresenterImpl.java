@@ -12,6 +12,7 @@ import com.provectus.public_transport.fragment.mapfragment.MapsFragmentPresenter
 import com.provectus.public_transport.model.DirectEntity;
 import com.provectus.public_transport.model.StopEntity;
 import com.provectus.public_transport.model.TransportEntity;
+import com.provectus.public_transport.model.VehicleMarkerInfoModel;
 import com.provectus.public_transport.model.VehiclesModel;
 import com.provectus.public_transport.model.converter.TransportType;
 import com.provectus.public_transport.persistence.database.DatabaseHelper;
@@ -25,7 +26,9 @@ import java.net.ConnectException;
 import java.net.HttpURLConnection;
 import java.net.SocketTimeoutException;
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 import io.reactivex.android.schedulers.AndroidSchedulers;
@@ -43,6 +46,8 @@ public class MapsFragmentPresenterImpl implements MapsFragmentPresenter {
     private long mCurrentRouteServerId;
     private CompositeDisposable mCompositeDisposable;
     private List<Long> mCurrentVehicles = new ArrayList<>();
+    private VehicleMarkerInfoModel mVehicleMarker;
+
 
     @Override
     public void bindView(MapsFragment mapsFragment) {
@@ -112,18 +117,28 @@ public class MapsFragmentPresenterImpl implements MapsFragmentPresenter {
         if (mIsSelectRoute && stopEntities.isEmpty()) {
             mMapsFragment.showErrorSnackbar(R.string.snack_bar_no_stops_for_this_route);
         }
+        Set<String> stopsNamed = new LinkedHashSet<>();
         List<MarkerOptions> markerOption = new ArrayList<>();
         for (int i = 0; i < stopEntities.size(); i++) {
             double lat = stopEntities.get(i).getLatitude();
             double lng = stopEntities.get(i).getLongitude();
             markerOption.add(new MarkerOptions().position(new LatLng(lat, lng)));
+            stopsNamed.add(stopEntities.get(i).getTitle());
         }
+        mVehicleMarker.setStopsName(stopsNamed);
+        mMapsFragment.getVehiclesFullInfo(mVehicleMarker);
         mMapsFragment.drawStops(markerOption);
     }
 
     private void getTransportFromDB(TransportEntity transportEntity) {
+        mVehicleMarker = new VehicleMarkerInfoModel();
+        mVehicleMarker.setVehicleId(transportEntity.getServerId());
+        mVehicleMarker.setDistance(transportEntity.getDistance());
+        mVehicleMarker.setNumber(transportEntity.getNumber());
+        mVehicleMarker.setServerId(transportEntity.getServerId());
         mCurrentRouteServerId = transportEntity.getServerId();
         getVehiclesPosition();
+
     }
 
     private void getVehiclesPosition() {

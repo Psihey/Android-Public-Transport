@@ -32,10 +32,12 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.maps.android.SphericalUtil;
+import com.orhanobut.logger.Logger;
 import com.provectus.public_transport.R;
 import com.provectus.public_transport.adapter.TransportAndParkingViewPagerAdapter;
 import com.provectus.public_transport.fragment.mapfragment.MapsFragment;
 import com.provectus.public_transport.fragment.mapfragment.MapsFragmentPresenter;
+import com.provectus.public_transport.model.VehicleMarkerInfoModel;
 import com.provectus.public_transport.model.VehiclesModel;
 import com.provectus.public_transport.utils.Const;
 import com.provectus.public_transport.utils.Utils;
@@ -53,7 +55,7 @@ import butterknife.ButterKnife;
 import butterknife.Unbinder;
 
 
-public class MapsFragmentImpl extends Fragment implements MapsFragment, OnMapReadyCallback {
+public class MapsFragmentImpl extends Fragment implements MapsFragment, OnMapReadyCallback, GoogleMap.OnMarkerClickListener {
 
     public static final String TAG_MAP_FRAGMENT = "fragment_map";
     private static final int REQUEST_LOCATION_PERMISSIONS = 1;
@@ -76,7 +78,9 @@ public class MapsFragmentImpl extends Fragment implements MapsFragment, OnMapRea
     private Map<Integer, List<Marker>> mAllCurrentStopsOnMap = new ConcurrentHashMap<>();
     private Map<Integer, List<Marker>> mAllCurrentArrowOnMap = new ConcurrentHashMap<>();
     private Map<Long, Integer> mAllCurrentRouteWithColorOnMap = new ConcurrentHashMap<>();
-    private List<Marker> mAllVehicles = new ArrayList<>();
+    private Map<Long, VehicleMarkerInfoModel> mAllCurrentVehicleInfo = new ConcurrentHashMap<>();
+    private List<Marker> mAllMarkerVehicles = new ArrayList<>();
+    private List<VehiclesModel> mAllVehicles;
     private int mTransportNumber;
     private long mTransportId;
     private int mIndexColorRoute = -1;
@@ -115,6 +119,7 @@ public class MapsFragmentImpl extends Fragment implements MapsFragment, OnMapRea
         mMap = googleMap;
         setDefaultCameraPosition();
         setMyLocationButton();
+        mMap.setOnMarkerClickListener(this);
     }
 
     @Override
@@ -125,8 +130,9 @@ public class MapsFragmentImpl extends Fragment implements MapsFragment, OnMapRea
 
     @Override
     public void drawVehicles(List<VehiclesModel> vehiclesModels) {
+        mAllVehicles = vehiclesModels;
         removeVehiclesFromMap();
-        mAllVehicles.clear();
+        mAllMarkerVehicles.clear();
         if (vehiclesModels != null) {
             for (VehiclesModel vehiclesModel : vehiclesModels) {
                 int azimuth = vehiclesModel.getAzimuth();
@@ -134,7 +140,8 @@ public class MapsFragmentImpl extends Fragment implements MapsFragment, OnMapRea
                 double lng = vehiclesModel.getLongitude();
                 LatLng latLn = new LatLng(lat, lng);
                 Marker marker = mMap.addMarker(new MarkerOptions().position(latLn));
-                mAllVehicles.add(marker);
+                marker.setTag(vehiclesModel.getVehicleId());
+                mAllMarkerVehicles.add(marker);
                 marker.setIcon(BitmapDescriptorFactory.fromBitmap(Utils.tintImage(Utils.drawVehicleDirection(this, azimuth, vehiclesModel.getType()), colorForVehicles(mAllCurrentRouteWithColorOnMap, vehiclesModel.getRouteId()))));
                 marker.setFlat(true);
             }
@@ -143,7 +150,7 @@ public class MapsFragmentImpl extends Fragment implements MapsFragment, OnMapRea
 
     @Override
     public void removeVehiclesFromMap() {
-        for (Marker marker : mAllVehicles) {
+        for (Marker marker : mAllMarkerVehicles) {
             marker.remove();
         }
     }
@@ -248,6 +255,22 @@ public class MapsFragmentImpl extends Fragment implements MapsFragment, OnMapRea
     }
 
     @Override
+    public void getVehiclesFullInfo(VehicleMarkerInfoModel vehicleMarkerInfoModel) {
+        if (mAllCurrentVehicleInfo.isEmpty()){
+            mAllCurrentVehicleInfo.put(mTransportId, vehicleMarkerInfoModel);
+        }else {
+            for (Map.Entry<Long, VehicleMarkerInfoModel> entry : mAllCurrentVehicleInfo.entrySet()) {
+                Logger.d("dddd888888888");
+                Long key = entry.getKey();
+                if (key == mTransportNumber) {
+                    mAllCurrentVehicleInfo.remove(mTransportNumber);
+                } else mAllCurrentVehicleInfo.put(mTransportId, vehicleMarkerInfoModel);
+            }
+        }
+
+    }
+
+    @Override
     public void getColorForRoute() {
         if (mIndexColorRoute == mColorRouteList.length - 1) {
             mIndexColorRoute = 0;
@@ -328,4 +351,32 @@ public class MapsFragmentImpl extends Fragment implements MapsFragment, OnMapRea
         return color;
     }
 
+    @Override
+    public boolean onMarkerClick(Marker marker) {
+
+        if (marker.getTag() != null) {
+        for (VehiclesModel vehiclesModel : mAllVehicles) {
+            Logger.d(marker.getTag());
+                if (marker.getTag().equals(vehiclesModel.getVehicleId())) {
+                    Logger.d(vehiclesModel.getType());
+                    Logger.d(vehiclesModel.getCost());
+                    Logger.d(vehiclesModel.getSeats());
+                    Logger.d(vehiclesModel.getSpeed());
+                    Logger.d(vehiclesModel.getInventoryNumber());
+                    for (Map.Entry<Long, VehicleMarkerInfoModel> entry : mAllCurrentVehicleInfo.entrySet()) {
+                        Long key = entry.getKey();
+                        VehicleMarkerInfoModel model = entry.getValue();
+                        if (vehiclesModel.getRouteId()==model.getServerId()) {
+                            Logger.d(model.getDistance());
+                            Logger.d(model.getNumber());
+                            Logger.d(model.getStopsName());
+                        }
+                    }
+                }
+
+            }
+
+        }
+        return false;
+    }
 }
