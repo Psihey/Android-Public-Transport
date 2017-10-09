@@ -11,6 +11,15 @@
         android:layout_height="match_parent"
         android:name="com.google.android.gms.maps.SupportMapFragment"/>
 
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:foregroundGravity="top"
+        android:gravity="center"
+        android:background="@color/colorPrimary"
+        android:visibility="invisible"
+        android:text="@string/text_view_offline_mode"/>
+
     <include layout="@layout/bottom_sheet_vehicle_detail"/>
 
     <include layout="@layout/bottom_sheet_tab_panel" />
