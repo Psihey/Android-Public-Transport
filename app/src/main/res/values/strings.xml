@@ -32,19 +32,11 @@
     <string name="text_view_distance">The length of the route</string>
 
     <integer-array name="route_color_array">
-        <item>@color/routeGreenColor</item>
         <item>@color/routePinkColor</item>
-        <item>@color/routeOrangeColor</item>
         <item>@color/routeBlackColor</item>
         <item>@color/routeIndigoColor</item>
-        <item>@color/routeLimeColor</item>
-        <item>@color/routeBlueColor</item>
-        <item>@color/routeLightGreenColor</item>
-        <item>@color/routeRedColor</item>
-        <item>@color/routeBrownColor</item>
         <item>@color/routeTealColor</item>
         <item>@color/routePurpleColor</item>
-        <item>@color/routeBlueGrey</item>
     </integer-array>
 
 </resources>
