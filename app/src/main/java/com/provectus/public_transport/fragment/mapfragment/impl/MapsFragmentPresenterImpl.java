@@ -26,9 +26,7 @@ import java.net.ConnectException;
 import java.net.HttpURLConnection;
 import java.net.SocketTimeoutException;
 import java.util.ArrayList;
-import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 import io.reactivex.android.schedulers.AndroidSchedulers;
@@ -117,16 +115,12 @@ public class MapsFragmentPresenterImpl implements MapsFragmentPresenter {
         if (mIsSelectRoute && stopEntities.isEmpty()) {
             mMapsFragment.showErrorSnackbar(R.string.snack_bar_no_stops_for_this_route);
         }
-        Set<String> stopsNamed = new LinkedHashSet<>();
         List<MarkerOptions> markerOption = new ArrayList<>();
         for (int i = 0; i < stopEntities.size(); i++) {
             double lat = stopEntities.get(i).getLatitude();
             double lng = stopEntities.get(i).getLongitude();
             markerOption.add(new MarkerOptions().position(new LatLng(lat, lng)));
-            stopsNamed.add(stopEntities.get(i).getTitle());
         }
-        mVehicleMarker.setStopsName(stopsNamed);
-        mMapsFragment.getVehiclesFullInfo(mVehicleMarker);
         mMapsFragment.drawStops(markerOption);
     }
 
@@ -137,6 +131,7 @@ public class MapsFragmentPresenterImpl implements MapsFragmentPresenter {
         mVehicleMarker.setNumber(transportEntity.getNumber());
         mVehicleMarker.setServerId(transportEntity.getServerId());
         mCurrentRouteServerId = transportEntity.getServerId();
+        mMapsFragment.getVehiclesFullInfo(mVehicleMarker);
         getVehiclesPosition();
 
     }
@@ -146,6 +141,9 @@ public class MapsFragmentPresenterImpl implements MapsFragmentPresenter {
             mCurrentVehicles.add(mCurrentRouteServerId);
         } else {
             mCurrentVehicles.remove(mCurrentRouteServerId);
+        }
+        if (mCurrentVehicles.size()==0){
+            mMapsFragment.routeNotSelected();
         }
 
         if (mCompositeDisposable != null && !mCompositeDisposable.isDisposed()) {

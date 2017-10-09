@@ -6,6 +6,8 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.constraint.ConstraintLayout;
+import android.support.design.widget.BottomSheetBehavior;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.Snackbar;
 import android.support.design.widget.TabLayout;
@@ -15,7 +17,9 @@ import android.support.v4.view.ViewPager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.RelativeLayout;
+import android.widget.TextView;
 
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -32,13 +36,13 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.maps.android.SphericalUtil;
-import com.orhanobut.logger.Logger;
 import com.provectus.public_transport.R;
 import com.provectus.public_transport.adapter.TransportAndParkingViewPagerAdapter;
 import com.provectus.public_transport.fragment.mapfragment.MapsFragment;
 import com.provectus.public_transport.fragment.mapfragment.MapsFragmentPresenter;
 import com.provectus.public_transport.model.VehicleMarkerInfoModel;
 import com.provectus.public_transport.model.VehiclesModel;
+import com.provectus.public_transport.model.converter.TransportType;
 import com.provectus.public_transport.utils.Const;
 import com.provectus.public_transport.utils.Utils;
 
@@ -70,6 +74,25 @@ public class MapsFragmentImpl extends Fragment implements MapsFragment, OnMapRea
     CoordinatorLayout mContainerLayout;
     @BindView(R.id.container_bottom_sheet)
     RelativeLayout mRelativeLayoutBottomSheet;
+    @BindView(R.id.constraint_container_vehicle_info)
+    ConstraintLayout mConstraintVehicleContainer;
+    @BindView(R.id.tv_route_number)
+    TextView mTextViewRouteNumber;
+    @BindView(R.id.tv_transport_type_value)
+    TextView mTextViewTransportType;
+    @BindView(R.id.tv_transport_speed_value)
+    TextView mTextViewSpeed;
+    @BindView(R.id.tv_transport_inventory_number_value)
+    TextView mTextViewInventoryNumber;
+    @BindView(R.id.tv_transport_capacity_value)
+    TextView mTextViewTransportCapacity;
+    @BindView(R.id.tv_transport_fee_value)
+    TextView mTextViewTransportFee;
+    @BindView(R.id.tv_transport_route_distance_value)
+    TextView mTextViewRouteDistance;
+    @BindView(R.id.iv_transport_icon)
+    ImageView mImageViewTransportIcon;
+
     private MapsFragmentPresenter mMapsPresenter;
     private Unbinder mUnbinder;
     private GoogleMap mMap;
@@ -86,6 +109,8 @@ public class MapsFragmentImpl extends Fragment implements MapsFragment, OnMapRea
     private int mIndexColorRoute = -1;
     private int[] mColorRouteList;
     private ViewPagerBottomSheetBehavior mViewPagerBottomSheetBehavior;
+    private BottomSheetBehavior mBottomSheetVehicleInfo;
+    private long mCurrentVehiclesId;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -101,6 +126,14 @@ public class MapsFragmentImpl extends Fragment implements MapsFragment, OnMapRea
         }
         mMapsPresenter.bindView(this);
         return view;
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        mBottomSheetVehicleInfo = BottomSheetBehavior.from(mConstraintVehicleContainer);
+        mBottomSheetVehicleInfo.setPeekHeight(0);
+        mBottomSheetVehicleInfo.setHideable(true);
     }
 
     @Override
@@ -133,6 +166,7 @@ public class MapsFragmentImpl extends Fragment implements MapsFragment, OnMapRea
         mAllVehicles = vehiclesModels;
         removeVehiclesFromMap();
         mAllMarkerVehicles.clear();
+        changeDynamicallyVehicleSpeedOnView(vehiclesModels);
         if (vehiclesModels != null) {
             for (VehiclesModel vehiclesModel : vehiclesModels) {
                 int azimuth = vehiclesModel.getAzimuth();
@@ -256,11 +290,10 @@ public class MapsFragmentImpl extends Fragment implements MapsFragment, OnMapRea
 
     @Override
     public void getVehiclesFullInfo(VehicleMarkerInfoModel vehicleMarkerInfoModel) {
-        if (mAllCurrentVehicleInfo.isEmpty()){
+        if (mAllCurrentVehicleInfo.isEmpty()) {
             mAllCurrentVehicleInfo.put(mTransportId, vehicleMarkerInfoModel);
-        }else {
+        } else {
             for (Map.Entry<Long, VehicleMarkerInfoModel> entry : mAllCurrentVehicleInfo.entrySet()) {
-                Logger.d("dddd888888888");
                 Long key = entry.getKey();
                 if (key == mTransportNumber) {
                     mAllCurrentVehicleInfo.remove(mTransportNumber);
@@ -270,6 +303,8 @@ public class MapsFragmentImpl extends Fragment implements MapsFragment, OnMapRea
 
     }
 
+
+
     @Override
     public void getColorForRoute() {
         if (mIndexColorRoute == mColorRouteList.length - 1) {
@@ -277,6 +312,20 @@ public class MapsFragmentImpl extends Fragment implements MapsFragment, OnMapRea
         } else {
             mIndexColorRoute++;
         }
+    }
+
+    @Override
+    public boolean onMarkerClick(Marker marker) {
+        mBottomSheetVehicleInfo.setState(BottomSheetBehavior.STATE_EXPANDED);
+        if (marker.getTag() != null) {
+            setDataIntoInfoView(marker);
+        }
+        return false;
+    }
+
+    @Override
+    public void routeNotSelected() {
+        mBottomSheetVehicleInfo.setState(BottomSheetBehavior.STATE_COLLAPSED);
     }
 
     private Marker drawArrowsRoute(LatLng previousLatLng, LatLng currentLatLng) {
@@ -351,32 +400,42 @@ public class MapsFragmentImpl extends Fragment implements MapsFragment, OnMapRea
         return color;
     }
 
-    @Override
-    public boolean onMarkerClick(Marker marker) {
-
-        if (marker.getTag() != null) {
+    private void setDataIntoInfoView(Marker marker) {
+        String transportType;
         for (VehiclesModel vehiclesModel : mAllVehicles) {
-            Logger.d(marker.getTag());
-                if (marker.getTag().equals(vehiclesModel.getVehicleId())) {
-                    Logger.d(vehiclesModel.getType());
-                    Logger.d(vehiclesModel.getCost());
-                    Logger.d(vehiclesModel.getSeats());
-                    Logger.d(vehiclesModel.getSpeed());
-                    Logger.d(vehiclesModel.getInventoryNumber());
-                    for (Map.Entry<Long, VehicleMarkerInfoModel> entry : mAllCurrentVehicleInfo.entrySet()) {
-                        Long key = entry.getKey();
-                        VehicleMarkerInfoModel model = entry.getValue();
-                        if (vehiclesModel.getRouteId()==model.getServerId()) {
-                            Logger.d(model.getDistance());
-                            Logger.d(model.getNumber());
-                            Logger.d(model.getStopsName());
-                        }
+            if (marker.getTag().equals(vehiclesModel.getVehicleId())) {
+                mCurrentVehiclesId = vehiclesModel.getVehicleId();
+                if (vehiclesModel.getType().equals(TransportType.TRAM_TYPE)) {
+                    transportType = getString(R.string.transport_type_tram);
+                    mImageViewTransportIcon.setImageResource(R.drawable.ic_tram_gray_24_dp);
+                } else {
+                    transportType = getString(R.string.transport_type_trolleybus);
+                    mImageViewTransportIcon.setImageResource(R.drawable.ic_trolley_gray_24_dp);
+                }
+                mTextViewTransportType.setText(transportType);
+                mTextViewTransportFee.setText(getResources().getString(R.string.text_view_transport_fee, Double.toString(vehiclesModel.getCost())));
+                mTextViewTransportCapacity.setText(String.valueOf(vehiclesModel.getSeats()));
+                mTextViewSpeed.setText(getResources().getString(R.string.text_view_transport_speed, vehiclesModel.getSpeed()));
+                mTextViewInventoryNumber.setText(String.valueOf(vehiclesModel.getInventoryNumber()));
+                for (Map.Entry<Long, VehicleMarkerInfoModel> entry : mAllCurrentVehicleInfo.entrySet()) {
+                    VehicleMarkerInfoModel model = entry.getValue();
+                    if (vehiclesModel.getRouteId() == model.getServerId()) {
+                        mTextViewRouteDistance.setText(getResources().getString(R.string.text_view_transport_route_distance, Double.toString(model.getDistance())));
+                        mTextViewRouteNumber.setText(getResources().getString(R.string.text_view_route_number, model.getNumber()));
                     }
                 }
-
             }
 
         }
-        return false;
+    }
+
+    private void changeDynamicallyVehicleSpeedOnView(List<VehiclesModel> vehiclesModels) {
+        if (mCurrentVehiclesId != 0) {
+            for (VehiclesModel vehicleModel : vehiclesModels) {
+                if (vehicleModel.getVehicleId() == mCurrentVehiclesId) {
+                    mTextViewSpeed.setText(getResources().getString(R.string.text_view_transport_speed, vehicleModel.getSpeed()));
+                }
+            }
+        }
     }
 }

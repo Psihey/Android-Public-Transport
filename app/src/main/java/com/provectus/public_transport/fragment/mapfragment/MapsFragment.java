@@ -33,4 +33,6 @@ public interface MapsFragment {
     void removeRoutesWithDirectionFromMap();
 
     void getVehiclesFullInfo(VehicleMarkerInfoModel vehicleMarkerInfoModel);
+
+    void routeNotSelected();
 }
