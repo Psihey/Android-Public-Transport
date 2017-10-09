@@ -4,6 +4,7 @@ import android.Manifest;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.constraint.ConstraintLayout;
@@ -65,6 +66,8 @@ public class MapsFragmentImpl extends Fragment implements MapsFragment, OnMapRea
     private static final int REQUEST_LOCATION_PERMISSIONS = 1;
     private static final int VIEW_PAGER_PAGE_IN_MEMORY = 3;
     private static final int POLYLINE_WIDTH = 5;
+    private static final String VEHICLE_TYPE = "vehicle";
+    private static final String ARROW_TYPE = "arrow";
 
     @BindView(R.id.bottom_sheet_view_pager)
     ViewPager mViewPagerTransportAndParking;
@@ -176,7 +179,7 @@ public class MapsFragmentImpl extends Fragment implements MapsFragment, OnMapRea
                 Marker marker = mMap.addMarker(new MarkerOptions().position(latLn));
                 marker.setTag(vehiclesModel.getVehicleId());
                 mAllMarkerVehicles.add(marker);
-                marker.setIcon(BitmapDescriptorFactory.fromBitmap(Utils.tintImage(Utils.drawVehicleDirection(this, azimuth, vehiclesModel.getType()), colorForVehicles(mAllCurrentRouteWithColorOnMap, vehiclesModel.getRouteId()))));
+                marker.setIcon(BitmapDescriptorFactory.fromBitmap(Utils.tintImage(Utils.drawVehicleDirection(this, azimuth, vehiclesModel.getType()), colorForVehicles(mAllCurrentRouteWithColorOnMap, vehiclesModel.getRouteId(),VEHICLE_TYPE))));
                 marker.setFlat(true);
             }
         }
@@ -303,8 +306,6 @@ public class MapsFragmentImpl extends Fragment implements MapsFragment, OnMapRea
 
     }
 
-
-
     @Override
     public void getColorForRoute() {
         if (mIndexColorRoute == mColorRouteList.length - 1) {
@@ -316,9 +317,11 @@ public class MapsFragmentImpl extends Fragment implements MapsFragment, OnMapRea
 
     @Override
     public boolean onMarkerClick(Marker marker) {
-        mBottomSheetVehicleInfo.setState(BottomSheetBehavior.STATE_EXPANDED);
-        if (marker.getTag() != null) {
-            setDataIntoInfoView(marker);
+        if (!marker.getTag().equals(ARROW_TYPE)){
+            mBottomSheetVehicleInfo.setState(BottomSheetBehavior.STATE_EXPANDED);
+            if (marker.getTag() != null) {
+                setDataIntoInfoView(marker);
+            }
         }
         return false;
     }
@@ -332,9 +335,10 @@ public class MapsFragmentImpl extends Fragment implements MapsFragment, OnMapRea
         Bitmap bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.arrow_drirection);
         double rotation = SphericalUtil.computeHeading(previousLatLng, currentLatLng);
         Marker marker = mMap.addMarker(new MarkerOptions().position((previousLatLng)));
-        marker.setIcon(BitmapDescriptorFactory.fromBitmap(Utils.tintImage(bitmap, colorForVehicles(mAllCurrentRouteWithColorOnMap, mTransportId))));
+        marker.setIcon(BitmapDescriptorFactory.fromBitmap(Utils.tintImage(bitmap, colorForVehicles(mAllCurrentRouteWithColorOnMap, mTransportId,ARROW_TYPE))));
         marker.setRotation((float) rotation);
         marker.setFlat(true);
+        marker.setTag(ARROW_TYPE);
         return marker;
     }
 
@@ -388,13 +392,19 @@ public class MapsFragmentImpl extends Fragment implements MapsFragment, OnMapRea
         settings.setMyLocationButtonEnabled(true);
     }
 
-    private int colorForVehicles(Map<Long, Integer> allRoutes, long routeId) {
+    private int colorForVehicles(Map<Long, Integer> allRoutes, long routeId,String type) {
         int color = 0;
         for (Map.Entry<Long, Integer> entry : allRoutes.entrySet()) {
             Long key = entry.getKey();
             Integer value = entry.getValue();
             if (key == routeId) {
                 color = value;
+                if (type.equals(VEHICLE_TYPE)){
+                    float[] hsv = new float[3];
+                    Color.colorToHSV(color, hsv);
+                    hsv[2] *= 0.7f;
+                    color = Color.HSVToColor(hsv);
+                }
             }
         }
         return color;
