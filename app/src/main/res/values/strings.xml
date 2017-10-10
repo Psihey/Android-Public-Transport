@@ -30,14 +30,14 @@
     <string name="text_view_capacity">Capacity</string>
     <string name="text_view_fee">Fare</string>
     <string name="text_view_distance">The length of the route</string>
-    <string name="text_view_offline_mode">OFFLINE MODE</string>
+    <string name="text_view_offline_mode">OFFLINE MODE info valid for %1$s</string>
 
     <integer-array name="route_color_array">
         <item>@color/routePinkColor</item>
-        <item>@color/routeOrangeColor</item>
         <item>@color/routeIndigoColor</item>
         <item>@color/routeTealColor</item>
         <item>@color/routePurpleColor</item>
+        <item>@color/routeOrangeColor</item>
     </integer-array>
 
 </resources>

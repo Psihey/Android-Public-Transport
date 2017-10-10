@@ -11,4 +11,6 @@
     <color name="routeIndigoColor">#3F51B5</color>
     <color name="routeOrangeColor">#FF9800</color>
     <color name="routeTealColor">#009688</color>
+
+    <color name="offline_mode">#630000</color>
 </resources>

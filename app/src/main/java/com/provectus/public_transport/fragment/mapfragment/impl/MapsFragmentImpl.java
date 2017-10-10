@@ -6,6 +6,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.constraint.ConstraintLayout;
 import android.support.design.widget.BottomSheetBehavior;
@@ -49,7 +50,9 @@ import com.provectus.public_transport.utils.Utils;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -58,6 +61,8 @@ import biz.laenger.android.vpbs.ViewPagerBottomSheetBehavior;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
+
+import static android.os.Looper.getMainLooper;
 
 
 public class MapsFragmentImpl extends Fragment implements MapsFragment, OnMapReadyCallback, GoogleMap.OnMarkerClickListener {
@@ -68,6 +73,7 @@ public class MapsFragmentImpl extends Fragment implements MapsFragment, OnMapRea
     private static final int POLYLINE_WIDTH = 5;
     private static final String VEHICLE_TYPE = "vehicle";
     private static final String ARROW_TYPE = "arrow";
+    private static final String TIME_FORMAT_OFFLINE_MODE = "%tT";
 
     @BindView(R.id.bottom_sheet_view_pager)
     ViewPager mViewPagerTransportAndParking;
@@ -95,6 +101,8 @@ public class MapsFragmentImpl extends Fragment implements MapsFragment, OnMapRea
     TextView mTextViewRouteDistance;
     @BindView(R.id.iv_transport_icon)
     ImageView mImageViewTransportIcon;
+    @BindView(R.id.tv_offline_mode)
+    TextView mTextViewOfflineMode;
 
     private MapsFragmentPresenter mMapsPresenter;
     private Unbinder mUnbinder;
@@ -114,6 +122,7 @@ public class MapsFragmentImpl extends Fragment implements MapsFragment, OnMapRea
     private ViewPagerBottomSheetBehavior mViewPagerBottomSheetBehavior;
     private BottomSheetBehavior mBottomSheetVehicleInfo;
     private long mCurrentVehiclesId;
+    private String mLastOnlineTime;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -162,10 +171,15 @@ public class MapsFragmentImpl extends Fragment implements MapsFragment, OnMapRea
     public void showErrorSnackbar(int message) {
         Snackbar snackbar = Snackbar.make(mContainerLayout, message, Snackbar.LENGTH_LONG);
         snackbar.show();
+        if (message == R.string.snack_bar_no_vehicles_no_internet_connection) {
+            offlineMode();
+        }
     }
 
     @Override
     public void drawVehicles(List<VehiclesModel> vehiclesModels) {
+        mTextViewOfflineMode.setVisibility(View.GONE);
+        mLastOnlineTime = String.format(Locale.US, TIME_FORMAT_OFFLINE_MODE, new Date());
         mAllVehicles = vehiclesModels;
         removeVehiclesFromMap();
         mAllMarkerVehicles.clear();
@@ -179,7 +193,7 @@ public class MapsFragmentImpl extends Fragment implements MapsFragment, OnMapRea
                 Marker marker = mMap.addMarker(new MarkerOptions().position(latLn));
                 marker.setTag(vehiclesModel.getVehicleId());
                 mAllMarkerVehicles.add(marker);
-                marker.setIcon(BitmapDescriptorFactory.fromBitmap(Utils.tintImage(Utils.drawVehicleDirection(this, azimuth, vehiclesModel.getType()), colorForVehicles(mAllCurrentRouteWithColorOnMap, vehiclesModel.getRouteId(),VEHICLE_TYPE))));
+                marker.setIcon(BitmapDescriptorFactory.fromBitmap(Utils.tintImage(Utils.drawVehicleDirection(this, azimuth, vehiclesModel.getType()), colorForVehicles(mAllCurrentRouteWithColorOnMap, vehiclesModel.getRouteId(), VEHICLE_TYPE))));
                 marker.setFlat(true);
             }
         }
@@ -317,11 +331,9 @@ public class MapsFragmentImpl extends Fragment implements MapsFragment, OnMapRea
 
     @Override
     public boolean onMarkerClick(Marker marker) {
-        if (!marker.getTag().equals(ARROW_TYPE)){
+        if (marker.getTag() != null) {
             mBottomSheetVehicleInfo.setState(BottomSheetBehavior.STATE_EXPANDED);
-            if (marker.getTag() != null) {
-                setDataIntoInfoView(marker);
-            }
+            setDataIntoInfoView(marker);
         }
         return false;
     }
@@ -331,14 +343,26 @@ public class MapsFragmentImpl extends Fragment implements MapsFragment, OnMapRea
         mBottomSheetVehicleInfo.setState(BottomSheetBehavior.STATE_COLLAPSED);
     }
 
+
+    private void offlineMode() {
+        Handler mHandler = new Handler(getMainLooper());
+        mHandler.post(() -> {
+            mTextViewOfflineMode.setVisibility(View.VISIBLE);
+            if (mLastOnlineTime == null) {
+                mTextViewOfflineMode.setText(R.string.snack_bar_no_vehicles_no_internet_connection);
+            } else
+                mTextViewOfflineMode.setText(getResources().getString(R.string.text_view_offline_mode, mLastOnlineTime));
+        });
+
+    }
+
     private Marker drawArrowsRoute(LatLng previousLatLng, LatLng currentLatLng) {
         Bitmap bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.arrow_drirection);
         double rotation = SphericalUtil.computeHeading(previousLatLng, currentLatLng);
         Marker marker = mMap.addMarker(new MarkerOptions().position((previousLatLng)));
-        marker.setIcon(BitmapDescriptorFactory.fromBitmap(Utils.tintImage(bitmap, colorForVehicles(mAllCurrentRouteWithColorOnMap, mTransportId,ARROW_TYPE))));
+        marker.setIcon(BitmapDescriptorFactory.fromBitmap(Utils.tintImage(bitmap, colorForVehicles(mAllCurrentRouteWithColorOnMap, mTransportId, ARROW_TYPE))));
         marker.setRotation((float) rotation);
         marker.setFlat(true);
-        marker.setTag(ARROW_TYPE);
         return marker;
     }
 
@@ -392,14 +416,14 @@ public class MapsFragmentImpl extends Fragment implements MapsFragment, OnMapRea
         settings.setMyLocationButtonEnabled(true);
     }
 
-    private int colorForVehicles(Map<Long, Integer> allRoutes, long routeId,String type) {
+    private int colorForVehicles(Map<Long, Integer> allRoutes, long routeId, String type) {
         int color = 0;
         for (Map.Entry<Long, Integer> entry : allRoutes.entrySet()) {
             Long key = entry.getKey();
             Integer value = entry.getValue();
             if (key == routeId) {
                 color = value;
-                if (type.equals(VEHICLE_TYPE)){
+                if (type.equals(VEHICLE_TYPE)) {
                     float[] hsv = new float[3];
                     Color.colorToHSV(color, hsv);
                     hsv[2] *= 0.7f;

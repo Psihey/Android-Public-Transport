@@ -35,4 +35,5 @@ public interface MapsFragment {
     void getVehiclesFullInfo(VehicleMarkerInfoModel vehicleMarkerInfoModel);
 
     void routeNotSelected();
+
 }
