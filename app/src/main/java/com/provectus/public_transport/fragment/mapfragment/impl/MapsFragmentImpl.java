@@ -172,7 +172,7 @@ public class MapsFragmentImpl extends Fragment implements MapsFragment, OnMapRea
         Snackbar snackbar = Snackbar.make(mContainerLayout, message, Snackbar.LENGTH_LONG);
         snackbar.show();
         if (message == R.string.snack_bar_no_vehicles_no_internet_connection) {
-            offlineMode();
+            setOfflineMode();
         }
     }
 
@@ -344,7 +344,7 @@ public class MapsFragmentImpl extends Fragment implements MapsFragment, OnMapRea
     }
 
 
-    private void offlineMode() {
+    private void setOfflineMode() {
         Handler mHandler = new Handler(getMainLooper());
         mHandler.post(() -> {
             mTextViewOfflineMode.setVisibility(View.VISIBLE);
