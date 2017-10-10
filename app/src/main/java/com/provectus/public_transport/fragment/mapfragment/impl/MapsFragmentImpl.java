@@ -4,8 +4,12 @@ import android.Manifest;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.NonNull;
+import android.support.constraint.ConstraintLayout;
+import android.support.design.widget.BottomSheetBehavior;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.Snackbar;
 import android.support.design.widget.TabLayout;
@@ -15,7 +19,9 @@ import android.support.v4.view.ViewPager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.RelativeLayout;
+import android.widget.TextView;
 
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -36,13 +42,17 @@ import com.provectus.public_transport.R;
 import com.provectus.public_transport.adapter.TransportAndParkingViewPagerAdapter;
 import com.provectus.public_transport.fragment.mapfragment.MapsFragment;
 import com.provectus.public_transport.fragment.mapfragment.MapsFragmentPresenter;
+import com.provectus.public_transport.model.VehicleMarkerInfoModel;
 import com.provectus.public_transport.model.VehiclesModel;
+import com.provectus.public_transport.model.converter.TransportType;
 import com.provectus.public_transport.utils.Const;
 import com.provectus.public_transport.utils.Utils;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -52,13 +62,18 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
 
+import static android.os.Looper.getMainLooper;
 
-public class MapsFragmentImpl extends Fragment implements MapsFragment, OnMapReadyCallback {
+
+public class MapsFragmentImpl extends Fragment implements MapsFragment, OnMapReadyCallback, GoogleMap.OnMarkerClickListener {
 
     public static final String TAG_MAP_FRAGMENT = "fragment_map";
     private static final int REQUEST_LOCATION_PERMISSIONS = 1;
     private static final int VIEW_PAGER_PAGE_IN_MEMORY = 3;
     private static final int POLYLINE_WIDTH = 5;
+    private static final String VEHICLE_TYPE = "vehicle";
+    private static final String ARROW_TYPE = "arrow";
+    private static final String TIME_FORMAT_OFFLINE_MODE = "%tT";
 
     @BindView(R.id.bottom_sheet_view_pager)
     ViewPager mViewPagerTransportAndParking;
@@ -68,6 +83,27 @@ public class MapsFragmentImpl extends Fragment implements MapsFragment, OnMapRea
     CoordinatorLayout mContainerLayout;
     @BindView(R.id.container_bottom_sheet)
     RelativeLayout mRelativeLayoutBottomSheet;
+    @BindView(R.id.constraint_container_vehicle_info)
+    ConstraintLayout mConstraintVehicleContainer;
+    @BindView(R.id.tv_route_number)
+    TextView mTextViewRouteNumber;
+    @BindView(R.id.tv_transport_type_value)
+    TextView mTextViewTransportType;
+    @BindView(R.id.tv_transport_speed_value)
+    TextView mTextViewSpeed;
+    @BindView(R.id.tv_transport_inventory_number_value)
+    TextView mTextViewInventoryNumber;
+    @BindView(R.id.tv_transport_capacity_value)
+    TextView mTextViewTransportCapacity;
+    @BindView(R.id.tv_transport_fee_value)
+    TextView mTextViewTransportFee;
+    @BindView(R.id.tv_transport_route_distance_value)
+    TextView mTextViewRouteDistance;
+    @BindView(R.id.iv_transport_icon)
+    ImageView mImageViewTransportIcon;
+    @BindView(R.id.tv_offline_mode)
+    TextView mTextViewOfflineMode;
+
     private MapsFragmentPresenter mMapsPresenter;
     private Unbinder mUnbinder;
     private GoogleMap mMap;
@@ -76,12 +112,17 @@ public class MapsFragmentImpl extends Fragment implements MapsFragment, OnMapRea
     private Map<Integer, List<Marker>> mAllCurrentStopsOnMap = new ConcurrentHashMap<>();
     private Map<Integer, List<Marker>> mAllCurrentArrowOnMap = new ConcurrentHashMap<>();
     private Map<Long, Integer> mAllCurrentRouteWithColorOnMap = new ConcurrentHashMap<>();
-    private List<Marker> mAllVehicles = new ArrayList<>();
+    private Map<Long, VehicleMarkerInfoModel> mAllCurrentVehicleInfo = new ConcurrentHashMap<>();
+    private List<Marker> mAllMarkerVehicles = new ArrayList<>();
+    private List<VehiclesModel> mAllVehicles;
     private int mTransportNumber;
     private long mTransportId;
     private int mIndexColorRoute = -1;
     private int[] mColorRouteList;
     private ViewPagerBottomSheetBehavior mViewPagerBottomSheetBehavior;
+    private BottomSheetBehavior mBottomSheetVehicleInfo;
+    private long mCurrentVehiclesId;
+    private String mLastOnlineTime;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -100,6 +141,14 @@ public class MapsFragmentImpl extends Fragment implements MapsFragment, OnMapRea
     }
 
     @Override
+    public void onResume() {
+        super.onResume();
+        mBottomSheetVehicleInfo = BottomSheetBehavior.from(mConstraintVehicleContainer);
+        mBottomSheetVehicleInfo.setPeekHeight(0);
+        mBottomSheetVehicleInfo.setHideable(true);
+    }
+
+    @Override
     public void onDestroyView() {
         super.onDestroyView();
         if (mUnbinder != null) {
@@ -115,18 +164,26 @@ public class MapsFragmentImpl extends Fragment implements MapsFragment, OnMapRea
         mMap = googleMap;
         setDefaultCameraPosition();
         setMyLocationButton();
+        mMap.setOnMarkerClickListener(this);
     }
 
     @Override
     public void showErrorSnackbar(int message) {
         Snackbar snackbar = Snackbar.make(mContainerLayout, message, Snackbar.LENGTH_LONG);
         snackbar.show();
+        if (message == R.string.snack_bar_no_vehicles_no_internet_connection) {
+            setOfflineMode();
+        }
     }
 
     @Override
     public void drawVehicles(List<VehiclesModel> vehiclesModels) {
+        mTextViewOfflineMode.setVisibility(View.GONE);
+        mLastOnlineTime = String.format(Locale.US, TIME_FORMAT_OFFLINE_MODE, new Date());
+        mAllVehicles = vehiclesModels;
         removeVehiclesFromMap();
-        mAllVehicles.clear();
+        mAllMarkerVehicles.clear();
+        changeDynamicallyVehicleSpeedOnView(vehiclesModels);
         if (vehiclesModels != null) {
             for (VehiclesModel vehiclesModel : vehiclesModels) {
                 int azimuth = vehiclesModel.getAzimuth();
@@ -134,8 +191,9 @@ public class MapsFragmentImpl extends Fragment implements MapsFragment, OnMapRea
                 double lng = vehiclesModel.getLongitude();
                 LatLng latLn = new LatLng(lat, lng);
                 Marker marker = mMap.addMarker(new MarkerOptions().position(latLn));
-                mAllVehicles.add(marker);
-                marker.setIcon(BitmapDescriptorFactory.fromBitmap(Utils.tintImage(Utils.drawVehicleDirection(this, azimuth, vehiclesModel.getType()), colorForVehicles(mAllCurrentRouteWithColorOnMap, vehiclesModel.getRouteId()))));
+                marker.setTag(vehiclesModel.getVehicleId());
+                mAllMarkerVehicles.add(marker);
+                marker.setIcon(BitmapDescriptorFactory.fromBitmap(Utils.tintImage(Utils.drawVehicleDirection(this, azimuth, vehiclesModel.getType()), colorForVehicles(mAllCurrentRouteWithColorOnMap, vehiclesModel.getRouteId(), VEHICLE_TYPE))));
                 marker.setFlat(true);
             }
         }
@@ -143,7 +201,7 @@ public class MapsFragmentImpl extends Fragment implements MapsFragment, OnMapRea
 
     @Override
     public void removeVehiclesFromMap() {
-        for (Marker marker : mAllVehicles) {
+        for (Marker marker : mAllMarkerVehicles) {
             marker.remove();
         }
     }
@@ -248,6 +306,21 @@ public class MapsFragmentImpl extends Fragment implements MapsFragment, OnMapRea
     }
 
     @Override
+    public void getVehiclesFullInfo(VehicleMarkerInfoModel vehicleMarkerInfoModel) {
+        if (mAllCurrentVehicleInfo.isEmpty()) {
+            mAllCurrentVehicleInfo.put(mTransportId, vehicleMarkerInfoModel);
+        } else {
+            for (Map.Entry<Long, VehicleMarkerInfoModel> entry : mAllCurrentVehicleInfo.entrySet()) {
+                Long key = entry.getKey();
+                if (key == mTransportNumber) {
+                    mAllCurrentVehicleInfo.remove(mTransportNumber);
+                } else mAllCurrentVehicleInfo.put(mTransportId, vehicleMarkerInfoModel);
+            }
+        }
+
+    }
+
+    @Override
     public void getColorForRoute() {
         if (mIndexColorRoute == mColorRouteList.length - 1) {
             mIndexColorRoute = 0;
@@ -256,11 +329,38 @@ public class MapsFragmentImpl extends Fragment implements MapsFragment, OnMapRea
         }
     }
 
+    @Override
+    public boolean onMarkerClick(Marker marker) {
+        if (marker.getTag() != null) {
+            mBottomSheetVehicleInfo.setState(BottomSheetBehavior.STATE_EXPANDED);
+            setDataIntoInfoView(marker);
+        }
+        return false;
+    }
+
+    @Override
+    public void routeNotSelected() {
+        mBottomSheetVehicleInfo.setState(BottomSheetBehavior.STATE_COLLAPSED);
+    }
+
+
+    private void setOfflineMode() {
+        Handler mHandler = new Handler(getMainLooper());
+        mHandler.post(() -> {
+            mTextViewOfflineMode.setVisibility(View.VISIBLE);
+            if (mLastOnlineTime == null) {
+                mTextViewOfflineMode.setText(R.string.snack_bar_no_vehicles_no_internet_connection);
+            } else
+                mTextViewOfflineMode.setText(getResources().getString(R.string.text_view_offline_mode, mLastOnlineTime));
+        });
+
+    }
+
     private Marker drawArrowsRoute(LatLng previousLatLng, LatLng currentLatLng) {
         Bitmap bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.arrow_drirection);
         double rotation = SphericalUtil.computeHeading(previousLatLng, currentLatLng);
         Marker marker = mMap.addMarker(new MarkerOptions().position((previousLatLng)));
-        marker.setIcon(BitmapDescriptorFactory.fromBitmap(Utils.tintImage(bitmap, colorForVehicles(mAllCurrentRouteWithColorOnMap, mTransportId))));
+        marker.setIcon(BitmapDescriptorFactory.fromBitmap(Utils.tintImage(bitmap, colorForVehicles(mAllCurrentRouteWithColorOnMap, mTransportId, ARROW_TYPE))));
         marker.setRotation((float) rotation);
         marker.setFlat(true);
         return marker;
@@ -316,16 +416,60 @@ public class MapsFragmentImpl extends Fragment implements MapsFragment, OnMapRea
         settings.setMyLocationButtonEnabled(true);
     }
 
-    private int colorForVehicles(Map<Long, Integer> allRoutes, long routeId) {
+    private int colorForVehicles(Map<Long, Integer> allRoutes, long routeId, String type) {
         int color = 0;
         for (Map.Entry<Long, Integer> entry : allRoutes.entrySet()) {
             Long key = entry.getKey();
             Integer value = entry.getValue();
             if (key == routeId) {
                 color = value;
+                if (type.equals(VEHICLE_TYPE)) {
+                    float[] hsv = new float[3];
+                    Color.colorToHSV(color, hsv);
+                    hsv[2] *= 0.7f;
+                    color = Color.HSVToColor(hsv);
+                }
             }
         }
         return color;
     }
 
+    private void setDataIntoInfoView(Marker marker) {
+        String transportType;
+        for (VehiclesModel vehiclesModel : mAllVehicles) {
+            if (marker.getTag().equals(vehiclesModel.getVehicleId())) {
+                mCurrentVehiclesId = vehiclesModel.getVehicleId();
+                if (vehiclesModel.getType().equals(TransportType.TRAM_TYPE)) {
+                    transportType = getString(R.string.transport_type_tram);
+                    mImageViewTransportIcon.setImageResource(R.drawable.ic_tram_gray_24_dp);
+                } else {
+                    transportType = getString(R.string.transport_type_trolleybus);
+                    mImageViewTransportIcon.setImageResource(R.drawable.ic_trolley_gray_24_dp);
+                }
+                mTextViewTransportType.setText(transportType);
+                mTextViewTransportFee.setText(getResources().getString(R.string.text_view_transport_fee, Double.toString(vehiclesModel.getCost())));
+                mTextViewTransportCapacity.setText(String.valueOf(vehiclesModel.getSeats()));
+                mTextViewSpeed.setText(getResources().getString(R.string.text_view_transport_speed, vehiclesModel.getSpeed()));
+                mTextViewInventoryNumber.setText(String.valueOf(vehiclesModel.getInventoryNumber()));
+                for (Map.Entry<Long, VehicleMarkerInfoModel> entry : mAllCurrentVehicleInfo.entrySet()) {
+                    VehicleMarkerInfoModel model = entry.getValue();
+                    if (vehiclesModel.getRouteId() == model.getServerId()) {
+                        mTextViewRouteDistance.setText(getResources().getString(R.string.text_view_transport_route_distance, Double.toString(model.getDistance())));
+                        mTextViewRouteNumber.setText(getResources().getString(R.string.text_view_route_number, model.getNumber()));
+                    }
+                }
+            }
+
+        }
+    }
+
+    private void changeDynamicallyVehicleSpeedOnView(List<VehiclesModel> vehiclesModels) {
+        if (mCurrentVehiclesId != 0) {
+            for (VehiclesModel vehicleModel : vehiclesModels) {
+                if (vehicleModel.getVehicleId() == mCurrentVehiclesId) {
+                    mTextViewSpeed.setText(getResources().getString(R.string.text_view_transport_speed, vehicleModel.getSpeed()));
+                }
+            }
+        }
+    }
 }

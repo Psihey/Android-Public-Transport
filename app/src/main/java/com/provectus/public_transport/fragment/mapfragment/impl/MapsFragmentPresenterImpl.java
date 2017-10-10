@@ -12,6 +12,7 @@ import com.provectus.public_transport.fragment.mapfragment.MapsFragmentPresenter
 import com.provectus.public_transport.model.DirectEntity;
 import com.provectus.public_transport.model.StopEntity;
 import com.provectus.public_transport.model.TransportEntity;
+import com.provectus.public_transport.model.VehicleMarkerInfoModel;
 import com.provectus.public_transport.model.VehiclesModel;
 import com.provectus.public_transport.model.converter.TransportType;
 import com.provectus.public_transport.persistence.database.DatabaseHelper;
@@ -43,6 +44,8 @@ public class MapsFragmentPresenterImpl implements MapsFragmentPresenter {
     private long mCurrentRouteServerId;
     private CompositeDisposable mCompositeDisposable;
     private List<Long> mCurrentVehicles = new ArrayList<>();
+    private VehicleMarkerInfoModel mVehicleMarker;
+
 
     @Override
     public void bindView(MapsFragment mapsFragment) {
@@ -122,8 +125,15 @@ public class MapsFragmentPresenterImpl implements MapsFragmentPresenter {
     }
 
     private void getTransportFromDB(TransportEntity transportEntity) {
+        mVehicleMarker = new VehicleMarkerInfoModel();
+        mVehicleMarker.setVehicleId(transportEntity.getServerId());
+        mVehicleMarker.setDistance(transportEntity.getDistance());
+        mVehicleMarker.setNumber(transportEntity.getNumber());
+        mVehicleMarker.setServerId(transportEntity.getServerId());
         mCurrentRouteServerId = transportEntity.getServerId();
+        mMapsFragment.getVehiclesFullInfo(mVehicleMarker);
         getVehiclesPosition();
+
     }
 
     private void getVehiclesPosition() {
@@ -131,6 +141,9 @@ public class MapsFragmentPresenterImpl implements MapsFragmentPresenter {
             mCurrentVehicles.add(mCurrentRouteServerId);
         } else {
             mCurrentVehicles.remove(mCurrentRouteServerId);
+        }
+        if (mCurrentVehicles.size()==0){
+            mMapsFragment.routeNotSelected();
         }
 
         if (mCompositeDisposable != null && !mCompositeDisposable.isDisposed()) {
@@ -167,7 +180,7 @@ public class MapsFragmentPresenterImpl implements MapsFragmentPresenter {
             if (throwable instanceof SocketTimeoutException) {
                 mMapsFragment.showErrorSnackbar(R.string.snack_bar_no_vehicles_no_internet_connection);
             } else if (throwable instanceof ConnectException) {
-                mMapsFragment.showErrorSnackbar(R.string.snack_bar_no_vehicles_server_not_response);
+                mMapsFragment.showErrorSnackbar(R.string.snack_bar_no_vehicles_no_internet_connection);
             }
         }
     }

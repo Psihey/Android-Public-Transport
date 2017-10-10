@@ -19,21 +19,25 @@
     <string name="alert_dialog_google_play_error_title">Google Play Error</string>
     <string name="alert_dialog_google_play_error_message">Problems with the Google Play Service. The Application is closing.</string>
     <string name="alert_dialog_google_play_error_button">Ok</string>
+    <string name="text_view_route_number">Route №%1$d</string>
+    <string name="text_view_transport_speed">%1$d km/h</string>
+    <string name="text_view_transport_fee">%1$s UAH</string>
+    <string name="text_view_transport_route_distance">%1$s km</string>
+    <string name="transport_type_tram">Tram</string>
+    <string name="transport_type_trolleybus">Trolleybus</string>
+    <string name="text_view_speed">Speed</string>
+    <string name="text_view_number">Number</string>
+    <string name="text_view_capacity">Capacity</string>
+    <string name="text_view_fee">Fare</string>
+    <string name="text_view_distance">The length of the route</string>
+    <string name="text_view_offline_mode">OFFLINE MODE info valid for %1$s</string>
 
     <integer-array name="route_color_array">
-        <item>@color/routeGreenColor</item>
         <item>@color/routePinkColor</item>
-        <item>@color/routeOrangeColor</item>
-        <item>@color/routeBlackColor</item>
         <item>@color/routeIndigoColor</item>
-        <item>@color/routeLimeColor</item>
-        <item>@color/routeBlueColor</item>
-        <item>@color/routeLightGreenColor</item>
-        <item>@color/routeRedColor</item>
-        <item>@color/routeBrownColor</item>
         <item>@color/routeTealColor</item>
         <item>@color/routePurpleColor</item>
-        <item>@color/routeBlueGrey</item>
+        <item>@color/routeOrangeColor</item>
     </integer-array>
 
 </resources>

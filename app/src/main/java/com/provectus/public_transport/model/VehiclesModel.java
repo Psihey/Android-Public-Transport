@@ -26,12 +26,24 @@ public class VehiclesModel {
     @SerializedName("sats")
     private int mSatellite;
 
+    @SerializedName("seats")
+    private int mSeats;
+
+    @SerializedName("cost")
+    private float mCost;
+
     @SerializedName("routeId")
     private long mRouteId;
 
-    @SerializedName("type")
+    @SerializedName("inventoryNumber")
+    private int mInventoryNumber;
 
+    @SerializedName("type")
     private TransportType mType;
+
+    public int getInventoryNumber() {
+        return mInventoryNumber;
+    }
 
     public long getRouteId() {
         return mRouteId;
@@ -69,6 +81,14 @@ public class VehiclesModel {
         return mSatellite;
     }
 
+    public int getSeats() {
+        return mSeats;
+    }
+
+    public float getCost() {
+        return mCost;
+    }
+
     @Override
     public String toString() {
         return "VehiclesModel{" +
@@ -79,7 +99,10 @@ public class VehiclesModel {
                 ", mAzimuth=" + mAzimuth +
                 ", mGsmPower='" + mGsmPower + '\'' +
                 ", mSatellite=" + mSatellite +
+                ", mSeats=" + mSeats +
+                ", mCost=" + mCost +
                 ", mRouteId=" + mRouteId +
+                ", mInventoryNumber=" + mInventoryNumber +
                 ", mType=" + mType +
                 '}';
     }
