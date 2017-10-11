@@ -74,6 +74,8 @@ public class MapsFragmentImpl extends Fragment implements MapsFragment, OnMapRea
     private static final String VEHICLE_TYPE = "vehicle";
     private static final String ARROW_TYPE = "arrow";
     private static final String TIME_FORMAT_OFFLINE_MODE = "%tT";
+    private static final int INTERNET_ERROR_OFFLINE_MODE = 1;
+    private static final int SERVER_ERROR_OFFLINE_MODE = 2;
 
     @BindView(R.id.bottom_sheet_view_pager)
     ViewPager mViewPagerTransportAndParking;
@@ -172,7 +174,9 @@ public class MapsFragmentImpl extends Fragment implements MapsFragment, OnMapRea
         Snackbar snackbar = Snackbar.make(mContainerLayout, message, Snackbar.LENGTH_LONG);
         snackbar.show();
         if (message == R.string.snack_bar_no_vehicles_no_internet_connection) {
-            setOfflineMode();
+            setOfflineMode(INTERNET_ERROR_OFFLINE_MODE);
+        }else if (message == R.string.snack_bar_no_vehicles_server_not_response){
+            setOfflineMode(SERVER_ERROR_OFFLINE_MODE);
         }
     }
 
@@ -314,7 +318,9 @@ public class MapsFragmentImpl extends Fragment implements MapsFragment, OnMapRea
                 Long key = entry.getKey();
                 if (key == mTransportNumber) {
                     mAllCurrentVehicleInfo.remove(mTransportNumber);
-                } else mAllCurrentVehicleInfo.put(mTransportId, vehicleMarkerInfoModel);
+                } else{
+                    mAllCurrentVehicleInfo.put(mTransportId, vehicleMarkerInfoModel);
+                }
             }
         }
 
@@ -344,14 +350,20 @@ public class MapsFragmentImpl extends Fragment implements MapsFragment, OnMapRea
     }
 
 
-    private void setOfflineMode() {
+    private void setOfflineMode(int code) {
         Handler mHandler = new Handler(getMainLooper());
         mHandler.post(() -> {
             mTextViewOfflineMode.setVisibility(View.VISIBLE);
-            if (mLastOnlineTime == null) {
-                mTextViewOfflineMode.setText(R.string.snack_bar_no_vehicles_no_internet_connection);
-            } else
-                mTextViewOfflineMode.setText(getResources().getString(R.string.text_view_offline_mode, mLastOnlineTime));
+            if (code == 1){
+                if (mLastOnlineTime == null) {
+                    mTextViewOfflineMode.setText(R.string.snack_bar_no_vehicles_no_internet_connection);
+                } else{
+                    mTextViewOfflineMode.setText(getResources().getString(R.string.text_view_offline_mode, mLastOnlineTime));
+                    return;
+                }
+            }
+            mTextViewOfflineMode.setText(R.string.text_view_server_error);
+
         });
 
     }

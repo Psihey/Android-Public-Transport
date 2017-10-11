@@ -30,7 +30,8 @@
     <string name="text_view_capacity">Capacity</string>
     <string name="text_view_fee">Fare</string>
     <string name="text_view_distance">The length of the route</string>
-    <string name="text_view_offline_mode">OFFLINE MODE info valid for %1$s</string>
+    <string name="text_view_offline_mode">OFFLINE MODE nfo valid for %1$s</string>
+    <string name="text_view_server_error">OFFLINE MODE server do not responding</string>
 
     <integer-array name="route_color_array">
         <item>@color/routePinkColor</item>
