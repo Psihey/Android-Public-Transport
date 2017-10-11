@@ -110,7 +110,7 @@ public class TransportRoutesService extends IntentService {
                                     currentPoint.getLongitude(), currentPoint.getPosition(),
                                     currentSegmentEntity.getServerId()));
                         }
-                        mStopEntity.add(new StopEntity(currentSegment.getStopEntity().getLatitude(),
+                        mStopEntity.add(new StopEntity(currentSegment.getStopEntity().getServerId(),currentSegment.getStopEntity().getLatitude(),
                                 currentSegment.getStopEntity().getLongitude(),
                                 currentSegment.getStopEntity().getTitle(),
                                 currentSegmentEntity.getServerId()));
