@@ -15,10 +15,10 @@ public class BusEvents {
         }
     }
 
-    public static class SendChosenRouter {
+    public static class SendChosenRoute {
         private TransportEntity mSelectRout;
 
-        public SendChosenRouter(TransportEntity selectRout) {
+        public SendChosenRoute(TransportEntity selectRout) {
             this.mSelectRout = selectRout;
         }
 
@@ -33,6 +33,18 @@ public class BusEvents {
          * A method which says to the subscriber that service has ended work
          */
         public ServiceEndWorked() {
+        }
+    }
+
+    public static class OpenRouteInformation{
+        private TransportEntity mSelectRout;
+
+        public OpenRouteInformation(TransportEntity selectRoute){
+            this.mSelectRout = selectRoute;
+        }
+
+        public TransportEntity getmSelectRout() {
+            return mSelectRout;
         }
     }
 }

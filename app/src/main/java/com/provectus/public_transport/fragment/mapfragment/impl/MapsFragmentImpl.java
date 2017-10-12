@@ -19,6 +19,7 @@ import android.support.v4.view.ViewPager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -38,13 +39,16 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.maps.android.SphericalUtil;
+import com.orhanobut.logger.Logger;
 import com.provectus.public_transport.R;
 import com.provectus.public_transport.adapter.TransportAndParkingViewPagerAdapter;
 import com.provectus.public_transport.fragment.mapfragment.MapsFragment;
 import com.provectus.public_transport.fragment.mapfragment.MapsFragmentPresenter;
+import com.provectus.public_transport.model.TransportEntity;
 import com.provectus.public_transport.model.VehicleMarkerInfoModel;
 import com.provectus.public_transport.model.VehiclesModel;
 import com.provectus.public_transport.model.converter.TransportType;
+import com.provectus.public_transport.persistence.database.DatabaseHelper;
 import com.provectus.public_transport.utils.Const;
 import com.provectus.public_transport.utils.Utils;
 
@@ -60,6 +64,7 @@ import biz.laenger.android.vpbs.BottomSheetUtils;
 import biz.laenger.android.vpbs.ViewPagerBottomSheetBehavior;
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 import butterknife.Unbinder;
 
 import static android.os.Looper.getMainLooper;
@@ -87,6 +92,8 @@ public class MapsFragmentImpl extends Fragment implements MapsFragment, OnMapRea
     RelativeLayout mRelativeLayoutBottomSheet;
     @BindView(R.id.constraint_container_vehicle_info)
     ConstraintLayout mConstraintVehicleContainer;
+    @BindView(R.id.constraint_layout_route)
+    ConstraintLayout mConstraintRouteContainer;
     @BindView(R.id.tv_route_number)
     TextView mTextViewRouteNumber;
     @BindView(R.id.tv_transport_type_value)
@@ -106,6 +113,19 @@ public class MapsFragmentImpl extends Fragment implements MapsFragment, OnMapRea
     @BindView(R.id.tv_offline_mode)
     TextView mTextViewOfflineMode;
 
+    @BindView(R.id.tv_route_info_number)
+    TextView mTextViewRouteInfoNumber;
+    @BindView(R.id.iv_route_info_transport_icon)
+    ImageView mImageViewRouteInfoIcon;
+    @BindView(R.id.tv_transport_route_info_type_value)
+    TextView mTextViewRouteInfoType;
+    @BindView(R.id.ib_route_info_favorite_icon)
+    ImageButton mImageButtonFavouriteInfo;
+    @BindView(R.id.tv_route_info_transport_fee_value)
+    TextView mTextViewRouteInfoFee;
+    @BindView(R.id.tv_route_info_transport_route_distance_value)
+    TextView mTextViewRouteInfoDistance;
+
     private MapsFragmentPresenter mMapsPresenter;
     private Unbinder mUnbinder;
     private GoogleMap mMap;
@@ -123,8 +143,10 @@ public class MapsFragmentImpl extends Fragment implements MapsFragment, OnMapRea
     private int[] mColorRouteList;
     private ViewPagerBottomSheetBehavior mViewPagerBottomSheetBehavior;
     private BottomSheetBehavior mBottomSheetVehicleInfo;
+    private BottomSheetBehavior mBottomSheetRouteInfo;
     private long mCurrentVehiclesId;
     private String mLastOnlineTime;
+    private TransportEntity mCurrentTransportInfo;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -148,6 +170,10 @@ public class MapsFragmentImpl extends Fragment implements MapsFragment, OnMapRea
         mBottomSheetVehicleInfo = BottomSheetBehavior.from(mConstraintVehicleContainer);
         mBottomSheetVehicleInfo.setPeekHeight(0);
         mBottomSheetVehicleInfo.setHideable(true);
+        mBottomSheetRouteInfo = BottomSheetBehavior.from(mConstraintRouteContainer);
+        mBottomSheetRouteInfo.setPeekHeight(0);
+        mBottomSheetRouteInfo.setHideable(true);
+
     }
 
     @Override
@@ -175,7 +201,7 @@ public class MapsFragmentImpl extends Fragment implements MapsFragment, OnMapRea
         snackbar.show();
         if (message == R.string.snack_bar_no_vehicles_no_internet_connection) {
             setOfflineMode(INTERNET_ERROR_OFFLINE_MODE);
-        }else if (message == R.string.snack_bar_no_vehicles_server_not_response){
+        } else if (message == R.string.snack_bar_no_vehicles_server_not_response) {
             setOfflineMode(SERVER_ERROR_OFFLINE_MODE);
         }
     }
@@ -310,7 +336,7 @@ public class MapsFragmentImpl extends Fragment implements MapsFragment, OnMapRea
     }
 
     @Override
-    public void getVehiclesFullInfo(VehicleMarkerInfoModel vehicleMarkerInfoModel) {
+    public void openVehicleInfo(VehicleMarkerInfoModel vehicleMarkerInfoModel) {
         if (mAllCurrentVehicleInfo.isEmpty()) {
             mAllCurrentVehicleInfo.put(mTransportId, vehicleMarkerInfoModel);
         } else {
@@ -318,7 +344,7 @@ public class MapsFragmentImpl extends Fragment implements MapsFragment, OnMapRea
                 Long key = entry.getKey();
                 if (key == mTransportNumber) {
                     mAllCurrentVehicleInfo.remove(mTransportNumber);
-                } else{
+                } else {
                     mAllCurrentVehicleInfo.put(mTransportId, vehicleMarkerInfoModel);
                 }
             }
@@ -349,15 +375,50 @@ public class MapsFragmentImpl extends Fragment implements MapsFragment, OnMapRea
         mBottomSheetVehicleInfo.setState(BottomSheetBehavior.STATE_COLLAPSED);
     }
 
+    @Override
+    public void openRouteInfo(TransportEntity transportEntity) {
+        mCurrentTransportInfo = transportEntity;
+        String transportType;
+        mBottomSheetRouteInfo.setState(BottomSheetBehavior.STATE_EXPANDED);
+        if (transportEntity.getType().equals(TransportType.TRAM_TYPE)) {
+            transportType = getString(R.string.transport_type_tram);
+            mImageViewRouteInfoIcon.setImageResource(R.drawable.ic_tram_gray_24_dp);
+        } else {
+            transportType = getString(R.string.transport_type_trolleybus);
+            mImageViewRouteInfoIcon.setImageResource(R.drawable.ic_trolley_gray_24_dp);
+        }
+        mTextViewRouteInfoNumber.setText(getResources().getString(R.string.text_view_route_number, transportEntity.getNumber()));
+        mTextViewRouteInfoDistance.setText(getResources().getString(R.string.text_view_transport_route_distance, Double.toString(transportEntity.getDistance())));
+        mTextViewRouteInfoType.setText(transportType);
+        if (transportEntity.isFavourites()){
+            mImageButtonFavouriteInfo.setImageResource(R.drawable.ic_favorite_blue_24_dp);
+        }else {
+            mImageButtonFavouriteInfo.setImageResource(R.drawable.ic_favorite_gray_24_dp);
+        }
+    }
+
+    @OnClick(R.id.ib_route_info_favorite_icon)
+    public void setFavourites() {
+        Logger.d(mCurrentTransportInfo);
+        if (mCurrentTransportInfo.isFavourites()) {
+            mCurrentTransportInfo.setIsFavourites(false);
+            new Thread(() -> DatabaseHelper.getPublicTransportDatabase().transportDao().updateFavourites(mCurrentTransportInfo)).start();
+            mImageButtonFavouriteInfo.setImageResource(R.drawable.ic_favorite_gray_24_dp);
+            return;
+        }
+        mCurrentTransportInfo.setIsFavourites(true);
+        new Thread(() -> DatabaseHelper.getPublicTransportDatabase().transportDao().updateFavourites(mCurrentTransportInfo)).start();
+        mImageButtonFavouriteInfo.setImageResource(R.drawable.ic_favorite_blue_24_dp);
+    }
 
     private void setOfflineMode(int code) {
         Handler mHandler = new Handler(getMainLooper());
         mHandler.post(() -> {
             mTextViewOfflineMode.setVisibility(View.VISIBLE);
-            if (code == 1){
+            if (code == 1) {
                 if (mLastOnlineTime == null) {
                     mTextViewOfflineMode.setText(R.string.snack_bar_no_vehicles_no_internet_connection);
-                } else{
+                } else {
                     mTextViewOfflineMode.setText(getResources().getString(R.string.text_view_offline_mode, mLastOnlineTime));
                     return;
                 }

@@ -69,7 +69,12 @@ public class MapsFragmentPresenterImpl implements MapsFragmentPresenter {
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
-    public void onMessageEvent(BusEvents.SendChosenRouter event) {
+    public void getRouteInfo(BusEvents.OpenRouteInformation event){
+        mMapsFragment.openRouteInfo(event.getmSelectRout());
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onMessageEvent(BusEvents.SendChosenRoute event) {
         mIsSelectRoute = event.getSelectRout().isSelected();
         String transportType = event.getSelectRout().getType().toString();
         if (transportType.equals(TransportType.TROLLEYBUSES_TYPE.name())) {
@@ -131,7 +136,7 @@ public class MapsFragmentPresenterImpl implements MapsFragmentPresenter {
         mVehicleMarker.setNumber(transportEntity.getNumber());
         mVehicleMarker.setServerId(transportEntity.getServerId());
         mCurrentRouteServerId = transportEntity.getServerId();
-        mMapsFragment.getVehiclesFullInfo(mVehicleMarker);
+        mMapsFragment.openVehicleInfo(mVehicleMarker);
         getVehiclesPosition();
 
     }

@@ -6,19 +6,19 @@
     android:paddingLeft="16dp"
     android:paddingRight="16dp">
     
-    <ImageView
+    <TextView
         android:id="@+id/image_view_logo_transport"
         android:layout_width="36dp"
         android:layout_height="36dp"
+        android:text="№"
         android:layout_centerVertical="true"
-        android:layout_alignParentStart="true"
-        app:srcCompat="@drawable/ic_tram_gray_24_dp"/>
+        android:layout_alignParentStart="true" />
 
     <TextView
         android:id="@+id/text_view_number_routes"
         android:layout_width="match_parent"
         android:layout_height="24dp"
-        android:layout_marginLeft="56dp"
+        android:layout_marginLeft="40dp"
         android:layout_centerVertical="true"
         android:layout_alignParentEnd="true"
         android:textSize="16sp"/>
@@ -28,5 +28,13 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentRight="true"/>
+
+    <ImageButton
+        android:id="@+id/image_button_route_info"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_toLeftOf="@+id/checkbox_select_rout"
+        app:srcCompat="@drawable/ic_info_outline_black_24dp"
+        />
 
 </RelativeLayout>

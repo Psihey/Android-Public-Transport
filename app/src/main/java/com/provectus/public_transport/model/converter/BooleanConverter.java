@@ -3,9 +3,8 @@ package com.provectus.public_transport.model.converter;
 import android.arch.persistence.room.TypeConverter;
 
 
-public class AvailableBooleanConverters {
-    private AvailableBooleanConverters() {
-
+public  class BooleanConverter {
+    private BooleanConverter() {
     }
 
     @TypeConverter

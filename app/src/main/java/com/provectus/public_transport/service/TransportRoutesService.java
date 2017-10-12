@@ -83,7 +83,7 @@ public class TransportRoutesService extends IntentService {
                     TransportEntity currentTransportEntity = new TransportEntity(currentRoutes.getServerId(),
                             currentRoutes.getNumber(),
                             currentRoutes.getType(),
-                            currentRoutes.getDistance(),available);
+                            currentRoutes.getDistance(),available,false);
                     for (DirectEntity directionEntity : currentRoutes.getDirectionEntity()){
                         DirectEntity currentDirection = new DirectEntity(directionEntity.getLatitude(),
                                 directionEntity.getLongitude(),

@@ -29,16 +29,6 @@
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/tv_route_number"/>
 
-    <ImageView
-        android:id="@+id/iv_favorite_icon"
-        android:layout_width="24dp"
-        android:layout_height="24dp"
-        android:layout_marginEnd="@dimen/vehicles_detail_layout_margin_end"
-        android:src="@drawable/ic_favorite_gray_24_dp"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/tv_route_number"
-        app:layout_constraintBottom_toTopOf="@+id/iv_transport_icon"/>
-
     <TextView
         android:id="@+id/tv_transport_type_value"
         android:layout_width="0dp"

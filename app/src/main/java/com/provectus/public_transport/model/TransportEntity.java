@@ -8,7 +8,7 @@ import android.arch.persistence.room.PrimaryKey;
 import android.arch.persistence.room.TypeConverters;
 
 import com.google.gson.annotations.SerializedName;
-import com.provectus.public_transport.model.converter.AvailableBooleanConverters;
+import com.provectus.public_transport.model.converter.BooleanConverter;
 import com.provectus.public_transport.model.converter.TransportType;
 
 import java.util.List;
@@ -35,8 +35,12 @@ public class TransportEntity {
     private double mDistance;
 
     @ColumnInfo(name = "available")
-    @TypeConverters({AvailableBooleanConverters.class})
+    @TypeConverters({BooleanConverter.class})
     private boolean mIsAvailable;
+
+    @ColumnInfo(name = "favourites")
+    @TypeConverters({BooleanConverter.class})
+    private boolean mIsFavourites;
 
     @SerializedName("segments")
     @Ignore
@@ -53,12 +57,13 @@ public class TransportEntity {
     @Ignore
     private boolean mIsSelected;
 
-    public TransportEntity(long mServerId, int mNumber, TransportType mType, double mDistance, boolean mIsAvailable) {
+    public TransportEntity(long mServerId, int mNumber, TransportType mType, double mDistance, boolean mIsAvailable, boolean mIsFavourites) {
         this.mServerId = mServerId;
         this.mNumber = mNumber;
         this.mType = mType;
         this.mDistance = mDistance;
         this.mIsAvailable = mIsAvailable;
+        this.mIsFavourites = mIsFavourites;
     }
 
     public boolean isAvailable() {
@@ -121,15 +126,27 @@ public class TransportEntity {
         return mIndirectionEntity;
     }
 
+    public boolean isFavourites() {
+        return mIsFavourites;
+    }
+
+    public void setIsFavourites(boolean mIsFavourites) {
+        this.mIsFavourites = mIsFavourites;
+    }
+
     @Override
     public String toString() {
         return "TransportEntity{" +
-                "ServerId=" + mServerId +
-                ", Number=" + mNumber +
-                ", Type=" + mType +
-                ", Distance=" + mDistance +
-                ", segments=" + mSegments +
+                "mServerId=" + mServerId +
+                ", mNumber=" + mNumber +
+                ", mType=" + mType +
+                ", mDistance=" + mDistance +
+                ", mIsAvailable=" + mIsAvailable +
+                ", mIsFavourites=" + mIsFavourites +
+                ", mSegments=" + mSegments +
+                ", mDirectionEntity=" + mDirectionEntity +
+                ", mIndirectionEntity=" + mIndirectionEntity +
+                ", mIsSelected=" + mIsSelected +
                 '}';
     }
-
 }

@@ -4,6 +4,7 @@ import android.arch.persistence.room.Dao;
 import android.arch.persistence.room.Delete;
 import android.arch.persistence.room.Insert;
 import android.arch.persistence.room.Query;
+import android.arch.persistence.room.Update;
 
 import com.provectus.public_transport.model.DirectEntity;
 import com.provectus.public_transport.model.StopEntity;
@@ -45,5 +46,8 @@ public interface TransportDao {
             + "INNER JOIN direction ON direction.direction_transport_id = transports.transport_id "
             + "WHERE transports.transport_number = :transportNumber AND transports.transport_type = :transportType ")
     Flowable<List<DirectEntity>> getDirectionEntity(int transportNumber, String transportType);
+
+    @Update()
+    void updateFavourites(TransportEntity transportEntity);
 
 }
