@@ -87,7 +87,7 @@ public class RoutesTabFragmentImpl extends Fragment implements RoutesTabFragment
     @Override
     public void initRecyclerView(List<TransportEntity> transportEntity) {
         mRoutesRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-        TramsAndTrolleyAdapter mAdapter = new TramsAndTrolleyAdapter(transportEntity);
+        TramsAndTrolleyAdapter mAdapter = new TramsAndTrolleyAdapter(getContext(),transportEntity);
         mRoutesRecyclerView.setAdapter(mAdapter);
         mProgressBarNoItem.setVisibility(View.GONE);
         setErrorVisible(View.GONE);

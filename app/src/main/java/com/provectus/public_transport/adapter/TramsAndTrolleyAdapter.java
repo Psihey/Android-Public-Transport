@@ -1,11 +1,12 @@
 package com.provectus.public_transport.adapter;
 
+import android.content.Context;
 import android.support.v7.widget.AppCompatCheckBox;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.provectus.public_transport.R;
@@ -21,8 +22,10 @@ import butterknife.ButterKnife;
 
 public class TramsAndTrolleyAdapter extends RecyclerView.Adapter<TramsAndTrolleyAdapter.TramsAndTrolleyViewHolder> {
     private List<TransportEntity> mTransportRoutesData;
+    private Context mContext;
 
-    public TramsAndTrolleyAdapter(List<TransportEntity> data) {
+    public TramsAndTrolleyAdapter(Context context, List<TransportEntity> data) {
+        this.mContext = context;
         this.mTransportRoutesData = data;
     }
 
@@ -36,17 +39,15 @@ public class TramsAndTrolleyAdapter extends RecyclerView.Adapter<TramsAndTrolley
     @Override
     public void onBindViewHolder(TramsAndTrolleyViewHolder holder, int position) {
         final TransportEntity transportRoutes = mTransportRoutesData.get(position);
-        holder.mTvRoutesNumber.setText(String.valueOf(mTransportRoutesData.get(position).getNumber()));
-
+        holder.mTvRoutesNumber.setText(mContext.getResources().getString(R.string.text_view_item_tram_trooley_transport_number, String.valueOf(mTransportRoutesData.get(position).getNumber())));
         holder.mCheckBoxSelectRout.setOnCheckedChangeListener(null);
         holder.mCheckBoxSelectRout.setChecked(transportRoutes.isSelected());
         holder.mCheckBoxSelectRout.setOnCheckedChangeListener((buttonView, isChecked) -> transportRoutes.setIsSelected(isChecked));
-        if (!transportRoutes.isAvailable()){
+        if (!transportRoutes.isAvailable()) {
             holder.mCheckBoxSelectRout.setVisibility(View.INVISIBLE);
-        }else  holder.mCheckBoxSelectRout.setVisibility(View.VISIBLE);
+        } else holder.mCheckBoxSelectRout.setVisibility(View.VISIBLE);
         holder.mCheckBoxSelectRout.setOnClickListener(view -> EventBus.getDefault().post(new BusEvents.SendChosenRoute(transportRoutes)));
-        holder.mImageButtonRouteInfo.setOnClickListener(v ->EventBus.getDefault().post(new BusEvents.OpenRouteInformation(transportRoutes)));
-
+        holder.mImageButtonRouteInfo.setOnClickListener(v -> EventBus.getDefault().post(new BusEvents.OpenRouteInformation(transportRoutes)));
     }
 
     @Override
@@ -55,12 +56,12 @@ public class TramsAndTrolleyAdapter extends RecyclerView.Adapter<TramsAndTrolley
     }
 
     class TramsAndTrolleyViewHolder extends RecyclerView.ViewHolder {
-        @BindView(R.id.text_view_number_routes)
+        @BindView(R.id.text_view_item_tram_trooley_transport_number)
         TextView mTvRoutesNumber;
         @BindView(R.id.checkbox_select_rout)
         AppCompatCheckBox mCheckBoxSelectRout;
         @BindView(R.id.image_button_route_info)
-        ImageButton mImageButtonRouteInfo;
+        ImageView mImageButtonRouteInfo;
 
         TramsAndTrolleyViewHolder(View itemView) {
             super(itemView);

@@ -44,7 +44,6 @@ public class MapsFragmentPresenterImpl implements MapsFragmentPresenter {
     private long mCurrentRouteServerId;
     private CompositeDisposable mCompositeDisposable;
     private List<Long> mCurrentVehicles = new ArrayList<>();
-    private VehicleMarkerInfoModel mVehicleMarker;
 
 
     @Override
@@ -70,7 +69,7 @@ public class MapsFragmentPresenterImpl implements MapsFragmentPresenter {
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void getRouteInfo(BusEvents.OpenRouteInformation event){
-        mMapsFragment.openRouteInfo(event.getmSelectRout());
+        mMapsFragment.openRouteInfo(event.getSelectRout());
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
@@ -84,6 +83,7 @@ public class MapsFragmentPresenterImpl implements MapsFragmentPresenter {
         }
         mMapsFragment.getInfoTransport(mTransportNumber, event.getSelectRout().getServerId());
         DatabaseHelper.getPublicTransportDatabase().transportDao().getTransportEntity(event.getSelectRout().getNumber(), transportType)
+                .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .doOnError(throwable -> Logger.d(throwable.getMessage()))
                 .subscribe(this::getTransportFromDB);
@@ -91,10 +91,12 @@ public class MapsFragmentPresenterImpl implements MapsFragmentPresenter {
             mMapsFragment.getColorForRoute();
             if (mMapsFragment.checkOnReadyMap()) {
                 DatabaseHelper.getPublicTransportDatabase().transportDao().getStopsForCurrentTransport(event.getSelectRout().getNumber(), transportType)
+                        .subscribeOn(Schedulers.io())
                         .observeOn(AndroidSchedulers.mainThread())
                         .doOnError(throwable -> Logger.d(throwable.getMessage()))
                         .subscribe(this::getStopsFromDB);
                 DatabaseHelper.getPublicTransportDatabase().transportDao().getDirectionEntity(event.getSelectRout().getNumber(), transportType)
+                        .subscribeOn(Schedulers.io())
                         .observeOn(AndroidSchedulers.mainThread())
                         .doOnError(throwable -> Logger.d(throwable.getMessage()))
                         .subscribe(this::getDirectionFromDB);
@@ -109,6 +111,7 @@ public class MapsFragmentPresenterImpl implements MapsFragmentPresenter {
     }
 
     private void getDirectionFromDB(List<DirectEntity> segmentEntities) {
+        Logger.d("cccccccccccccccccccc");
         PolylineOptions polylineOptions = new PolylineOptions();
         for (DirectEntity directionEntity : segmentEntities) {
             polylineOptions.add(new LatLng(directionEntity.getLatitude(), directionEntity.getLongitude()));
@@ -117,6 +120,7 @@ public class MapsFragmentPresenterImpl implements MapsFragmentPresenter {
     }
 
     private void getStopsFromDB(List<StopEntity> stopEntities) {
+        Logger.d("gggggggggggggg");
         if (mIsSelectRoute && stopEntities.isEmpty()) {
             mMapsFragment.showErrorSnackbar(R.string.snack_bar_no_stops_for_this_route);
         }
@@ -130,15 +134,17 @@ public class MapsFragmentPresenterImpl implements MapsFragmentPresenter {
     }
 
     private void getTransportFromDB(TransportEntity transportEntity) {
-        mVehicleMarker = new VehicleMarkerInfoModel();
+        Logger.d("fffffffffffffffffffff");
+        VehicleMarkerInfoModel mVehicleMarker = new VehicleMarkerInfoModel();
         mVehicleMarker.setVehicleId(transportEntity.getServerId());
         mVehicleMarker.setDistance(transportEntity.getDistance());
         mVehicleMarker.setNumber(transportEntity.getNumber());
         mVehicleMarker.setServerId(transportEntity.getServerId());
         mCurrentRouteServerId = transportEntity.getServerId();
-        mMapsFragment.openVehicleInfo(mVehicleMarker);
+        if (mVehicleMarker != null){
+            mMapsFragment.openVehicleInfo(mVehicleMarker);
+        }
         getVehiclesPosition();
-
     }
 
     private void getVehiclesPosition() {

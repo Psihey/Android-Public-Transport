@@ -39,7 +39,6 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.maps.android.SphericalUtil;
-import com.orhanobut.logger.Logger;
 import com.provectus.public_transport.R;
 import com.provectus.public_transport.adapter.TransportAndParkingViewPagerAdapter;
 import com.provectus.public_transport.fragment.mapfragment.MapsFragment;
@@ -395,14 +394,15 @@ public class MapsFragmentImpl extends Fragment implements MapsFragment, OnMapRea
         }else {
             mImageButtonFavouriteInfo.setImageResource(R.drawable.ic_favorite_gray_24_dp);
         }
+
     }
 
     @OnClick(R.id.ib_route_info_favorite_icon)
     public void setFavourites() {
-        Logger.d(mCurrentTransportInfo);
         if (mCurrentTransportInfo.isFavourites()) {
             mCurrentTransportInfo.setIsFavourites(false);
             new Thread(() -> DatabaseHelper.getPublicTransportDatabase().transportDao().updateFavourites(mCurrentTransportInfo)).start();
+
             mImageButtonFavouriteInfo.setImageResource(R.drawable.ic_favorite_gray_24_dp);
             return;
         }
@@ -426,7 +426,6 @@ public class MapsFragmentImpl extends Fragment implements MapsFragment, OnMapRea
             mTextViewOfflineMode.setText(R.string.text_view_server_error);
 
         });
-
     }
 
     private Marker drawArrowsRoute(LatLng previousLatLng, LatLng currentLatLng) {

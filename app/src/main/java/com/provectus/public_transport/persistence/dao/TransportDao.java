@@ -12,7 +12,7 @@ import com.provectus.public_transport.model.TransportEntity;
 
 import java.util.List;
 
-import io.reactivex.Flowable;
+import io.reactivex.Maybe;
 
 @Dao
 public interface TransportDao {
@@ -20,34 +20,33 @@ public interface TransportDao {
     @Insert
     void insertAll(List<TransportEntity> transports);
 
-    @Query("SELECT * FROM transports")
-    Flowable<List<TransportEntity>> getAllTransport();
-
     @Query("SELECT * FROM transports WHERE transport_type = 'TRAM_TYPE'")
-    Flowable<List<TransportEntity>> getAllTram();
+    Maybe<List<TransportEntity>> getAllTram();
 
     @Query("SELECT * FROM transports WHERE transport_type = 'TROLLEYBUSES_TYPE'")
-    Flowable<List<TransportEntity>> getAllTrolleybuses();
+    Maybe<List<TransportEntity>> getAllTrolleybuses();
 
-    @Delete()
+    @Delete
     void deleteAll(List<TransportEntity> transportEntities);
 
     @Query("SELECT * FROM transports "
             + "WHERE transports.transport_number = :transportNumber AND transports.transport_type = :transportType")
-    Flowable<TransportEntity> getTransportEntity(int transportNumber, String transportType);
+    Maybe<TransportEntity> getTransportEntity(int transportNumber, String transportType);
 
     @Query("SELECT * FROM transports "
             + "INNER JOIN segments ON segments.segment_transport_id = transports.transport_id "
             + "INNER JOIN stopping ON stopping.stop_segment_id = segments.segment_id "
             + "WHERE transports.transport_number = :transportNumber AND transports.transport_type = :transportType")
-    Flowable<List<StopEntity>> getStopsForCurrentTransport(int transportNumber, String transportType);
+    Maybe<List<StopEntity>> getStopsForCurrentTransport(int transportNumber, String transportType);
 
     @Query("SELECT * FROM transports "
             + "INNER JOIN direction ON direction.direction_transport_id = transports.transport_id "
             + "WHERE transports.transport_number = :transportNumber AND transports.transport_type = :transportType ")
-    Flowable<List<DirectEntity>> getDirectionEntity(int transportNumber, String transportType);
+    Maybe<List<DirectEntity>> getDirectionEntity(int transportNumber, String transportType);
 
-    @Update()
+//    @Query("UPDATE transports SET favourites = :is where transport_id=:id")
+//    void updateFavourites(long id,boolean is);
+    @Update
     void updateFavourites(TransportEntity transportEntity);
 
 }

@@ -43,7 +43,7 @@ public class BusEvents {
             this.mSelectRout = selectRoute;
         }
 
-        public TransportEntity getmSelectRout() {
+        public TransportEntity getSelectRout() {
             return mSelectRout;
         }
     }
