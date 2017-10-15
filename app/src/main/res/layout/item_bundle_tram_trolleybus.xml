@@ -23,14 +23,4 @@
         android:layout_alignParentEnd="true"
         app:srcCompat="@drawable/ic_info_outline_black_24dp" />
 
-    <android.support.v7.widget.AppCompatCheckBox
-        android:id="@+id/checkbox_select_rout"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_toStartOf="@+id/image_button_route_info"
-        android:layout_marginEnd="10dp"
-        android:layout_alignBaseline="@+id/text_view_item_tram_trooley_transport_number"/>
-
-
-
 </RelativeLayout>

@@ -1,5 +1,6 @@
 package com.provectus.public_transport.adapter;
 
+import android.graphics.Color;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.ImageView;
@@ -45,12 +46,19 @@ public class FavouritesSectionAdapter extends StatelessSection {
 
     @Override
     public void onBindItemViewHolder(RecyclerView.ViewHolder holder, int position) {
-    FavouritesItemViewHolder favouritesViewHolder = (FavouritesItemViewHolder)holder;
+        TransportEntity transportRoutes = mListTransportEntity.get(position);
+        FavouritesItemViewHolder favouritesViewHolder = (FavouritesItemViewHolder) holder;
         favouritesViewHolder.textView.setText(String.valueOf(mListTransportEntity.get(position).getNumber()));
         favouritesViewHolder.mImageViewDelete.setOnClickListener(v -> EventBus.getDefault().post(new BusEvents.DeleteFavourites(mListTransportEntity.get(position))));
-        favouritesViewHolder.mItemFavourites.setOnClickListener(v ->{
-            mListTransportEntity.get(position).setIsSelected(true);
-            EventBus.getDefault().post(new BusEvents.SendChosenRoute(mListTransportEntity.get(position)));
+        favouritesViewHolder.mItemFavourites.setOnClickListener(v -> {
+            if (transportRoutes.isSelected()) {
+                transportRoutes.setIsSelected(false);
+                holder.itemView.setBackgroundColor(Color.parseColor("#F5F5F5"));
+            } else {
+                transportRoutes.setIsSelected(true);
+                holder.itemView.setBackgroundColor(Color.parseColor("#795548"));
+            }
+            EventBus.getDefault().post(new BusEvents.SendChosenRoute(transportRoutes));
         });
     }
 
@@ -61,7 +69,7 @@ public class FavouritesSectionAdapter extends StatelessSection {
 
     @Override
     public void onBindHeaderViewHolder(RecyclerView.ViewHolder holder) {
-        FavouritesHeaderViewHolder headerViewHolder = (FavouritesHeaderViewHolder)holder;
+        FavouritesHeaderViewHolder headerViewHolder = (FavouritesHeaderViewHolder) holder;
         headerViewHolder.textView.setText(mTitle);
     }
 
