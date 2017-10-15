@@ -66,6 +66,11 @@ public class TransportEntity {
         this.mIsFavourites = mIsFavourites;
     }
 
+    @Ignore
+    public TransportEntity(int mNumber) {
+        this.mNumber = mNumber;
+    }
+
     public boolean isAvailable() {
         return mIsAvailable;
     }

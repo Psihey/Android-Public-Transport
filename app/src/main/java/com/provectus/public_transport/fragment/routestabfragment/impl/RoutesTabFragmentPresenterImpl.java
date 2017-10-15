@@ -74,7 +74,6 @@ public class RoutesTabFragmentPresenterImpl implements RoutesTabFragmentPresente
             DatabaseHelper.getPublicTransportDatabase().transportDao().getAllTrolleybuses()
                     .map(list -> {
                         Collections.sort(list, sortByNumber);
-                        Logger.d("lklklkl");
                         return list;
                     })
                     .subscribeOn(Schedulers.io())

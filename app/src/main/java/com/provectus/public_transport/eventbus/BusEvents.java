@@ -47,4 +47,16 @@ public class BusEvents {
             return mSelectRout;
         }
     }
+
+    public static class DeleteFavourites{
+        private  TransportEntity mSelectRout;
+
+        public DeleteFavourites(TransportEntity mSelectRout) {
+            this.mSelectRout = mSelectRout;
+        }
+
+        public TransportEntity getSelectRout() {
+            return mSelectRout;
+        }
+    }
 }

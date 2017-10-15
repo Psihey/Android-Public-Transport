@@ -402,7 +402,6 @@ public class MapsFragmentImpl extends Fragment implements MapsFragment, OnMapRea
         if (mCurrentTransportInfo.isFavourites()) {
             mCurrentTransportInfo.setIsFavourites(false);
             new Thread(() -> DatabaseHelper.getPublicTransportDatabase().transportDao().updateFavourites(mCurrentTransportInfo)).start();
-
             mImageButtonFavouriteInfo.setImageResource(R.drawable.ic_favorite_gray_24_dp);
             return;
         }

@@ -12,6 +12,7 @@ import com.provectus.public_transport.model.TransportEntity;
 
 import java.util.List;
 
+import io.reactivex.Flowable;
 import io.reactivex.Maybe;
 
 @Dao
@@ -44,9 +45,13 @@ public interface TransportDao {
             + "WHERE transports.transport_number = :transportNumber AND transports.transport_type = :transportType ")
     Maybe<List<DirectEntity>> getDirectionEntity(int transportNumber, String transportType);
 
-//    @Query("UPDATE transports SET favourites = :is where transport_id=:id")
-//    void updateFavourites(long id,boolean is);
     @Update
     void updateFavourites(TransportEntity transportEntity);
+
+    @Query("SELECT * FROM transports WHERE favourites = '1'")
+    Flowable<List<TransportEntity>> getFavouritesRoute();
+
+    @Query("SELECT * FROM transports WHERE transport_id = :transportID ")
+    Maybe<TransportEntity> getAllTransports(long transportID);
 
 }

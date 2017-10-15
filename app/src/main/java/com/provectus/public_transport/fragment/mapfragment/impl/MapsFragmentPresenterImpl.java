@@ -69,11 +69,17 @@ public class MapsFragmentPresenterImpl implements MapsFragmentPresenter {
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void getRouteInfo(BusEvents.OpenRouteInformation event){
-        mMapsFragment.openRouteInfo(event.getSelectRout());
+        DatabaseHelper.getPublicTransportDatabase().transportDao().getAllTransports(event.getSelectRout().getServerId())
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .doOnError(throwable -> Logger.d(throwable.getMessage()))
+                .subscribe(this::getAllTransportFromDB);
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onMessageEvent(BusEvents.SendChosenRoute event) {
+        Logger.d("111111");
+        Logger.d(event.getSelectRout());
         mIsSelectRoute = event.getSelectRout().isSelected();
         String transportType = event.getSelectRout().getType().toString();
         if (transportType.equals(TransportType.TROLLEYBUSES_TYPE.name())) {
@@ -110,8 +116,11 @@ public class MapsFragmentPresenterImpl implements MapsFragmentPresenter {
         }
     }
 
+    private void getAllTransportFromDB(TransportEntity transportEntity) {
+        mMapsFragment.openRouteInfo(transportEntity);
+    }
+
     private void getDirectionFromDB(List<DirectEntity> segmentEntities) {
-        Logger.d("cccccccccccccccccccc");
         PolylineOptions polylineOptions = new PolylineOptions();
         for (DirectEntity directionEntity : segmentEntities) {
             polylineOptions.add(new LatLng(directionEntity.getLatitude(), directionEntity.getLongitude()));
@@ -120,7 +129,6 @@ public class MapsFragmentPresenterImpl implements MapsFragmentPresenter {
     }
 
     private void getStopsFromDB(List<StopEntity> stopEntities) {
-        Logger.d("gggggggggggggg");
         if (mIsSelectRoute && stopEntities.isEmpty()) {
             mMapsFragment.showErrorSnackbar(R.string.snack_bar_no_stops_for_this_route);
         }
@@ -134,7 +142,6 @@ public class MapsFragmentPresenterImpl implements MapsFragmentPresenter {
     }
 
     private void getTransportFromDB(TransportEntity transportEntity) {
-        Logger.d("fffffffffffffffffffff");
         VehicleMarkerInfoModel mVehicleMarker = new VehicleMarkerInfoModel();
         mVehicleMarker.setVehicleId(transportEntity.getServerId());
         mVehicleMarker.setDistance(transportEntity.getDistance());
