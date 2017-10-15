@@ -2,6 +2,8 @@ package com.provectus.public_transport.eventbus;
 
 import com.provectus.public_transport.model.TransportEntity;
 
+import java.util.List;
+
 
 public class BusEvents {
     private BusEvents() {
@@ -36,10 +38,10 @@ public class BusEvents {
         }
     }
 
-    public static class OpenRouteInformation{
+    public static class OpenRouteInformation {
         private TransportEntity mSelectRout;
 
-        public OpenRouteInformation(TransportEntity selectRoute){
+        public OpenRouteInformation(TransportEntity selectRoute) {
             this.mSelectRout = selectRoute;
         }
 
@@ -48,8 +50,8 @@ public class BusEvents {
         }
     }
 
-    public static class DeleteFavourites{
-        private  TransportEntity mSelectRout;
+    public static class DeleteFavourites {
+        private TransportEntity mSelectRout;
 
         public DeleteFavourites(TransportEntity mSelectRout) {
             this.mSelectRout = mSelectRout;
@@ -57,6 +59,29 @@ public class BusEvents {
 
         public TransportEntity getSelectRout() {
             return mSelectRout;
+        }
+    }
+
+    public static class updateRecyclerView {
+        private TransportEntity mSelectRout;
+
+        public updateRecyclerView(TransportEntity mSelectRout) {
+            this.mSelectRout = mSelectRout;
+        }
+
+        public TransportEntity getSelectRout() {
+            return mSelectRout;
+        }
+    }
+    public static class updateFavouritesRecyclerView {
+        private List<TransportEntity> mTransportData;
+
+        public updateFavouritesRecyclerView(List<TransportEntity> mTransportData) {
+            this.mTransportData = mTransportData;
+        }
+
+        public List<TransportEntity> getTransportData() {
+            return mTransportData;
         }
     }
 }

@@ -11,4 +11,6 @@ import java.util.List;
 public interface FavouritesFragment {
 
     void initRecyclerView(List<TransportEntity> transportEntity);
+
+    void updateRecyclerView(List<TransportEntity> mTransportData);
 }

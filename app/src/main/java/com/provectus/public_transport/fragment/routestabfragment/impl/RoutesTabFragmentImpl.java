@@ -46,6 +46,7 @@ public class RoutesTabFragmentImpl extends Fragment implements RoutesTabFragment
     private RoutesTabFragmentPresenterImpl mTabFragmentPresenter;
     private TransportType mType;
     private Unbinder mUnbinder;
+    private TramsAndTrolleyAdapter mTramTrolleybusAdapter;
 
     public static RoutesTabFragmentImpl newInstance(TransportType transportType) {
         RoutesTabFragmentImpl routesTabFragmentImpl = new RoutesTabFragmentImpl();
@@ -87,8 +88,8 @@ public class RoutesTabFragmentImpl extends Fragment implements RoutesTabFragment
     @Override
     public void initRecyclerView(List<TransportEntity> transportEntity) {
         mRoutesRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-        TramsAndTrolleyAdapter mAdapter = new TramsAndTrolleyAdapter(getContext(),transportEntity);
-        mRoutesRecyclerView.setAdapter(mAdapter);
+        mTramTrolleybusAdapter = new TramsAndTrolleyAdapter(getContext(), transportEntity);
+        mRoutesRecyclerView.setAdapter(mTramTrolleybusAdapter);
         mProgressBarNoItem.setVisibility(View.GONE);
         setErrorVisible(View.GONE);
     }
@@ -108,6 +109,13 @@ public class RoutesTabFragmentImpl extends Fragment implements RoutesTabFragment
     public void serviceEndWorked() {
         mBtnLoading.setVisibility(View.GONE);
         mRoutesRecyclerView.setVisibility(View.VISIBLE);
+    }
+
+    @Override
+    public void updateRecyclerView(TransportEntity transportEntity) {
+        if (mTramTrolleybusAdapter != null) {
+            mTramTrolleybusAdapter.updateData(transportEntity);
+        }
     }
 
     private void setErrorVisible(int visible) {

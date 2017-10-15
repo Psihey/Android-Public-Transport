@@ -78,8 +78,6 @@ public class MapsFragmentPresenterImpl implements MapsFragmentPresenter {
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onMessageEvent(BusEvents.SendChosenRoute event) {
-        Logger.d("111111");
-        Logger.d(event.getSelectRout());
         mIsSelectRoute = event.getSelectRout().isSelected();
         String transportType = event.getSelectRout().getType().toString();
         if (transportType.equals(TransportType.TROLLEYBUSES_TYPE.name())) {

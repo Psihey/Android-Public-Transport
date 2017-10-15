@@ -23,4 +23,6 @@ public interface RoutesTabFragment {
      * A method which hides loading button, and show recyclerview
      */
     void serviceEndWorked();
+
+    void updateRecyclerView(TransportEntity transportEntity);
 }

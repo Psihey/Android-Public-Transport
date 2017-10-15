@@ -59,6 +59,12 @@ public class RoutesTabFragmentPresenterImpl implements RoutesTabFragmentPresente
         mRoutesTabFragment.serviceEndWorked();
     }
 
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void getUpdateRecyclerView(BusEvents.updateRecyclerView transportEntity) {
+
+        mRoutesTabFragment.updateRecyclerView(transportEntity.getSelectRout());
+    }
+
     private void getDataFromDB() {
         if (mTransportType == TransportType.TRAM_TYPE) {
             DatabaseHelper.getPublicTransportDatabase().transportDao().getAllTram()
