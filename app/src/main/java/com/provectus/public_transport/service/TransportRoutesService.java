@@ -41,6 +41,7 @@ public class TransportRoutesService extends IntentService {
     private List<PointEntity> mPointEntity = new ArrayList<>();
     private List<StopEntity> mStopEntity = new ArrayList<>();
     private List<DirectEntity> mDirectionEntity = new ArrayList<>();
+    private List<TransportEntity> mCurrentFavourites = new ArrayList<>();
 
     public TransportRoutesService() {
         super(TransportRoutesService.class.getSimpleName());
@@ -76,22 +77,29 @@ public class TransportRoutesService extends IntentService {
                 Logger.d("There are no updates");
                 EventBus.getDefault().post(new BusEvents.DataBaseInitialized());
             } else if (response.isSuccessful() && response.body() != null && !response.body().isEmpty()) {
+                getAllCurrentFavourite();
                 putLastModifiedDateToPreference();
                 for (TransportEntity currentRoutes : response.body()) {
-                    boolean available = true;
+                    boolean isAvailable = true;
+                    boolean isFavourites = false;
+                    for (TransportEntity transportEntity : mCurrentFavourites) {
+                        if (transportEntity.getServerId() == currentRoutes.getServerId()) {
+                            isFavourites = true;
+                        }
+                    }
                     List<PointEntity> pointsForCurrentRoute = new ArrayList<>();
                     TransportEntity currentTransportEntity = new TransportEntity(currentRoutes.getServerId(),
                             currentRoutes.getNumber(),
                             currentRoutes.getType(),
-                            currentRoutes.getDistance(),available,false);
-                    for (DirectEntity directionEntity : currentRoutes.getDirectionEntity()){
+                            currentRoutes.getDistance(), isAvailable, isFavourites);
+                    for (DirectEntity directionEntity : currentRoutes.getDirectionEntity()) {
                         DirectEntity currentDirection = new DirectEntity(directionEntity.getLatitude(),
                                 directionEntity.getLongitude(),
                                 directionEntity.getPosition(),
                                 currentTransportEntity.getServerId());
                         mDirectionEntity.add(currentDirection);
                     }
-                    for (IndirectionModel indirectionEntity : currentRoutes.getIndirectionEntity()){
+                    for (IndirectionModel indirectionEntity : currentRoutes.getIndirectionEntity()) {
                         DirectEntity currentIndirection = new DirectEntity(indirectionEntity.getLatitude(),
                                 indirectionEntity.getLongitude(),
                                 indirectionEntity.getPosition(),
@@ -110,14 +118,14 @@ public class TransportRoutesService extends IntentService {
                                     currentPoint.getLongitude(), currentPoint.getPosition(),
                                     currentSegmentEntity.getServerId()));
                         }
-                        mStopEntity.add(new StopEntity(currentSegment.getStopEntity().getServerId(),currentSegment.getStopEntity().getLatitude(),
+                        mStopEntity.add(new StopEntity(currentSegment.getStopEntity().getServerId(), currentSegment.getStopEntity().getLatitude(),
                                 currentSegment.getStopEntity().getLongitude(),
                                 currentSegment.getStopEntity().getTitle(),
                                 currentSegmentEntity.getServerId()));
                     }
-                    if(pointsForCurrentRoute.isEmpty()){
-                        available = false;
-                        currentTransportEntity.setIsAvailable(available);
+                    if (pointsForCurrentRoute.isEmpty()) {
+                        isAvailable = false;
+                        currentTransportEntity.setIsAvailable(isAvailable);
                     }
                     mTransportEntity.add(currentTransportEntity);
                 }
@@ -127,10 +135,11 @@ public class TransportRoutesService extends IntentService {
         } catch (IOException e) {
             Logger.d(e.getMessage());
         }
-
     }
 
-    private @Nullable String getDateForRequest() {
+    private
+    @Nullable
+    String getDateForRequest() {
         SharedPreferences settingCodeResponse = getSharedPreferences(PREFS_NAME, 0);
         String dateLastModified = settingCodeResponse.getString(PREFS_KEY, "");
         if (dateLastModified.isEmpty()) {
@@ -150,6 +159,7 @@ public class TransportRoutesService extends IntentService {
     }
 
     private void removeAllFromTables() {
+        DatabaseHelper.getPublicTransportDatabase().transportDao().getFavouritesRouteBeforeDeleteDB();
         DatabaseHelper.getPublicTransportDatabase().transportDao().deleteAll(mTransportEntity);
         DatabaseHelper.getPublicTransportDatabase().segmentDao().deleteAll(mSegmentEntity);
         DatabaseHelper.getPublicTransportDatabase().pointDao().deleteAll(mPointEntity);
@@ -166,4 +176,15 @@ public class TransportRoutesService extends IntentService {
         EventBus.getDefault().post(new BusEvents.DataBaseInitialized());
         Logger.d("Database is initialized");
     }
+
+    private void getAllCurrentFavourite() {
+        DatabaseHelper.getPublicTransportDatabase().transportDao().getFavouritesRouteBeforeDeleteDB()
+                .doOnError(throwable -> Logger.d(throwable.getMessage()))
+                .subscribe(this::getAllFavouritesFromDB);
+    }
+
+    private void getAllFavouritesFromDB(List<TransportEntity> transportEntities) {
+        mCurrentFavourites = transportEntities;
+    }
+
 }

@@ -41,6 +41,13 @@ public class TramsAndTrolleyAdapter extends RecyclerView.Adapter<TramsAndTrolley
         TransportEntity transportRoutes = mTransportRoutesData.get(position);
         holder.mTvRoutesNumber.setText(mContext.getResources().getString(R.string.text_view_item_tram_trooley_transport_number, String.valueOf(mTransportRoutesData.get(position).getNumber())));
         holder.itemView.setOnFocusChangeListener((v, hasFocus) -> transportRoutes.setIsSelected(hasFocus));
+        if (!transportRoutes.isAvailable()){
+            holder.itemView.setEnabled(false);
+            holder.itemView.setAlpha((float) 0.4);
+        }else {
+            holder.itemView.setEnabled(true);
+            holder.itemView.setAlpha(1);
+        }
         if (transportRoutes.isSelected()) {
             holder.itemView.setBackgroundColor(Color.parseColor("#795548"));
         } else {
@@ -83,7 +90,6 @@ public class TramsAndTrolleyAdapter extends RecyclerView.Adapter<TramsAndTrolley
         TramsAndTrolleyViewHolder(View itemView) {
             super(itemView);
             ButterKnife.bind(this, itemView);
-//            this.setIsRecyclable(false);
         }
     }
 

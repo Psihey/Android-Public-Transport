@@ -49,7 +49,6 @@ public class FavouritesFragmentPresenterImpl implements FavouritesFragmentPresen
     }
 
     private void getFavouritesFromDB(List<TransportEntity> transportEntities) {
-        Logger.d(transportEntities);
         if (transportEntities == null) {
             return;
         }
@@ -90,7 +89,6 @@ public class FavouritesFragmentPresenterImpl implements FavouritesFragmentPresen
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void updateRecyclerView(BusEvents.updateFavouritesRecyclerView event) {
         mFavouritesFragment.updateRecyclerView(event.getTransportData());
-        Logger.d(event.getTransportData());
         for (TransportEntity transportEntity : event.getTransportData()){
             if (transportEntity.isSelected()){
                 mAllSelected.add(transportEntity);

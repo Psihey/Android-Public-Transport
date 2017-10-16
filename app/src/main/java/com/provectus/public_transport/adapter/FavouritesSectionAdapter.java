@@ -1,5 +1,6 @@
 package com.provectus.public_transport.adapter;
 
+import android.content.Context;
 import android.graphics.Color;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
@@ -20,21 +21,19 @@ import butterknife.ButterKnife;
 import io.github.luizgrp.sectionedrecyclerviewadapter.SectionedRecyclerViewAdapter;
 import io.github.luizgrp.sectionedrecyclerviewadapter.StatelessSection;
 
-/**
- * Created by Psihey on 13.10.2017.
- */
-
 public class FavouritesSectionAdapter extends StatelessSection {
     private String mTitle;
     private List<TransportEntity> mListTransportEntity;
-    SectionedRecyclerViewAdapter sectionAdapter;
+    private SectionedRecyclerViewAdapter mSectionAdapter;
+    private Context mContext;
 
 
-    public FavouritesSectionAdapter(String title, List<TransportEntity> list, SectionedRecyclerViewAdapter sectionAdapter) {
-        super(R.layout.header, R.layout.item);
+    public FavouritesSectionAdapter(Context context, String title, List<TransportEntity> list, SectionedRecyclerViewAdapter sectionAdapter) {
+        super(R.layout.header, R.layout.item_item_bundle_favourites_tram_trolleybus);
+        this.mContext = context;
         this.mTitle = title;
         this.mListTransportEntity = list;
-        this.sectionAdapter = sectionAdapter;
+        this.mSectionAdapter = sectionAdapter;
     }
 
     @Override
@@ -52,8 +51,7 @@ public class FavouritesSectionAdapter extends StatelessSection {
         TransportEntity transportRoutes = mListTransportEntity.get(position);
 
         FavouritesItemViewHolder favouritesViewHolder = (FavouritesItemViewHolder) holder;
-        favouritesViewHolder.textView.setText(String.valueOf(mListTransportEntity.get(position).getNumber()));
-
+        favouritesViewHolder.textView.setText(mContext.getResources().getString(R.string.text_view_item_tram_trooley_transport_number, String.valueOf(mListTransportEntity.get(position).getNumber())));
         if (transportRoutes.isSelected()) {
             holder.itemView.setBackgroundColor(Color.parseColor("#795548"));
         } else {
@@ -94,11 +92,11 @@ public class FavouritesSectionAdapter extends StatelessSection {
                 }
             }
         }
-        sectionAdapter.notifyDataSetChanged();
+        mSectionAdapter.notifyDataSetChanged();
     }
 
     class FavouritesItemViewHolder extends RecyclerView.ViewHolder {
-        @BindView(R.id.rr)
+        @BindView(R.id.tv_number_transport_favourites)
         TextView textView;
         @BindView(R.id.iv_delete_favourites)
         ImageView mImageViewDelete;

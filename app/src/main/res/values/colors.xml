@@ -13,4 +13,5 @@
     <color name="routeTealColor">#009688</color>
 
     <color name="offline_mode">#630000</color>
+    <color name="text_item_view">#000000</color>
 </resources>

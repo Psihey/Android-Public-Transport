@@ -21,14 +21,14 @@ public interface TransportDao {
     @Insert
     void insertAll(List<TransportEntity> transports);
 
+    @Delete
+    void deleteAll(List<TransportEntity> transportEntities);
+
     @Query("SELECT * FROM transports WHERE transport_type = 'TRAM_TYPE'")
     Maybe<List<TransportEntity>> getAllTram();
 
     @Query("SELECT * FROM transports WHERE transport_type = 'TROLLEYBUSES_TYPE'")
     Maybe<List<TransportEntity>> getAllTrolleybuses();
-
-    @Delete
-    void deleteAll(List<TransportEntity> transportEntities);
 
     @Query("SELECT * FROM transports "
             + "WHERE transports.transport_number = :transportNumber AND transports.transport_type = :transportType")
@@ -53,5 +53,8 @@ public interface TransportDao {
 
     @Query("SELECT * FROM transports WHERE transport_id = :transportID ")
     Maybe<TransportEntity> getAllTransports(long transportID);
+
+    @Query("SELECT * FROM transports WHERE favourites = '1'")
+    Maybe<List<TransportEntity>> getFavouritesRouteBeforeDeleteDB();
 
 }

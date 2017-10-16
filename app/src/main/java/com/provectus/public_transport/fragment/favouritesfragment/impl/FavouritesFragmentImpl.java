@@ -34,16 +34,16 @@ public class FavouritesFragmentImpl extends Fragment implements FavouritesFragme
     RecyclerView mFavouritesRecyclerView;
     private Unbinder mUnbinder;
     private FavouritesFragmentPresenter mFavouritesFragmentPresenter;
-    FavouritesSectionAdapter section1;
-    FavouritesSectionAdapter section2;
-    SectionedRecyclerViewAdapter sectionAdapter;
+    private FavouritesSectionAdapter mTramSection;
+    private FavouritesSectionAdapter mTrolleybusSection;
+    private SectionedRecyclerViewAdapter mSectionAdapter;
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_favourites, container, false);
         mUnbinder = ButterKnife.bind(this, view);
-        Logger.d("CREate favourite");
+        Logger.d("Create favourite");
         if (mFavouritesFragmentPresenter == null) {
             mFavouritesFragmentPresenter = new FavouritesFragmentPresenterImpl();
         }
@@ -64,7 +64,7 @@ public class FavouritesFragmentImpl extends Fragment implements FavouritesFragme
     public void initRecyclerView(List<TransportEntity> transportEntity) {
         List<TransportEntity> tramSection = new ArrayList<>();
         List<TransportEntity> trolleybusSection = new ArrayList<>();
-        sectionAdapter = new SectionedRecyclerViewAdapter();
+        mSectionAdapter = new SectionedRecyclerViewAdapter();
 
         for (TransportEntity currentTransport : transportEntity) {
             if (currentTransport.getType().equals(TransportType.TRAM_TYPE)) {
@@ -75,13 +75,13 @@ public class FavouritesFragmentImpl extends Fragment implements FavouritesFragme
         }
 
         mFavouritesRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-        section1 = new FavouritesSectionAdapter("Tram", tramSection, sectionAdapter);
-        section2 = new FavouritesSectionAdapter("TrolleyBus", trolleybusSection, sectionAdapter);
+        mTramSection = new FavouritesSectionAdapter(getContext(),"Tram", tramSection, mSectionAdapter);
+        mTrolleybusSection = new FavouritesSectionAdapter(getContext(),"TrolleyBus", trolleybusSection, mSectionAdapter);
 
-        sectionAdapter.addSection(section1);
-        sectionAdapter.addSection(section2);
+        mSectionAdapter.addSection(mTramSection);
+        mSectionAdapter.addSection(mTrolleybusSection);
         mFavouritesRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-        mFavouritesRecyclerView.setAdapter(sectionAdapter);
+        mFavouritesRecyclerView.setAdapter(mSectionAdapter);
 
     }
 
@@ -96,7 +96,7 @@ public class FavouritesFragmentImpl extends Fragment implements FavouritesFragme
                 trolleybusSection.add(currentTransport);
             }
         }
-        section1.updateRecyclerView(tramSection);
-        section2.updateRecyclerView(trolleybusSection);
+        mTramSection.updateRecyclerView(tramSection);
+        mTrolleybusSection.updateRecyclerView(trolleybusSection);
     }
 }
