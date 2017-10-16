@@ -5,7 +5,7 @@
     android:id="@+id/constraint_layout_route"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@color/colorBottomSheet"
+    android:background="@color/colorBottomSheetBackground"
     app:layout_behavior="android.support.design.widget.BottomSheetBehavior">
 
     <TextView

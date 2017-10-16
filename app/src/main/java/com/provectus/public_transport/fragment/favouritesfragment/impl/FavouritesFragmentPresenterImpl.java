@@ -25,7 +25,7 @@ public class FavouritesFragmentPresenterImpl implements FavouritesFragmentPresen
 
     private FavouritesFragment mFavouritesFragment;
     private List<TransportEntity> mListForUpdate;
-    private List<TransportEntity> mAllSelected = new ArrayList<>();
+    private List<TransportEntity> mAllSelectedRoutes = new ArrayList<>();
 
     @Override
     public void bindView(FavouritesFragment favouritesFragment) {
@@ -53,16 +53,16 @@ public class FavouritesFragmentPresenterImpl implements FavouritesFragmentPresen
             return;
         }
         if (mListForUpdate != null) {
-            for (TransportEntity transportEntity : transportEntities) {
-                for (TransportEntity transportEntity1 : mListForUpdate) {
-                    if (transportEntity.getServerId() == transportEntity1.getServerId()) {
-                        transportEntity.setIsSelected(transportEntity1.isSelected());
+            for (TransportEntity newEntity : transportEntities) {
+                for (TransportEntity recentEntity : mListForUpdate) {
+                    if (newEntity.getServerId() == recentEntity.getServerId()) {
+                        newEntity.setIsSelected(recentEntity.isSelected());
                     }
                 }
-                if (mAllSelected != null){
-                    for (TransportEntity transportEntity2 : mAllSelected){
-                        if (transportEntity.getServerId() == transportEntity2.getServerId()){
-                            transportEntity.setIsSelected(transportEntity2.isSelected());
+                if (mAllSelectedRoutes != null){
+                    for (TransportEntity newClickEntity : mAllSelectedRoutes){
+                        if (newEntity.getServerId() == newClickEntity.getServerId()){
+                            newEntity.setIsSelected(newClickEntity.isSelected());
                         }
                     }
                 }
@@ -72,7 +72,6 @@ public class FavouritesFragmentPresenterImpl implements FavouritesFragmentPresen
             Logger.d(mListForUpdate);
         } else {
                 mListForUpdate = transportEntities;
-            Logger.d(mListForUpdate);
         }
         if (mFavouritesFragment != null) {
             mFavouritesFragment.initRecyclerView(transportEntities);
@@ -87,11 +86,11 @@ public class FavouritesFragmentPresenterImpl implements FavouritesFragmentPresen
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
-    public void updateRecyclerView(BusEvents.updateFavouritesRecyclerView event) {
-        mFavouritesFragment.updateRecyclerView(event.getTransportData());
+    public void updateRecyclerView(BusEvents.UpdateDataFavouritesRecyclerView event) {
+        mFavouritesFragment.updateData(event.getTransportData());
         for (TransportEntity transportEntity : event.getTransportData()){
             if (transportEntity.isSelected()){
-                mAllSelected.add(transportEntity);
+                mAllSelectedRoutes.add(transportEntity);
             }
         }
     }

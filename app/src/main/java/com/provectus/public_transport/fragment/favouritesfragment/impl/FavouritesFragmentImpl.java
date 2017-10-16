@@ -16,6 +16,7 @@ import com.provectus.public_transport.fragment.favouritesfragment.FavouritesFrag
 import com.provectus.public_transport.fragment.favouritesfragment.FavouritesFragmentPresenter;
 import com.provectus.public_transport.model.TransportEntity;
 import com.provectus.public_transport.model.converter.TransportType;
+import com.provectus.public_transport.utils.Const;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,6 +31,7 @@ import io.github.luizgrp.sectionedrecyclerviewadapter.SectionedRecyclerViewAdapt
  */
 
 public class FavouritesFragmentImpl extends Fragment implements FavouritesFragment {
+
     @BindView(R.id.recycler_view_favourites)
     RecyclerView mFavouritesRecyclerView;
     private Unbinder mUnbinder;
@@ -75,8 +77,8 @@ public class FavouritesFragmentImpl extends Fragment implements FavouritesFragme
         }
 
         mFavouritesRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-        mTramSection = new FavouritesSectionAdapter(getContext(),"Tram", tramSection, mSectionAdapter);
-        mTrolleybusSection = new FavouritesSectionAdapter(getContext(),"TrolleyBus", trolleybusSection, mSectionAdapter);
+        mTramSection = new FavouritesSectionAdapter(getContext(), Const.TransportType.TRAMS, tramSection, mSectionAdapter);
+        mTrolleybusSection = new FavouritesSectionAdapter(getContext(), Const.TransportType.TROLLEYBUSES, trolleybusSection, mSectionAdapter);
 
         mSectionAdapter.addSection(mTramSection);
         mSectionAdapter.addSection(mTrolleybusSection);
@@ -86,7 +88,7 @@ public class FavouritesFragmentImpl extends Fragment implements FavouritesFragme
     }
 
     @Override
-    public void updateRecyclerView(List<TransportEntity> mTransportData) {
+    public void updateData(List<TransportEntity> mTransportData) {
         List<TransportEntity> tramSection = new ArrayList<>();
         List<TransportEntity> trolleybusSection = new ArrayList<>();
         for (TransportEntity currentTransport : mTransportData) {
@@ -96,7 +98,7 @@ public class FavouritesFragmentImpl extends Fragment implements FavouritesFragme
                 trolleybusSection.add(currentTransport);
             }
         }
-        mTramSection.updateRecyclerView(tramSection);
-        mTrolleybusSection.updateRecyclerView(trolleybusSection);
+        mTramSection.updateData(tramSection);
+        mTrolleybusSection.updateData(trolleybusSection);
     }
 }

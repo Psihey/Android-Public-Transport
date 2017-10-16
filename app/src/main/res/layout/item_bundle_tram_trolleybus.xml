@@ -12,7 +12,7 @@
         android:layout_height="wrap_content"
         android:layout_centerVertical="true"
         android:layout_alignParentStart="true"
-        android:layout_marginStart="16dp"
+        android:layout_marginStart="14dp"
         android:text="@string/text_view_item_tram_trooley_transport_number"
         android:textColor="@color/text_item_view"/>
 
@@ -21,7 +21,7 @@
         android:layout_width="24dp"
         android:layout_height="24dp"
         android:layout_marginTop="11dp"
-        android:layout_marginEnd="16dp"
+        android:layout_marginEnd="14dp"
         android:layout_alignParentEnd="true"
         app:srcCompat="@drawable/ic_info_outline_black_24dp" />
 

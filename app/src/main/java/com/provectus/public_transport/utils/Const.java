@@ -17,4 +17,13 @@ public final class Const {
         public static final int ZOOM_ON_MAP = 30;
     }
 
+    public static class TransportType{
+        private TransportType(){
+
+        }
+        public static final String TRAMS = "Trams";
+        public static final String TROLLEYBUSES = "Trolleybuses";
+
+    }
+
 }

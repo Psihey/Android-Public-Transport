@@ -60,9 +60,9 @@ public class RoutesTabFragmentPresenterImpl implements RoutesTabFragmentPresente
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
-    public void getUpdateRecyclerView(BusEvents.updateRecyclerView transportEntity) {
+    public void getUpdateRecyclerView(BusEvents.UpdateDataTransportsRecyclerView transportEntity) {
 
-        mRoutesTabFragment.updateRecyclerView(transportEntity.getSelectRout());
+        mRoutesTabFragment.updateData(transportEntity.getSelectRout());
     }
 
     private void getDataFromDB() {

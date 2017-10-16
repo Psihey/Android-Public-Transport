@@ -24,5 +24,5 @@ public interface RoutesTabFragment {
      */
     void serviceEndWorked();
 
-    void updateRecyclerView(TransportEntity transportEntity);
+    void updateData(TransportEntity transportEntity);
 }

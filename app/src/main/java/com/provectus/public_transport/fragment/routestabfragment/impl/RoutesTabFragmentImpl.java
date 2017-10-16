@@ -112,7 +112,7 @@ public class RoutesTabFragmentImpl extends Fragment implements RoutesTabFragment
     }
 
     @Override
-    public void updateRecyclerView(TransportEntity transportEntity) {
+    public void updateData(TransportEntity transportEntity) {
         if (mTramTrolleybusAdapter != null) {
             mTramTrolleybusAdapter.updateData(transportEntity);
         }

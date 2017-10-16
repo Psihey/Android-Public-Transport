@@ -62,10 +62,10 @@ public class BusEvents {
         }
     }
 
-    public static class updateRecyclerView {
+    public static class UpdateDataTransportsRecyclerView {
         private TransportEntity mSelectRout;
 
-        public updateRecyclerView(TransportEntity mSelectRout) {
+        public UpdateDataTransportsRecyclerView(TransportEntity mSelectRout) {
             this.mSelectRout = mSelectRout;
         }
 
@@ -73,10 +73,10 @@ public class BusEvents {
             return mSelectRout;
         }
     }
-    public static class updateFavouritesRecyclerView {
+    public static class UpdateDataFavouritesRecyclerView {
         private List<TransportEntity> mTransportData;
 
-        public updateFavouritesRecyclerView(List<TransportEntity> mTransportData) {
+        public UpdateDataFavouritesRecyclerView(List<TransportEntity> mTransportData) {
             this.mTransportData = mTransportData;
         }
 

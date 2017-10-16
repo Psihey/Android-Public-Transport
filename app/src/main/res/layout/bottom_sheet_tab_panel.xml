@@ -5,7 +5,7 @@
     android:id="@+id/container_bottom_sheet"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/colorBottomSheet"
+    android:background="@color/colorBottomSheetBackground"
     app:behavior_hideable="false"
     app:behavior_peekHeight="48dp"
     app:elevation="4dp"
@@ -21,7 +21,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="top"
-            app:tabBackground="@color/colorBottomSheet"
+            app:tabBackground="@color/colorBottomSheetBackground"
             app:tabIndicatorColor="@color/colorPrimaryDark"
             app:tabIndicatorHeight="4dp" />
 

@@ -6,9 +6,7 @@ package com.provectus.public_transport.fragment.favouritesfragment;
 
 public interface FavouritesFragmentPresenter {
 
-
     void bindView(FavouritesFragment favouritesFragment);
-
 
     void unbindView();
 }

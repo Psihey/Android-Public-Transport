@@ -12,5 +12,5 @@ public interface FavouritesFragment {
 
     void initRecyclerView(List<TransportEntity> transportEntity);
 
-    void updateRecyclerView(List<TransportEntity> mTransportData);
+    void updateData(List<TransportEntity> transportList);
 }
