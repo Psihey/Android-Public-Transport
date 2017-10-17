@@ -69,7 +69,8 @@ import butterknife.Unbinder;
 import static android.os.Looper.getMainLooper;
 
 
-public class MapsFragmentImpl extends Fragment implements MapsFragment, OnMapReadyCallback, GoogleMap.OnMarkerClickListener {
+public class MapsFragmentImpl extends Fragment
+        implements MapsFragment, GoogleMap.OnMapClickListener, OnMapReadyCallback, GoogleMap.OnMarkerClickListener {
 
     public static final String TAG_MAP_FRAGMENT = "fragment_map";
     private static final int REQUEST_LOCATION_PERMISSIONS = 1;
@@ -80,6 +81,7 @@ public class MapsFragmentImpl extends Fragment implements MapsFragment, OnMapRea
     private static final String TIME_FORMAT_OFFLINE_MODE = "%tT";
     private static final int INTERNET_ERROR_OFFLINE_MODE = 1;
     private static final int SERVER_ERROR_OFFLINE_MODE = 2;
+    private static final int PEEK_HEIGHT_INFO_BOTTOM_SHEET = 0;
 
     @BindView(R.id.bottom_sheet_view_pager)
     ViewPager mViewPagerTransportAndParking;
@@ -167,12 +169,11 @@ public class MapsFragmentImpl extends Fragment implements MapsFragment, OnMapRea
     public void onResume() {
         super.onResume();
         mBottomSheetVehicleInfo = BottomSheetBehavior.from(mConstraintVehicleContainer);
-        mBottomSheetVehicleInfo.setPeekHeight(0);
+        mBottomSheetVehicleInfo.setPeekHeight(PEEK_HEIGHT_INFO_BOTTOM_SHEET);
         mBottomSheetVehicleInfo.setHideable(true);
         mBottomSheetRouteInfo = BottomSheetBehavior.from(mConstraintRouteContainer);
-        mBottomSheetRouteInfo.setPeekHeight(0);
+        mBottomSheetRouteInfo.setPeekHeight(PEEK_HEIGHT_INFO_BOTTOM_SHEET);
         mBottomSheetRouteInfo.setHideable(true);
-
     }
 
     @Override
@@ -192,16 +193,33 @@ public class MapsFragmentImpl extends Fragment implements MapsFragment, OnMapRea
         setDefaultCameraPosition();
         setMyLocationButton();
         mMap.setOnMarkerClickListener(this);
+        mMap.setOnMapClickListener(this);
+    }
+
+    @Override
+    public void onMapClick(LatLng latLng) {
+        mBottomSheetVehicleInfo.setState(BottomSheetBehavior.STATE_COLLAPSED);
+        mBottomSheetRouteInfo.setState(BottomSheetBehavior.STATE_COLLAPSED);
+    }
+
+    @Override
+    public boolean onMarkerClick(Marker marker) {
+        if (marker.getTag() != null) {
+            mBottomSheetVehicleInfo.setState(BottomSheetBehavior.STATE_EXPANDED);
+            setVehicleDataIntoInfoView(marker);
+        }
+        return false;
     }
 
     @Override
     public void showErrorSnackbar(int message) {
-        Snackbar snackbar = Snackbar.make(mContainerLayout, message, Snackbar.LENGTH_LONG);
-        snackbar.show();
         if (message == R.string.snack_bar_no_vehicles_no_internet_connection) {
             setOfflineMode(INTERNET_ERROR_OFFLINE_MODE);
         } else if (message == R.string.snack_bar_no_vehicles_server_not_response) {
             setOfflineMode(SERVER_ERROR_OFFLINE_MODE);
+        } else {
+            Snackbar snackbar = Snackbar.make(mContainerLayout, message, Snackbar.LENGTH_LONG);
+            snackbar.show();
         }
     }
 
@@ -361,15 +379,6 @@ public class MapsFragmentImpl extends Fragment implements MapsFragment, OnMapRea
     }
 
     @Override
-    public boolean onMarkerClick(Marker marker) {
-        if (marker.getTag() != null) {
-            mBottomSheetVehicleInfo.setState(BottomSheetBehavior.STATE_EXPANDED);
-            setDataIntoInfoView(marker);
-        }
-        return false;
-    }
-
-    @Override
     public void routeNotSelected() {
         mBottomSheetVehicleInfo.setState(BottomSheetBehavior.STATE_COLLAPSED);
     }
@@ -389,9 +398,9 @@ public class MapsFragmentImpl extends Fragment implements MapsFragment, OnMapRea
         mTextViewRouteInfoNumber.setText(getResources().getString(R.string.text_view_route_number, transportEntity.getNumber()));
         mTextViewRouteInfoDistance.setText(getResources().getString(R.string.text_view_transport_route_distance, Double.toString(transportEntity.getDistance())));
         mTextViewRouteInfoType.setText(transportType);
-        if (transportEntity.isFavourites()){
+        if (transportEntity.isFavourites()) {
             mImageButtonFavouriteInfo.setImageResource(R.drawable.ic_favorite_blue_24_dp);
-        }else {
+        } else {
             mImageButtonFavouriteInfo.setImageResource(R.drawable.ic_favorite_gray_24_dp);
         }
 
@@ -414,7 +423,7 @@ public class MapsFragmentImpl extends Fragment implements MapsFragment, OnMapRea
         Handler mHandler = new Handler(getMainLooper());
         mHandler.post(() -> {
             mTextViewOfflineMode.setVisibility(View.VISIBLE);
-            if (code == 1) {
+            if (code == INTERNET_ERROR_OFFLINE_MODE) {
                 if (mLastOnlineTime == null) {
                     mTextViewOfflineMode.setText(R.string.snack_bar_no_vehicles_no_internet_connection);
                 } else {
@@ -505,7 +514,7 @@ public class MapsFragmentImpl extends Fragment implements MapsFragment, OnMapRea
         return color;
     }
 
-    private void setDataIntoInfoView(Marker marker) {
+    private void setVehicleDataIntoInfoView(Marker marker) {
         String transportType;
         for (VehiclesModel vehiclesModel : mAllVehicles) {
             if (marker.getTag().equals(vehiclesModel.getVehicleId())) {
@@ -543,4 +552,5 @@ public class MapsFragmentImpl extends Fragment implements MapsFragment, OnMapRea
             }
         }
     }
+
 }

@@ -79,6 +79,7 @@
         android:gravity="end"
         android:textSize="@dimen/vehicles_detail_text_size_value"
         app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintBaseline_toBaselineOf="@+id/tv_route_info_transport_fee"
         app:layout_constraintTop_toBottomOf="@+id/view_separate_line_top"/>
 
     <TextView
@@ -99,6 +100,7 @@
         android:gravity="end"
         android:textSize="@dimen/vehicles_detail_text_size_value"
         app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintBaseline_toBaselineOf="@+id/tv_route_info_transport_route_distance"
         app:layout_constraintTop_toBottomOf="@+id/tv_route_info_transport_fee_value"/>
 
     <View

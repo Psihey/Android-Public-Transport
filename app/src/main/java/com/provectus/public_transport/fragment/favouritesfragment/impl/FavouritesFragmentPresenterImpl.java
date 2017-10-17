@@ -31,7 +31,7 @@ public class FavouritesFragmentPresenterImpl implements FavouritesFragmentPresen
     public void bindView(FavouritesFragment favouritesFragment) {
         this.mFavouritesFragment = favouritesFragment;
         EventBus.getDefault().register(this);
-        getAllFavouritesFromBD();
+        getAllFavouritesFromDB();
     }
 
     @Override
@@ -40,7 +40,7 @@ public class FavouritesFragmentPresenterImpl implements FavouritesFragmentPresen
         EventBus.getDefault().unregister(this);
     }
 
-    private void getAllFavouritesFromBD() {
+    private void getAllFavouritesFromDB() {
         DatabaseHelper.getPublicTransportDatabase().transportDao().getFavouritesRoute()
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
@@ -69,7 +69,6 @@ public class FavouritesFragmentPresenterImpl implements FavouritesFragmentPresen
             }
             mListForUpdate.clear();
             mListForUpdate.addAll(transportEntities);
-            Logger.d(mListForUpdate);
         } else {
                 mListForUpdate = transportEntities;
         }

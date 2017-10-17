@@ -23,11 +23,11 @@
         android:id="@+id/iv_route_info_transport_icon"
         android:layout_width="16dp"
         android:layout_height="16dp"
-        android:layout_marginTop="11dp"
         android:layout_marginStart="@dimen/vehicles_detail_layout_margin_start"
+        android:layout_marginTop="11dp"
         android:src="@drawable/ic_tram_gray_24_dp"
         app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tv_route_info_number"/>
+        app:layout_constraintTop_toBottomOf="@+id/tv_route_info_number" />
 
     <ImageButton
         android:id="@+id/ib_route_info_favorite_icon"
@@ -35,19 +35,19 @@
         android:layout_height="24dp"
         android:layout_marginEnd="@dimen/vehicles_detail_layout_margin_end"
         android:src="@drawable/ic_favorite_gray_24_dp"
+        app:layout_constraintBottom_toTopOf="@+id/iv_route_info_transport_icon"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/tv_route_info_number"
-        app:layout_constraintBottom_toTopOf="@+id/iv_route_info_transport_icon"/>
+        app:layout_constraintTop_toTopOf="@+id/tv_route_info_number" />
 
     <TextView
         android:id="@+id/tv_transport_route_info_type_value"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
         android:layout_marginStart="4dp"
+        android:layout_marginTop="8dp"
         android:textSize="14sp"
-        app:layout_constraintTop_toBottomOf="@+id/tv_route_info_number"
-        app:layout_constraintLeft_toRightOf="@+id/iv_route_info_transport_icon"/>
+        app:layout_constraintLeft_toRightOf="@+id/iv_route_info_transport_icon"
+        app:layout_constraintTop_toBottomOf="@+id/tv_route_info_number" />
 
     <View
         android:id="@+id/view_separate_line_top"
@@ -64,12 +64,12 @@
         android:id="@+id/tv_route_info_transport_fee"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
         android:layout_marginStart="@dimen/vehicles_detail_layout_margin_start"
+        android:layout_marginTop="16dp"
         android:text="@string/text_view_fee"
         android:textSize="@dimen/vehicles_detail_text_size_value"
         app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tv_transport_route_info_type_value"/>
+        app:layout_constraintTop_toBottomOf="@+id/tv_transport_route_info_type_value" />
 
     <TextView
         android:id="@+id/tv_route_info_transport_fee_value"
@@ -78,8 +78,9 @@
         android:layout_marginEnd="@dimen/vehicles_detail_layout_margin_end"
         android:gravity="end"
         android:textSize="@dimen/vehicles_detail_text_size_value"
+        app:layout_constraintBaseline_toBaselineOf="@+id/tv_route_info_transport_fee"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/view_separate_line_top"/>
+        app:layout_constraintTop_toBottomOf="@+id/view_separate_line_top" />
 
     <TextView
         android:id="@+id/tv_route_info_transport_route_distance"
@@ -89,7 +90,7 @@
         android:text="@string/text_view_distance"
         android:textSize="12sp"
         app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tv_route_info_transport_fee"/>
+        app:layout_constraintTop_toBottomOf="@+id/tv_route_info_transport_fee" />
 
     <TextView
         android:id="@+id/tv_route_info_transport_route_distance_value"
@@ -98,15 +99,16 @@
         android:layout_marginEnd="@dimen/vehicles_detail_layout_margin_end"
         android:gravity="end"
         android:textSize="@dimen/vehicles_detail_text_size_value"
+        app:layout_constraintBaseline_toBaselineOf="@+id/tv_route_info_transport_route_distance"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tv_route_info_transport_fee_value"/>
+        app:layout_constraintTop_toBottomOf="@+id/tv_route_info_transport_fee_value" />
 
     <View
         android:layout_width="fill_parent"
         android:layout_height="1dp"
-        android:layout_marginTop="9dp"
         android:layout_marginEnd="@dimen/vehicles_detail_layout_margin_end"
         android:layout_marginStart="@dimen/vehicles_detail_layout_margin_start"
+        android:layout_marginTop="9dp"
         android:background="#b5b5b3"
         app:layout_constraintTop_toBottomOf="@+id/tv_route_info_transport_route_distance"
         tools:layout_editor_absoluteX="8dp" />
