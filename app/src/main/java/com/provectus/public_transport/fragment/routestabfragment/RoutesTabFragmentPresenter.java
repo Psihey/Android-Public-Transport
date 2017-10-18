@@ -1,6 +1,7 @@
 package com.provectus.public_transport.fragment.routestabfragment;
 
 
+import com.provectus.public_transport.model.TransportEntity;
 import com.provectus.public_transport.model.converter.TransportType;
 
 public interface RoutesTabFragmentPresenter {
@@ -27,5 +28,7 @@ public interface RoutesTabFragmentPresenter {
      * A method which unregistered Event Bus event
      */
     void unregisteredEventBus();
+
+    void getDataForUpdateRecyclerView(TransportEntity transportEntity);
 
 }

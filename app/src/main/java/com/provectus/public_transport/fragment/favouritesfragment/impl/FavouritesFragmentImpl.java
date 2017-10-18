@@ -12,11 +12,18 @@ import android.view.ViewGroup;
 import com.orhanobut.logger.Logger;
 import com.provectus.public_transport.R;
 import com.provectus.public_transport.adapter.FavouritesSectionAdapter;
+import com.provectus.public_transport.eventbus.BusEvents;
 import com.provectus.public_transport.fragment.favouritesfragment.FavouritesFragment;
 import com.provectus.public_transport.fragment.favouritesfragment.FavouritesFragmentPresenter;
+import com.provectus.public_transport.fragment.mapfragment.MapsFragmentPresenter;
+import com.provectus.public_transport.fragment.routestabfragment.RoutesTabFragmentPresenter;
 import com.provectus.public_transport.model.TransportEntity;
 import com.provectus.public_transport.model.converter.TransportType;
 import com.provectus.public_transport.utils.Const;
+
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,10 +33,6 @@ import butterknife.ButterKnife;
 import butterknife.Unbinder;
 import io.github.luizgrp.sectionedrecyclerviewadapter.SectionedRecyclerViewAdapter;
 
-/**
- * Created by Psihey on 13.10.2017.
- */
-
 public class FavouritesFragmentImpl extends Fragment implements FavouritesFragment {
 
     @BindView(R.id.recycler_view_favourites)
@@ -38,7 +41,8 @@ public class FavouritesFragmentImpl extends Fragment implements FavouritesFragme
     private FavouritesFragmentPresenter mFavouritesFragmentPresenter;
     private FavouritesSectionAdapter mTramSection;
     private FavouritesSectionAdapter mTrolleybusSection;
-    private SectionedRecyclerViewAdapter mSectionAdapter;
+    private MapsFragmentPresenter mMapsFragmentPresenter;
+    private RoutesTabFragmentPresenter mRoutesTabFragmentPresenter;
 
     @Nullable
     @Override
@@ -50,6 +54,7 @@ public class FavouritesFragmentImpl extends Fragment implements FavouritesFragme
             mFavouritesFragmentPresenter = new FavouritesFragmentPresenterImpl();
         }
         mFavouritesFragmentPresenter.bindView(this);
+        EventBus.getDefault().register(this);
         return view;
     }
 
@@ -60,13 +65,14 @@ public class FavouritesFragmentImpl extends Fragment implements FavouritesFragme
             mUnbinder.unbind();
         }
         mFavouritesFragmentPresenter.unbindView();
+        EventBus.getDefault().unregister(this);
     }
 
     @Override
     public void initRecyclerView(List<TransportEntity> transportEntity) {
         List<TransportEntity> tramSection = new ArrayList<>();
         List<TransportEntity> trolleybusSection = new ArrayList<>();
-        mSectionAdapter = new SectionedRecyclerViewAdapter();
+        SectionedRecyclerViewAdapter mSectionAdapter = new SectionedRecyclerViewAdapter();
 
         for (TransportEntity currentTransport : transportEntity) {
             if (currentTransport.getType().equals(TransportType.TRAM_TYPE)) {
@@ -77,14 +83,13 @@ public class FavouritesFragmentImpl extends Fragment implements FavouritesFragme
         }
 
         mFavouritesRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-        mTramSection = new FavouritesSectionAdapter(getContext(), Const.TransportType.TRAMS, tramSection, mSectionAdapter);
-        mTrolleybusSection = new FavouritesSectionAdapter(getContext(), Const.TransportType.TROLLEYBUSES, trolleybusSection, mSectionAdapter);
+        mTramSection = new FavouritesSectionAdapter(getContext(), Const.TransportType.TRAMS, tramSection, mSectionAdapter, mMapsFragmentPresenter,mFavouritesFragmentPresenter,mRoutesTabFragmentPresenter);
+        mTrolleybusSection = new FavouritesSectionAdapter(getContext(), Const.TransportType.TROLLEYBUSES, trolleybusSection, mSectionAdapter, mMapsFragmentPresenter,mFavouritesFragmentPresenter,mRoutesTabFragmentPresenter);
 
         mSectionAdapter.addSection(mTramSection);
         mSectionAdapter.addSection(mTrolleybusSection);
         mFavouritesRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         mFavouritesRecyclerView.setAdapter(mSectionAdapter);
-
     }
 
     @Override
@@ -100,5 +105,15 @@ public class FavouritesFragmentImpl extends Fragment implements FavouritesFragme
         }
         mTramSection.updateData(tramSection);
         mTrolleybusSection.updateData(trolleybusSection);
+    }
+
+    @Subscribe(sticky = true,threadMode = ThreadMode.MAIN)
+    public void getMapsFragmentPresenter(BusEvents.SendMapsFragmentPresenter event) {
+        mMapsFragmentPresenter = event.getMapsFragmentPresenter();
+    }
+
+    @Subscribe(sticky = true,threadMode = ThreadMode.MAIN)
+    public void getRoutesTabFragmentPresenter(BusEvents.SendRoutesTabFragmentPresenter event) {
+        mRoutesTabFragmentPresenter = event.getRoutesTabFragmentPresenter();
     }
 }

@@ -8,11 +8,11 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.provectus.public_transport.R;
-import com.provectus.public_transport.eventbus.BusEvents;
+import com.provectus.public_transport.fragment.favouritesfragment.FavouritesFragmentPresenter;
+import com.provectus.public_transport.fragment.mapfragment.MapsFragmentPresenter;
+import com.provectus.public_transport.fragment.routestabfragment.RoutesTabFragmentPresenter;
 import com.provectus.public_transport.model.TransportEntity;
 import com.provectus.public_transport.utils.Const;
-
-import org.greenrobot.eventbus.EventBus;
 
 import java.util.List;
 
@@ -27,8 +27,17 @@ public class FavouritesSectionAdapter extends StatelessSection {
     private List<TransportEntity> mListTransportEntity;
     private SectionedRecyclerViewAdapter mSectionAdapter;
     private Context mContext;
+    private MapsFragmentPresenter mMapsFragmentPresenter;
+    private FavouritesFragmentPresenter mFavouritesFragmentPresenter;
+    private RoutesTabFragmentPresenter mRoutesTabFragmentPresenter;
 
-    public FavouritesSectionAdapter(Context context, String title, List<TransportEntity> list, SectionedRecyclerViewAdapter sectionAdapter) {
+    public FavouritesSectionAdapter(Context context,
+                                    String title,
+                                    List<TransportEntity> list,
+                                    SectionedRecyclerViewAdapter sectionAdapter,
+                                    MapsFragmentPresenter mapsFragmentPresenter,
+                                    FavouritesFragmentPresenter favouritesFragmentPresenter,
+                                    RoutesTabFragmentPresenter routesTabFragmentPresenter) {
         super(new SectionParameters.Builder(R.layout.item_item_bundle_favourites_tram_trolleybus)
                 .headerResourceId(R.layout.item_header_bundle_favourites_tram_trolleybus)
                 .build());
@@ -36,6 +45,9 @@ public class FavouritesSectionAdapter extends StatelessSection {
         this.mTitle = title;
         this.mListTransportEntity = list;
         this.mSectionAdapter = sectionAdapter;
+        this.mMapsFragmentPresenter = mapsFragmentPresenter;
+        this.mFavouritesFragmentPresenter = favouritesFragmentPresenter;
+        this.mRoutesTabFragmentPresenter = routesTabFragmentPresenter;
     }
 
     @Override
@@ -56,24 +68,25 @@ public class FavouritesSectionAdapter extends StatelessSection {
         itemViewHolder.mTextViewTransportNumber.setText(mContext.getResources().getString(R.string.text_view_item_tram_trooley_transport_number, String.valueOf(mListTransportEntity.get(position).getNumber())));
 
         if (currentRoute.isSelected()) {
-            holder.itemView.setBackgroundColor(ContextCompat.getColor(mContext,R.color.colorBottomSheetSelectedBackground));
+            holder.itemView.setBackgroundColor(ContextCompat.getColor(mContext, R.color.colorBottomSheetSelectedBackground));
         } else {
-            holder.itemView.setBackgroundColor(ContextCompat.getColor(mContext,R.color.colorBottomSheetBackground));
+            holder.itemView.setBackgroundColor(ContextCompat.getColor(mContext, R.color.colorBottomSheetBackground));
         }
 
-        itemViewHolder.mImageViewDeleteFavourites.setOnClickListener(v -> EventBus.getDefault().post(new BusEvents.DeleteFavourites(mListTransportEntity.get(position))));
+        itemViewHolder.mImageViewDeleteFavourites.setOnClickListener(v -> mFavouritesFragmentPresenter.deleteFavourites(currentRoute));
+
 
         itemViewHolder.itemView.setOnClickListener(v -> {
             if (currentRoute.isSelected()) {
                 currentRoute.setIsSelected(false);
-                holder.itemView.setBackgroundColor(ContextCompat.getColor(mContext,R.color.colorBottomSheetBackground));
+                holder.itemView.setBackgroundColor(ContextCompat.getColor(mContext, R.color.colorBottomSheetBackground));
             } else {
                 currentRoute.setIsSelected(true);
-                holder.itemView.setBackgroundColor(ContextCompat.getColor(mContext,R.color.colorBottomSheetSelectedBackground));
+                holder.itemView.setBackgroundColor(ContextCompat.getColor(mContext, R.color.colorBottomSheetSelectedBackground));
             }
 
-            EventBus.getDefault().post(new BusEvents.SendChosenRoute(currentRoute));
-            EventBus.getDefault().post(new BusEvents.UpdateDataTransportsRecyclerView(currentRoute));
+            mMapsFragmentPresenter.onSelectCurrentRoute(currentRoute);
+            mRoutesTabFragmentPresenter.getDataForUpdateRecyclerView(currentRoute);
         });
     }
 
@@ -87,9 +100,9 @@ public class FavouritesSectionAdapter extends StatelessSection {
         FavouritesHeaderViewHolder headerViewHolder = (FavouritesHeaderViewHolder) holder;
 
         headerViewHolder.mTextViewTypeTransport.setText(mTitle);
-        if (mTitle.equals(Const.TransportType.TRAMS)){
+        if (mTitle.equals(Const.TransportType.TRAMS)) {
             headerViewHolder.mTransportIcon.setImageResource(R.drawable.ic_tram_gray_24_dp);
-        }else {
+        } else {
             headerViewHolder.mTransportIcon.setImageResource(R.drawable.ic_trolley_gray_24_dp);
         }
 
@@ -122,7 +135,7 @@ public class FavouritesSectionAdapter extends StatelessSection {
         @BindView(R.id.tv_header_favourites)
         TextView mTextViewTypeTransport;
         @BindView(R.id.iv_header_favourites)
-        ImageView mTransportIcon;        
+        ImageView mTransportIcon;
 
         FavouritesHeaderViewHolder(View itemView) {
             super(itemView);

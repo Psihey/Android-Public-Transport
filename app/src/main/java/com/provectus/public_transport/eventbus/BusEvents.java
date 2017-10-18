@@ -1,8 +1,9 @@
 package com.provectus.public_transport.eventbus;
 
+import com.provectus.public_transport.fragment.favouritesfragment.FavouritesFragmentPresenter;
+import com.provectus.public_transport.fragment.mapfragment.MapsFragmentPresenter;
+import com.provectus.public_transport.fragment.routestabfragment.RoutesTabFragmentPresenter;
 import com.provectus.public_transport.model.TransportEntity;
-
-import java.util.List;
 
 
 public class BusEvents {
@@ -17,36 +18,11 @@ public class BusEvents {
         }
     }
 
-    public static class SendChosenRoute {
-        private TransportEntity mSelectRout;
-
-        public SendChosenRoute(TransportEntity selectRout) {
-            this.mSelectRout = selectRout;
-        }
-
-        public TransportEntity getSelectRout() {
-            return mSelectRout;
-        }
-
-    }
-
     public static class ServiceEndWorked {
         /**
          * A method which says to the subscriber that service has ended work
          */
         public ServiceEndWorked() {
-        }
-    }
-
-    public static class OpenRouteInformation {
-        private TransportEntity mSelectRout;
-
-        public OpenRouteInformation(TransportEntity selectRoute) {
-            this.mSelectRout = selectRoute;
-        }
-
-        public TransportEntity getSelectRout() {
-            return mSelectRout;
         }
     }
 
@@ -62,26 +38,39 @@ public class BusEvents {
         }
     }
 
-    public static class UpdateDataTransportsRecyclerView {
-        private TransportEntity mSelectRout;
+    public static class SendMapsFragmentPresenter{
+        private MapsFragmentPresenter mMapsFragmentPresenter;
 
-        public UpdateDataTransportsRecyclerView(TransportEntity mSelectRout) {
-            this.mSelectRout = mSelectRout;
+        public SendMapsFragmentPresenter(MapsFragmentPresenter mMapsFragmentPresenter) {
+            this.mMapsFragmentPresenter = mMapsFragmentPresenter;
         }
 
-        public TransportEntity getSelectRout() {
-            return mSelectRout;
+        public MapsFragmentPresenter getMapsFragmentPresenter() {
+            return mMapsFragmentPresenter;
         }
     }
-    public static class UpdateDataFavouritesRecyclerView {
-        private List<TransportEntity> mTransportData;
 
-        public UpdateDataFavouritesRecyclerView(List<TransportEntity> mTransportData) {
-            this.mTransportData = mTransportData;
+    public static class SendFavouriteFragmentPresenter{
+        private FavouritesFragmentPresenter mFavouritesFragmentPresenter;
+
+        public SendFavouriteFragmentPresenter(FavouritesFragmentPresenter mFavouritesFragmentPresenter) {
+            this.mFavouritesFragmentPresenter = mFavouritesFragmentPresenter;
         }
 
-        public List<TransportEntity> getTransportData() {
-            return mTransportData;
+        public FavouritesFragmentPresenter getFavouritesFragmentPresenter() {
+            return mFavouritesFragmentPresenter;
+        }
+    }
+
+    public static class SendRoutesTabFragmentPresenter{
+        private RoutesTabFragmentPresenter mRoutesTabFragmentPresenter;
+
+        public SendRoutesTabFragmentPresenter(RoutesTabFragmentPresenter mRoutesTabFragmentPresenter) {
+            this.mRoutesTabFragmentPresenter = mRoutesTabFragmentPresenter;
+        }
+
+        public RoutesTabFragmentPresenter getRoutesTabFragmentPresenter() {
+            return mRoutesTabFragmentPresenter;
         }
     }
 }

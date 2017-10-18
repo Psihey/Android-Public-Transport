@@ -29,6 +29,7 @@ public class RoutesTabFragmentPresenterImpl implements RoutesTabFragmentPresente
     public void bindView(RoutesTabFragment routesTabFragment) {
         mRoutesTabFragment = routesTabFragment;
         EventBus.getDefault().register(this);
+        EventBus.getDefault().postSticky(new BusEvents.SendRoutesTabFragmentPresenter(this));
         Logger.d("RoutesTab is binded to its presenter.");
     }
 
@@ -49,6 +50,11 @@ public class RoutesTabFragmentPresenterImpl implements RoutesTabFragmentPresente
         EventBus.getDefault().unregister(this);
     }
 
+    @Override
+    public void getDataForUpdateRecyclerView(TransportEntity transportEntity) {
+        mRoutesTabFragment.updateData(transportEntity);
+    }
+
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void getUpdateDBEvent(BusEvents.DataBaseInitialized routesEvent) {
         getDataFromDB();
@@ -57,12 +63,6 @@ public class RoutesTabFragmentPresenterImpl implements RoutesTabFragmentPresente
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void getUpdateDBEvent(BusEvents.ServiceEndWorked service) {
         mRoutesTabFragment.serviceEndWorked();
-    }
-
-    @Subscribe(threadMode = ThreadMode.MAIN)
-    public void getUpdateRecyclerView(BusEvents.UpdateDataTransportsRecyclerView transportEntity) {
-
-        mRoutesTabFragment.updateData(transportEntity.getSelectRout());
     }
 
     private void getDataFromDB() {

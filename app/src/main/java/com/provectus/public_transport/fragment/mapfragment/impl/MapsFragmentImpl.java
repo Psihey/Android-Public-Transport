@@ -39,6 +39,7 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.maps.android.SphericalUtil;
+import com.orhanobut.logger.Logger;
 import com.provectus.public_transport.R;
 import com.provectus.public_transport.adapter.TransportAndParkingViewPagerAdapter;
 import com.provectus.public_transport.fragment.mapfragment.MapsFragment;
@@ -65,6 +66,8 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import butterknife.Unbinder;
+import io.reactivex.Completable;
+import io.reactivex.schedulers.Schedulers;
 
 import static android.os.Looper.getMainLooper;
 
@@ -182,7 +185,6 @@ public class MapsFragmentImpl extends Fragment
         if (mUnbinder != null) {
             mUnbinder.unbind();
         }
-        mMapsPresenter.unregisteredEventBus();
         mMapsPresenter.unbindView();
     }
 
@@ -410,13 +412,27 @@ public class MapsFragmentImpl extends Fragment
     public void setFavourites() {
         if (mCurrentTransportInfo.isFavourites()) {
             mCurrentTransportInfo.setIsFavourites(false);
-            new Thread(() -> DatabaseHelper.getPublicTransportDatabase().transportDao().updateFavourites(mCurrentTransportInfo)).start();
+            updateFavourites();
             mImageButtonFavouriteInfo.setImageResource(R.drawable.ic_favorite_gray_24_dp);
             return;
         }
         mCurrentTransportInfo.setIsFavourites(true);
-        new Thread(() -> DatabaseHelper.getPublicTransportDatabase().transportDao().updateFavourites(mCurrentTransportInfo)).start();
+        updateFavourites();
         mImageButtonFavouriteInfo.setImageResource(R.drawable.ic_favorite_blue_24_dp);
+    }
+
+    private void updateFavourites() {
+        Completable.defer(() -> Completable.fromCallable(this::updateFavouritesDB))
+                .subscribeOn(Schedulers.computation())
+                .subscribe(
+                        () -> {},
+                        throwable -> Logger.d(throwable.getMessage())
+                );
+    }
+
+    private boolean updateFavouritesDB() {
+        DatabaseHelper.getPublicTransportDatabase().transportDao().updateFavourites(mCurrentTransportInfo);
+        return true;
     }
 
     private void setOfflineMode(int code) {

@@ -1,12 +1,17 @@
 package com.provectus.public_transport.fragment.favouritesfragment;
 
-/**
- * Created by Psihey on 13.10.2017.
- */
+import com.provectus.public_transport.model.TransportEntity;
+
+import java.util.List;
+
 
 public interface FavouritesFragmentPresenter {
 
     void bindView(FavouritesFragment favouritesFragment);
 
     void unbindView();
+
+    void deleteFavourites(TransportEntity transportEntity);
+
+    void updateRecyclerView(List<TransportEntity> transportEntities);
 }

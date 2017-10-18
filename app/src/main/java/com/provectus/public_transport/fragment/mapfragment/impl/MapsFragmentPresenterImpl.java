@@ -19,8 +19,6 @@ import com.provectus.public_transport.persistence.database.DatabaseHelper;
 import com.provectus.public_transport.service.retrofit.RetrofitProvider;
 
 import org.greenrobot.eventbus.EventBus;
-import org.greenrobot.eventbus.Subscribe;
-import org.greenrobot.eventbus.ThreadMode;
 
 import java.net.ConnectException;
 import java.net.HttpURLConnection;
@@ -50,7 +48,7 @@ public class MapsFragmentPresenterImpl implements MapsFragmentPresenter {
     public void bindView(MapsFragment mapsFragment) {
         mMapsFragment = mapsFragment;
         Logger.d("Maps is binded to its presenter.");
-        EventBus.getDefault().register(this);
+        EventBus.getDefault().postSticky(new BusEvents.SendMapsFragmentPresenter(this));
     }
 
     @Override
@@ -63,30 +61,25 @@ public class MapsFragmentPresenterImpl implements MapsFragmentPresenter {
     }
 
     @Override
-    public void unregisteredEventBus() {
-        EventBus.getDefault().unregister(this);
-    }
-
-    @Subscribe(threadMode = ThreadMode.MAIN)
-    public void getRouteInfo(BusEvents.OpenRouteInformation event){
-        DatabaseHelper.getPublicTransportDatabase().transportDao().getAllTransports(event.getSelectRout().getServerId())
+    public void getRouteInformation(TransportEntity transportEntity) {
+        DatabaseHelper.getPublicTransportDatabase().transportDao().getAllTransports(transportEntity.getServerId())
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .doOnError(throwable -> Logger.d(throwable.getMessage()))
                 .subscribe(this::getAllTransportFromDB);
     }
 
-    @Subscribe(threadMode = ThreadMode.MAIN)
-    public void onMessageEvent(BusEvents.SendChosenRoute event) {
-        mIsSelectRoute = event.getSelectRout().isSelected();
-        String transportType = event.getSelectRout().getType().toString();
+    @Override
+    public void onSelectCurrentRoute(TransportEntity event) {
+        mIsSelectRoute = event.isSelected();
+        String transportType = event.getType().toString();
         if (transportType.equals(TransportType.TROLLEYBUSES_TYPE.name())) {
-            mTransportNumber = event.getSelectRout().getNumber() + TROLLEY_NUMBER_INCREMENT;
+            mTransportNumber = event.getNumber() + TROLLEY_NUMBER_INCREMENT;
         } else if (transportType.equals(TransportType.TRAM_TYPE.name())) {
-            mTransportNumber = event.getSelectRout().getNumber() + TRAM_NUMBER_INCREMENT;
+            mTransportNumber = event.getNumber() + TRAM_NUMBER_INCREMENT;
         }
-        mMapsFragment.getInfoTransport(mTransportNumber, event.getSelectRout().getServerId());
-        DatabaseHelper.getPublicTransportDatabase().transportDao().getTransportEntity(event.getSelectRout().getNumber(), transportType)
+        mMapsFragment.getInfoTransport(mTransportNumber, event.getServerId());
+        DatabaseHelper.getPublicTransportDatabase().transportDao().getTransportEntity(event.getNumber(), transportType)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .doOnError(throwable -> Logger.d(throwable.getMessage()))
@@ -94,12 +87,12 @@ public class MapsFragmentPresenterImpl implements MapsFragmentPresenter {
         if (mIsSelectRoute) {
             mMapsFragment.getColorForRoute();
             if (mMapsFragment.checkOnReadyMap()) {
-                DatabaseHelper.getPublicTransportDatabase().transportDao().getStopsForCurrentTransport(event.getSelectRout().getNumber(), transportType)
+                DatabaseHelper.getPublicTransportDatabase().transportDao().getStopsForCurrentTransport(event.getNumber(), transportType)
                         .subscribeOn(Schedulers.io())
                         .observeOn(AndroidSchedulers.mainThread())
                         .doOnError(throwable -> Logger.d(throwable.getMessage()))
                         .subscribe(this::getStopsFromDB);
-                DatabaseHelper.getPublicTransportDatabase().transportDao().getDirectionEntity(event.getSelectRout().getNumber(), transportType)
+                DatabaseHelper.getPublicTransportDatabase().transportDao().getDirectionEntity(event.getNumber(), transportType)
                         .subscribeOn(Schedulers.io())
                         .observeOn(AndroidSchedulers.mainThread())
                         .doOnError(throwable -> Logger.d(throwable.getMessage()))
@@ -201,5 +194,3 @@ public class MapsFragmentPresenterImpl implements MapsFragmentPresenter {
         }
     }
 }
-
-

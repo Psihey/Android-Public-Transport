@@ -13,13 +13,21 @@ import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import com.orhanobut.logger.Logger;
 import com.provectus.public_transport.R;
 import com.provectus.public_transport.adapter.TramsAndTrolleyAdapter;
+import com.provectus.public_transport.eventbus.BusEvents;
+import com.provectus.public_transport.fragment.favouritesfragment.FavouritesFragmentPresenter;
+import com.provectus.public_transport.fragment.mapfragment.MapsFragmentPresenter;
 import com.provectus.public_transport.fragment.routestabfragment.RoutesTabFragment;
 import com.provectus.public_transport.model.TransportEntity;
 import com.provectus.public_transport.model.converter.TransportType;
 import com.provectus.public_transport.service.TransportRoutesService;
 import com.provectus.public_transport.utils.Utils;
+
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 
 import java.util.List;
 
@@ -46,7 +54,9 @@ public class RoutesTabFragmentImpl extends Fragment implements RoutesTabFragment
     private RoutesTabFragmentPresenterImpl mTabFragmentPresenter;
     private TransportType mType;
     private Unbinder mUnbinder;
-    private TramsAndTrolleyAdapter mTramTrolleybusAdapter;
+    private  TramsAndTrolleyAdapter mTramTrolleybusAdapter;
+    private MapsFragmentPresenter mMapsFragmentPresenter;
+    private FavouritesFragmentPresenter mFavouritesFragmentPresenter;
 
     public static RoutesTabFragmentImpl newInstance(TransportType transportType) {
         RoutesTabFragmentImpl routesTabFragmentImpl = new RoutesTabFragmentImpl();
@@ -59,19 +69,22 @@ public class RoutesTabFragmentImpl extends Fragment implements RoutesTabFragment
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mType = (TransportType) getArguments().get(BUNDLE_TRANSPORT_TYPE);
+        if (getArguments() != null){
+            mType = (TransportType) getArguments().get(BUNDLE_TRANSPORT_TYPE);
+        }
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.tab_fragment, container, false);
         mUnbinder = ButterKnife.bind(this, view);
-        mRoutesRecyclerView.setVisibility(View.GONE);
         if (mTabFragmentPresenter == null) {
             mTabFragmentPresenter = new RoutesTabFragmentPresenterImpl();
         }
         mTabFragmentPresenter.bindView(this);
         mTabFragmentPresenter.setTransportType(mType);
+        mRoutesRecyclerView.setVisibility(View.GONE);
+        EventBus.getDefault().register(this);
         return view;
     }
 
@@ -83,15 +96,19 @@ public class RoutesTabFragmentImpl extends Fragment implements RoutesTabFragment
         }
         mTabFragmentPresenter.unregisteredEventBus();
         mTabFragmentPresenter.unbindView();
+        EventBus.getDefault().unregister(this);
     }
 
     @Override
     public void initRecyclerView(List<TransportEntity> transportEntity) {
         mRoutesRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-        mTramTrolleybusAdapter = new TramsAndTrolleyAdapter(getContext(), transportEntity);
+        Logger.d(mMapsFragmentPresenter);
+        Logger.d(mFavouritesFragmentPresenter);
+        mTramTrolleybusAdapter = new TramsAndTrolleyAdapter(getContext(), transportEntity, mMapsFragmentPresenter,mFavouritesFragmentPresenter);
         mRoutesRecyclerView.setAdapter(mTramTrolleybusAdapter);
         mProgressBarNoItem.setVisibility(View.GONE);
         setErrorVisible(View.GONE);
+        Logger.d(mTramTrolleybusAdapter);
     }
 
     @Override
@@ -109,18 +126,31 @@ public class RoutesTabFragmentImpl extends Fragment implements RoutesTabFragment
     public void serviceEndWorked() {
         mBtnLoading.setVisibility(View.GONE);
         mRoutesRecyclerView.setVisibility(View.VISIBLE);
+        Logger.d(mTramTrolleybusAdapter);
     }
 
     @Override
     public void updateData(TransportEntity transportEntity) {
+        Logger.d(mTramTrolleybusAdapter);
         if (mTramTrolleybusAdapter != null) {
             mTramTrolleybusAdapter.updateData(transportEntity);
         }
     }
 
+    @Subscribe(sticky = true,threadMode = ThreadMode.MAIN)
+    public void getMapsFragmentPresenter(BusEvents.SendMapsFragmentPresenter event) {
+        mMapsFragmentPresenter = event.getMapsFragmentPresenter();
+    }
+
+    @Subscribe(sticky = true,threadMode = ThreadMode.MAIN)
+    public void getFavouritesFragmentPresenter(BusEvents.SendFavouriteFragmentPresenter event) {
+        mFavouritesFragmentPresenter = event.getFavouritesFragmentPresenter();
+    }
+
     private void setErrorVisible(int visible) {
         mTextViewNoData.setVisibility(visible);
         mBtnUpdate.setVisibility(visible);
+        Logger.d(mTramTrolleybusAdapter);
     }
 
     private void startService() {

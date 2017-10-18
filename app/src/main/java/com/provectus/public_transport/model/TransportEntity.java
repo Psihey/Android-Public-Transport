@@ -154,4 +154,6 @@ public class TransportEntity {
                 ", mIsSelected=" + mIsSelected +
                 '}';
     }
+
+
 }

@@ -10,10 +10,9 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.provectus.public_transport.R;
-import com.provectus.public_transport.eventbus.BusEvents;
+import com.provectus.public_transport.fragment.favouritesfragment.FavouritesFragmentPresenter;
+import com.provectus.public_transport.fragment.mapfragment.MapsFragmentPresenter;
 import com.provectus.public_transport.model.TransportEntity;
-
-import org.greenrobot.eventbus.EventBus;
 
 import java.util.List;
 
@@ -25,10 +24,14 @@ public class TramsAndTrolleyAdapter extends RecyclerView.Adapter<TramsAndTrolley
     private static final float mItemViewTransparentNotAvailable = 0.4f;
     private List<TransportEntity> mTransportRoutesData;
     private Context mContext;
+    private MapsFragmentPresenter mMapsFragmentPresenter;
+    private FavouritesFragmentPresenter mFavouritesFragmentPresenter;
 
-    public TramsAndTrolleyAdapter(Context context, List<TransportEntity> data) {
+    public TramsAndTrolleyAdapter(Context context, List<TransportEntity> data, MapsFragmentPresenter mapsFragmentPresenter,FavouritesFragmentPresenter favouritesFragmentPresenter) {
         this.mContext = context;
         this.mTransportRoutesData = data;
+        this.mMapsFragmentPresenter = mapsFragmentPresenter;
+        this.mFavouritesFragmentPresenter = favouritesFragmentPresenter;
     }
 
     @Override
@@ -60,10 +63,11 @@ public class TramsAndTrolleyAdapter extends RecyclerView.Adapter<TramsAndTrolley
                 holder.itemView.setBackgroundColor(ContextCompat.getColor(mContext, R.color.colorBottomSheetSelectedBackground));
             }
 
-            EventBus.getDefault().post(new BusEvents.SendChosenRoute(transportRoutes));
-            EventBus.getDefault().post(new BusEvents.UpdateDataFavouritesRecyclerView(mTransportRoutesData));
+            mMapsFragmentPresenter.onSelectCurrentRoute(transportRoutes);
+            mFavouritesFragmentPresenter.updateRecyclerView(mTransportRoutesData);
         });
-        holder.mImageButtonRouteInfo.setOnClickListener(v -> EventBus.getDefault().post(new BusEvents.OpenRouteInformation(transportRoutes)));
+
+        holder.mImageButtonRouteInfo.setOnClickListener(v -> mMapsFragmentPresenter.getRouteInformation(transportRoutes));
     }
 
     @Override
