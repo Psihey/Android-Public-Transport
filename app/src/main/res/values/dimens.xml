@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="vehicles_detail_layout_margin_end">23.5dp</dimen>
+    <dimen name="vehicles_detail_layout_margin_start">20dp</dimen>
+    <dimen name="vehicles_detail_text_size_value">12sp</dimen>
+</resources>

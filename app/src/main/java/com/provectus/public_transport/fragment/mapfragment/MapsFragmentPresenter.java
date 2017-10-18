@@ -1,6 +1,8 @@
 package com.provectus.public_transport.fragment.mapfragment;
 
 
+import com.provectus.public_transport.model.TransportEntity;
+
 public interface MapsFragmentPresenter {
 
     /**
@@ -15,8 +17,7 @@ public interface MapsFragmentPresenter {
      */
     void unbindView();
 
-    /**
-     * A method which unregistered Event Bus event
-     */
-    void unregisteredEventBus();
+    void onSelectCurrentRoute(TransportEntity route);
+
+    void getRouteInformation(TransportEntity transportEntity);
 }

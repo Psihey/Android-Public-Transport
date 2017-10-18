@@ -1,6 +1,7 @@
 package com.provectus.public_transport.adapter;
 
-import android.support.v7.widget.AppCompatCheckBox;
+import android.content.Context;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -8,12 +9,10 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.orhanobut.logger.Logger;
 import com.provectus.public_transport.R;
-import com.provectus.public_transport.eventbus.BusEvents;
+import com.provectus.public_transport.fragment.favouritesfragment.FavouritesFragmentPresenter;
+import com.provectus.public_transport.fragment.mapfragment.MapsFragmentPresenter;
 import com.provectus.public_transport.model.TransportEntity;
-
-import org.greenrobot.eventbus.EventBus;
 
 import java.util.List;
 
@@ -21,45 +20,54 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 
 public class TramsAndTrolleyAdapter extends RecyclerView.Adapter<TramsAndTrolleyAdapter.TramsAndTrolleyViewHolder> {
+    private static final float mItemViewTransparentAvailable = 1;
+    private static final float mItemViewTransparentNotAvailable = 0.4f;
     private List<TransportEntity> mTransportRoutesData;
+    private Context mContext;
+    private MapsFragmentPresenter mMapsFragmentPresenter;
+    private FavouritesFragmentPresenter mFavouritesFragmentPresenter;
 
-    public TramsAndTrolleyAdapter(List<TransportEntity> data) {
+    public TramsAndTrolleyAdapter(Context context, List<TransportEntity> data, MapsFragmentPresenter mapsFragmentPresenter,FavouritesFragmentPresenter favouritesFragmentPresenter) {
+        this.mContext = context;
         this.mTransportRoutesData = data;
+        this.mMapsFragmentPresenter = mapsFragmentPresenter;
+        this.mFavouritesFragmentPresenter = favouritesFragmentPresenter;
     }
 
     @Override
     public TramsAndTrolleyViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View rootView = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_bundle_tram_trolleybus, parent, false);
-
         return new TramsAndTrolleyViewHolder(rootView);
     }
 
     @Override
     public void onBindViewHolder(TramsAndTrolleyViewHolder holder, int position) {
-        final TransportEntity transportRoutes = mTransportRoutesData.get(position);
+        TransportEntity transportRoutes = mTransportRoutesData.get(position);
+        holder.mTvRoutesNumber.setText(mContext.getResources().getString(R.string.text_view_item_tram_trooley_transport_number, String.valueOf(mTransportRoutesData.get(position).getNumber())));
+        holder.itemView.setOnFocusChangeListener((v, hasFocus) -> transportRoutes.setIsSelected(hasFocus));
 
-        switch (transportRoutes.getType()) {
-            case TRAM_TYPE:
-                holder.ivLogoTransport.setImageResource(R.drawable.ic_tram_gray_24_dp);
-                break;
-            case TROLLEYBUSES_TYPE:
-                holder.ivLogoTransport.setImageResource(R.drawable.ic_trolley_gray_24_dp);
-                break;
-            default:
-                Logger.d("TransportEntity Type is Invalid");
-                break;
+        setItemViewCondition(holder.itemView, transportRoutes);
+
+        if (transportRoutes.isSelected()) {
+            holder.itemView.setBackgroundColor(ContextCompat.getColor(mContext, R.color.colorBottomSheetSelectedBackground));
+        } else {
+            holder.itemView.setBackgroundColor(ContextCompat.getColor(mContext, R.color.colorBottomSheetBackground));
         }
 
-        holder.tvRoutesNumber.setText(String.valueOf(mTransportRoutesData.get(position).getNumber()));
+        holder.itemView.setOnClickListener(v -> {
+            if (transportRoutes.isSelected()) {
+                transportRoutes.setIsSelected(false);
+                holder.itemView.setBackgroundColor(ContextCompat.getColor(mContext, R.color.colorBottomSheetBackground));
+            } else {
+                transportRoutes.setIsSelected(true);
+                holder.itemView.setBackgroundColor(ContextCompat.getColor(mContext, R.color.colorBottomSheetSelectedBackground));
+            }
 
+            mMapsFragmentPresenter.onSelectCurrentRoute(transportRoutes);
+            mFavouritesFragmentPresenter.updateRecyclerView(mTransportRoutesData);
+        });
 
-        holder.checkBoxSelectRout.setOnCheckedChangeListener(null);
-        holder.checkBoxSelectRout.setChecked(transportRoutes.isSelected());
-        holder.checkBoxSelectRout.setOnCheckedChangeListener((buttonView, isChecked) -> transportRoutes.setIsSelected(isChecked));
-        if (!transportRoutes.isAvailable()){
-            holder.checkBoxSelectRout.setVisibility(View.INVISIBLE);
-        }else  holder.checkBoxSelectRout.setVisibility(View.VISIBLE);
-        holder.checkBoxSelectRout.setOnClickListener(view -> EventBus.getDefault().post(new BusEvents.SendChosenRouter(transportRoutes)));
+        holder.mImageButtonRouteInfo.setOnClickListener(v -> mMapsFragmentPresenter.getRouteInformation(transportRoutes));
     }
 
     @Override
@@ -67,13 +75,31 @@ public class TramsAndTrolleyAdapter extends RecyclerView.Adapter<TramsAndTrolley
         return mTransportRoutesData.size();
     }
 
+
+    private void setItemViewCondition(View itemView, TransportEntity transportEntity) {
+        if (!transportEntity.isAvailable()) {
+            itemView.setEnabled(false);
+            itemView.setAlpha(mItemViewTransparentNotAvailable);
+        } else {
+            itemView.setEnabled(true);
+            itemView.setAlpha(mItemViewTransparentAvailable);
+        }
+    }
+
+    public void updateData(TransportEntity transportRoute) {
+        for (TransportEntity currentEntity : mTransportRoutesData) {
+            if (currentEntity.getServerId() == transportRoute.getServerId()) {
+                currentEntity.setIsSelected(transportRoute.isSelected());
+            }
+            notifyDataSetChanged();
+        }
+    }
+
     class TramsAndTrolleyViewHolder extends RecyclerView.ViewHolder {
-        @BindView(R.id.text_view_number_routes)
-        TextView tvRoutesNumber;
-        @BindView(R.id.image_view_logo_transport)
-        ImageView ivLogoTransport;
-        @BindView(R.id.checkbox_select_rout)
-        AppCompatCheckBox checkBoxSelectRout;
+        @BindView(R.id.text_view_item_tram_trooley_transport_number)
+        TextView mTvRoutesNumber;
+        @BindView(R.id.image_button_route_info)
+        ImageView mImageButtonRouteInfo;
 
         TramsAndTrolleyViewHolder(View itemView) {
             super(itemView);

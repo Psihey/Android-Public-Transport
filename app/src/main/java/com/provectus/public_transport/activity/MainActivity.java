@@ -18,5 +18,4 @@ public class MainActivity extends AppCompatActivity {
         getSupportFragmentManager().beginTransaction().replace(R.id.container_fragment_map,
                 new MapsFragmentImpl(), MapsFragmentImpl.TAG_MAP_FRAGMENT).commit();
     }
-
 }

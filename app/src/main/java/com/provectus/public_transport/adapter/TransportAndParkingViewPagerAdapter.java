@@ -4,8 +4,10 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 
-import com.provectus.public_transport.fragment.routestabfragment.impl.RoutesTabFragmentImpl;
-import com.provectus.public_transport.model.converter.TransportType;
+import com.provectus.public_transport.fragment.ParkingFragment;
+import com.provectus.public_transport.fragment.routestabfragment.impl.TramFragmentImpl;
+import com.provectus.public_transport.fragment.routestabfragment.impl.TrolleybusFragmentImpl;
+import com.provectus.public_transport.fragment.favouritesfragment.impl.FavouritesFragmentImpl;
 
 public class TransportAndParkingViewPagerAdapter extends FragmentPagerAdapter {
 
@@ -18,10 +20,10 @@ public class TransportAndParkingViewPagerAdapter extends FragmentPagerAdapter {
 
     public TransportAndParkingViewPagerAdapter(FragmentManager fm) {
         super(fm);
-        fragments[POSITION_BUS] = RoutesTabFragmentImpl.newInstance(TransportType.TROLLEYBUSES_TYPE);
-        fragments[POSITION_TRAM] = RoutesTabFragmentImpl.newInstance(TransportType.TRAM_TYPE);
-        fragments[POSITION_PARKING] = RoutesTabFragmentImpl.newInstance(TransportType.PARKING_TYPE);
-        fragments[POSITION_FAVOURITES] = RoutesTabFragmentImpl.newInstance(TransportType.PARKING_TYPE);
+        fragments[POSITION_BUS] = new TrolleybusFragmentImpl();
+        fragments[POSITION_TRAM] = new TramFragmentImpl();
+        fragments[POSITION_PARKING] =  new ParkingFragment();
+        fragments[POSITION_FAVOURITES] = new FavouritesFragmentImpl();
     }
 
     @Override

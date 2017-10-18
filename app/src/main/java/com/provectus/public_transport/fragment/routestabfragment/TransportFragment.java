@@ -5,7 +5,7 @@ import com.provectus.public_transport.service.TransportRoutesService;
 
 import java.util.List;
 
-public interface RoutesTabFragment {
+public interface TransportFragment {
     /**
      * A method which creates recyclerview
      *
@@ -23,4 +23,6 @@ public interface RoutesTabFragment {
      * A method which hides loading button, and show recyclerview
      */
     void serviceEndWorked();
+
+    void updateData(TransportEntity transportEntity);
 }

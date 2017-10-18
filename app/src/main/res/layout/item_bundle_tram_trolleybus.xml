@@ -6,27 +6,23 @@
     android:paddingLeft="16dp"
     android:paddingRight="16dp">
     
-    <ImageView
-        android:id="@+id/image_view_logo_transport"
-        android:layout_width="36dp"
-        android:layout_height="36dp"
-        android:layout_centerVertical="true"
-        android:layout_alignParentStart="true"
-        app:srcCompat="@drawable/ic_tram_gray_24_dp"/>
-
     <TextView
-        android:id="@+id/text_view_number_routes"
-        android:layout_width="match_parent"
-        android:layout_height="24dp"
-        android:layout_marginLeft="56dp"
-        android:layout_centerVertical="true"
-        android:layout_alignParentEnd="true"
-        android:textSize="16sp"/>
-
-    <android.support.v7.widget.AppCompatCheckBox
-        android:id="@+id/checkbox_select_rout"
+        android:id="@+id/text_view_item_tram_trooley_transport_number"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentRight="true"/>
+        android:layout_centerVertical="true"
+        android:layout_alignParentStart="true"
+        android:layout_marginStart="14dp"
+        android:text="@string/text_view_item_tram_trooley_transport_number"
+        android:textColor="@color/text_item_view"/>
+
+    <ImageView
+        android:id="@+id/image_button_route_info"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:layout_marginTop="11dp"
+        android:layout_marginEnd="14dp"
+        android:layout_alignParentEnd="true"
+        app:srcCompat="@drawable/ic_info_outline_black_24dp" />
 
 </RelativeLayout>

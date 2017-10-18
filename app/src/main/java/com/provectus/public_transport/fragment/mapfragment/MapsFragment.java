@@ -2,6 +2,7 @@ package com.provectus.public_transport.fragment.mapfragment;
 
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PolylineOptions;
+import com.provectus.public_transport.model.TransportEntity;
 import com.provectus.public_transport.model.VehicleMarkerInfoModel;
 import com.provectus.public_transport.model.VehiclesModel;
 
@@ -32,8 +33,10 @@ public interface MapsFragment {
 
     void removeRoutesWithDirectionFromMap();
 
-    void getVehiclesFullInfo(VehicleMarkerInfoModel vehicleMarkerInfoModel);
+    void openVehicleInfo(VehicleMarkerInfoModel vehicleMarkerInfoModel);
 
     void routeNotSelected();
+
+    void openRouteInfo(TransportEntity transportEntity);
 
 }

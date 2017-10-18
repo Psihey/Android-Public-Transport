@@ -9,8 +9,6 @@ import com.provectus.public_transport.model.StopEntity;
 
 import java.util.List;
 
-import io.reactivex.Flowable;
-
 
 @Dao
 public interface StopDao {
@@ -20,9 +18,6 @@ public interface StopDao {
 
     @Query("DELETE FROM stopping")
     void deleteAll();
-
-    @Query("SELECT * FROM stopping")
-    Flowable<List<StopEntity>> getAllStop();
 
     @Delete()
     void deleteAll(List<StopEntity> stopEntities);
