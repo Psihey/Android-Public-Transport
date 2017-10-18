@@ -2,10 +2,7 @@ package com.provectus.public_transport.fragment.routestabfragment.impl;
 
 import com.orhanobut.logger.Logger;
 import com.provectus.public_transport.eventbus.BusEvents;
-import com.provectus.public_transport.fragment.routestabfragment.RoutesTabFragment;
-import com.provectus.public_transport.fragment.routestabfragment.RoutesTabFragmentPresenter;
 import com.provectus.public_transport.model.TransportEntity;
-import com.provectus.public_transport.model.converter.TransportType;
 import com.provectus.public_transport.persistence.database.DatabaseHelper;
 
 import org.greenrobot.eventbus.EventBus;
@@ -20,29 +17,22 @@ import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
 
 
-public class RoutesTabFragmentPresenterImpl implements RoutesTabFragmentPresenter {
-
-    private RoutesTabFragment mRoutesTabFragment;
-    private TransportType mTransportType;
+public class TramFragmentPresenterImpl implements com.provectus.public_transport.fragment.routestabfragment.TramFragmentPresenter {
+    private TramFragmentImpl mTramFragment;
 
     @Override
-    public void bindView(RoutesTabFragment routesTabFragment) {
-        mRoutesTabFragment = routesTabFragment;
+    public void bindView(TramFragmentImpl tramFragment) {
+        mTramFragment = tramFragment;
         EventBus.getDefault().register(this);
-        EventBus.getDefault().postSticky(new BusEvents.SendRoutesTabFragmentPresenter(this));
+        EventBus.getDefault().postSticky(new BusEvents.SendTramFragmentPresenter(this));
+        getDataFromDB();
         Logger.d("RoutesTab is binded to its presenter.");
     }
 
     @Override
     public void unbindView() {
-        mRoutesTabFragment = null;
+        mTramFragment = null;
         Logger.d("RoutesTab is unbind from presenter");
-    }
-
-    @Override
-    public void setTransportType(TransportType transportType) {
-        mTransportType = transportType;
-        getDataFromDB();
     }
 
     @Override
@@ -52,7 +42,7 @@ public class RoutesTabFragmentPresenterImpl implements RoutesTabFragmentPresente
 
     @Override
     public void getDataForUpdateRecyclerView(TransportEntity transportEntity) {
-        mRoutesTabFragment.updateData(transportEntity);
+        mTramFragment.updateData(transportEntity);
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
@@ -62,11 +52,10 @@ public class RoutesTabFragmentPresenterImpl implements RoutesTabFragmentPresente
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void getUpdateDBEvent(BusEvents.ServiceEndWorked service) {
-        mRoutesTabFragment.serviceEndWorked();
+        mTramFragment.serviceEndWorked();
     }
 
     private void getDataFromDB() {
-        if (mTransportType == TransportType.TRAM_TYPE) {
             DatabaseHelper.getPublicTransportDatabase().transportDao().getAllTram()
                     .map(list -> {
                         Collections.sort(list, sortByNumber);
@@ -76,28 +65,17 @@ public class RoutesTabFragmentPresenterImpl implements RoutesTabFragmentPresente
                     .observeOn(AndroidSchedulers.mainThread())
                     .doOnError(throwable -> Logger.d(throwable.getMessage()))
                     .subscribe(this::getTransportFromDB);
-        } else if (mTransportType == TransportType.TROLLEYBUSES_TYPE) {
-            DatabaseHelper.getPublicTransportDatabase().transportDao().getAllTrolleybuses()
-                    .map(list -> {
-                        Collections.sort(list, sortByNumber);
-                        return list;
-                    })
-                    .subscribeOn(Schedulers.io())
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .doOnError(throwable -> Logger.d(throwable.getMessage()))
-                    .subscribe(this::getTransportFromDB);
-        }
     }
 
     private void getTransportFromDB(List<TransportEntity> transportEntities) {
-        if (mRoutesTabFragment == null) {
+        if (mTramFragment == null) {
             return;
         }
         if (transportEntities != null && !transportEntities.isEmpty()) {
-            mRoutesTabFragment.initRecyclerView(transportEntities);
-            mRoutesTabFragment.serviceEndWorked();
+            mTramFragment.initRecyclerView(transportEntities);
+            mTramFragment.serviceEndWorked();
         } else {
-            mRoutesTabFragment.checkMyServiceRunning();
+            mTramFragment.checkMyServiceRunning();
 
         }
 

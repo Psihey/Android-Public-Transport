@@ -13,10 +13,11 @@ import com.orhanobut.logger.Logger;
 import com.provectus.public_transport.R;
 import com.provectus.public_transport.adapter.FavouritesSectionAdapter;
 import com.provectus.public_transport.eventbus.BusEvents;
+import com.provectus.public_transport.fragment.routestabfragment.impl.TrolleybusFragmentPresenterImpl;
 import com.provectus.public_transport.fragment.favouritesfragment.FavouritesFragment;
 import com.provectus.public_transport.fragment.favouritesfragment.FavouritesFragmentPresenter;
 import com.provectus.public_transport.fragment.mapfragment.MapsFragmentPresenter;
-import com.provectus.public_transport.fragment.routestabfragment.RoutesTabFragmentPresenter;
+import com.provectus.public_transport.fragment.routestabfragment.TramFragmentPresenter;
 import com.provectus.public_transport.model.TransportEntity;
 import com.provectus.public_transport.model.converter.TransportType;
 import com.provectus.public_transport.utils.Const;
@@ -42,7 +43,8 @@ public class FavouritesFragmentImpl extends Fragment implements FavouritesFragme
     private FavouritesSectionAdapter mTramSection;
     private FavouritesSectionAdapter mTrolleybusSection;
     private MapsFragmentPresenter mMapsFragmentPresenter;
-    private RoutesTabFragmentPresenter mRoutesTabFragmentPresenter;
+    private TramFragmentPresenter mRoutesTabFragmentPresenter;
+    private TrolleybusFragmentPresenterImpl trolleybusFragmentPresenter;
 
     @Nullable
     @Override
@@ -83,8 +85,8 @@ public class FavouritesFragmentImpl extends Fragment implements FavouritesFragme
         }
 
         mFavouritesRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-        mTramSection = new FavouritesSectionAdapter(getContext(), Const.TransportType.TRAMS, tramSection, mSectionAdapter, mMapsFragmentPresenter,mFavouritesFragmentPresenter,mRoutesTabFragmentPresenter);
-        mTrolleybusSection = new FavouritesSectionAdapter(getContext(), Const.TransportType.TROLLEYBUSES, trolleybusSection, mSectionAdapter, mMapsFragmentPresenter,mFavouritesFragmentPresenter,mRoutesTabFragmentPresenter);
+        mTramSection = new FavouritesSectionAdapter(getContext(), Const.TransportType.TRAMS, tramSection, mSectionAdapter, mMapsFragmentPresenter,mFavouritesFragmentPresenter,mRoutesTabFragmentPresenter,trolleybusFragmentPresenter);
+        mTrolleybusSection = new FavouritesSectionAdapter(getContext(), Const.TransportType.TROLLEYBUSES, trolleybusSection, mSectionAdapter, mMapsFragmentPresenter,mFavouritesFragmentPresenter,mRoutesTabFragmentPresenter,trolleybusFragmentPresenter);
 
         mSectionAdapter.addSection(mTramSection);
         mSectionAdapter.addSection(mTrolleybusSection);
@@ -113,7 +115,12 @@ public class FavouritesFragmentImpl extends Fragment implements FavouritesFragme
     }
 
     @Subscribe(sticky = true,threadMode = ThreadMode.MAIN)
-    public void getRoutesTabFragmentPresenter(BusEvents.SendRoutesTabFragmentPresenter event) {
+    public void getRoutesTabFragmentPresenter(BusEvents.SendTramFragmentPresenter event) {
         mRoutesTabFragmentPresenter = event.getRoutesTabFragmentPresenter();
+    }
+
+    @Subscribe(sticky = true,threadMode = ThreadMode.MAIN)
+    public void getTrolleyBusTabFragmentPresenter(BusEvents.SendTrolleybusFragmentPresenter event) {
+        trolleybusFragmentPresenter = event.getTrolleybusFragmentPresenter();
     }
 }

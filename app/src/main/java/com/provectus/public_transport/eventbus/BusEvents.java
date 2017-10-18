@@ -1,8 +1,9 @@
 package com.provectus.public_transport.eventbus;
 
+import com.provectus.public_transport.fragment.routestabfragment.impl.TramFragmentPresenterImpl;
+import com.provectus.public_transport.fragment.routestabfragment.impl.TrolleybusFragmentPresenterImpl;
 import com.provectus.public_transport.fragment.favouritesfragment.FavouritesFragmentPresenter;
 import com.provectus.public_transport.fragment.mapfragment.MapsFragmentPresenter;
-import com.provectus.public_transport.fragment.routestabfragment.RoutesTabFragmentPresenter;
 import com.provectus.public_transport.model.TransportEntity;
 
 
@@ -62,15 +63,27 @@ public class BusEvents {
         }
     }
 
-    public static class SendRoutesTabFragmentPresenter{
-        private RoutesTabFragmentPresenter mRoutesTabFragmentPresenter;
+    public static class SendTramFragmentPresenter {
+        private TramFragmentPresenterImpl mTramFragmentPresenter;
 
-        public SendRoutesTabFragmentPresenter(RoutesTabFragmentPresenter mRoutesTabFragmentPresenter) {
-            this.mRoutesTabFragmentPresenter = mRoutesTabFragmentPresenter;
+        public SendTramFragmentPresenter(TramFragmentPresenterImpl mRoutesTabFragmentPresenter) {
+            this.mTramFragmentPresenter = mRoutesTabFragmentPresenter;
         }
 
-        public RoutesTabFragmentPresenter getRoutesTabFragmentPresenter() {
-            return mRoutesTabFragmentPresenter;
+        public TramFragmentPresenterImpl getRoutesTabFragmentPresenter() {
+            return mTramFragmentPresenter;
+        }
+    }
+
+    public static class SendTrolleybusFragmentPresenter {
+        private TrolleybusFragmentPresenterImpl trolleybusFragmentPresenter;
+
+        public SendTrolleybusFragmentPresenter(TrolleybusFragmentPresenterImpl trolleybusFragmentPresenter) {
+            this.trolleybusFragmentPresenter = trolleybusFragmentPresenter;
+        }
+
+        public TrolleybusFragmentPresenterImpl getTrolleybusFragmentPresenter() {
+            return trolleybusFragmentPresenter;
         }
     }
 }

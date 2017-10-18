@@ -8,10 +8,12 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.provectus.public_transport.R;
+import com.provectus.public_transport.fragment.routestabfragment.impl.TrolleybusFragmentPresenterImpl;
 import com.provectus.public_transport.fragment.favouritesfragment.FavouritesFragmentPresenter;
 import com.provectus.public_transport.fragment.mapfragment.MapsFragmentPresenter;
-import com.provectus.public_transport.fragment.routestabfragment.RoutesTabFragmentPresenter;
+import com.provectus.public_transport.fragment.routestabfragment.TramFragmentPresenter;
 import com.provectus.public_transport.model.TransportEntity;
+import com.provectus.public_transport.model.converter.TransportType;
 import com.provectus.public_transport.utils.Const;
 
 import java.util.List;
@@ -29,7 +31,8 @@ public class FavouritesSectionAdapter extends StatelessSection {
     private Context mContext;
     private MapsFragmentPresenter mMapsFragmentPresenter;
     private FavouritesFragmentPresenter mFavouritesFragmentPresenter;
-    private RoutesTabFragmentPresenter mRoutesTabFragmentPresenter;
+    private TramFragmentPresenter mTramFragmentPresenter;
+    private TrolleybusFragmentPresenterImpl mTrolleybusFragmentPresenter;
 
     public FavouritesSectionAdapter(Context context,
                                     String title,
@@ -37,7 +40,8 @@ public class FavouritesSectionAdapter extends StatelessSection {
                                     SectionedRecyclerViewAdapter sectionAdapter,
                                     MapsFragmentPresenter mapsFragmentPresenter,
                                     FavouritesFragmentPresenter favouritesFragmentPresenter,
-                                    RoutesTabFragmentPresenter routesTabFragmentPresenter) {
+                                    TramFragmentPresenter routesTabFragmentPresenter,
+                                    TrolleybusFragmentPresenterImpl trolleybusFragmentPresenter) {
         super(new SectionParameters.Builder(R.layout.item_item_bundle_favourites_tram_trolleybus)
                 .headerResourceId(R.layout.item_header_bundle_favourites_tram_trolleybus)
                 .build());
@@ -47,7 +51,8 @@ public class FavouritesSectionAdapter extends StatelessSection {
         this.mSectionAdapter = sectionAdapter;
         this.mMapsFragmentPresenter = mapsFragmentPresenter;
         this.mFavouritesFragmentPresenter = favouritesFragmentPresenter;
-        this.mRoutesTabFragmentPresenter = routesTabFragmentPresenter;
+        this.mTramFragmentPresenter = routesTabFragmentPresenter;
+        this.mTrolleybusFragmentPresenter = trolleybusFragmentPresenter;
     }
 
     @Override
@@ -85,8 +90,13 @@ public class FavouritesSectionAdapter extends StatelessSection {
                 holder.itemView.setBackgroundColor(ContextCompat.getColor(mContext, R.color.colorBottomSheetSelectedBackground));
             }
 
+            if (currentRoute.getType() == TransportType.TROLLEYBUSES_TYPE){
+                mTrolleybusFragmentPresenter.getDataForUpdateRecyclerView(currentRoute);
+            }else {
+                mTramFragmentPresenter.getDataForUpdateRecyclerView(currentRoute);
+            }
             mMapsFragmentPresenter.onSelectCurrentRoute(currentRoute);
-            mRoutesTabFragmentPresenter.getDataForUpdateRecyclerView(currentRoute);
+
         });
     }
 

@@ -2,7 +2,6 @@ package com.provectus.public_transport.fragment.routestabfragment.impl;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -19,9 +18,9 @@ import com.provectus.public_transport.adapter.TramsAndTrolleyAdapter;
 import com.provectus.public_transport.eventbus.BusEvents;
 import com.provectus.public_transport.fragment.favouritesfragment.FavouritesFragmentPresenter;
 import com.provectus.public_transport.fragment.mapfragment.MapsFragmentPresenter;
-import com.provectus.public_transport.fragment.routestabfragment.RoutesTabFragment;
+import com.provectus.public_transport.fragment.routestabfragment.TransportFragment;
+import com.provectus.public_transport.fragment.routestabfragment.TramFragmentPresenter;
 import com.provectus.public_transport.model.TransportEntity;
-import com.provectus.public_transport.model.converter.TransportType;
 import com.provectus.public_transport.service.TransportRoutesService;
 import com.provectus.public_transport.utils.Utils;
 
@@ -36,9 +35,7 @@ import butterknife.ButterKnife;
 import butterknife.Unbinder;
 
 
-public class RoutesTabFragmentImpl extends Fragment implements RoutesTabFragment {
-
-    private static final String BUNDLE_TRANSPORT_TYPE = "transport_type";
+public class TramFragmentImpl extends Fragment implements TransportFragment {
 
     @BindView(R.id.recycler_view_routes)
     RecyclerView mRoutesRecyclerView;
@@ -51,46 +48,23 @@ public class RoutesTabFragmentImpl extends Fragment implements RoutesTabFragment
     @BindView(R.id.tv_wait_for_loading)
     TextView mBtnLoading;
 
-    private RoutesTabFragmentPresenterImpl mTabFragmentPresenter;
-    private TransportType mType;
+    private TramFragmentPresenter mTabFragmentPresenter;
     private Unbinder mUnbinder;
     private TramsAndTrolleyAdapter mTramTrolleybusAdapter;
     private MapsFragmentPresenter mMapsFragmentPresenter;
     private FavouritesFragmentPresenter mFavouritesFragmentPresenter;
-
-    public static RoutesTabFragmentImpl newInstance(TransportType transportType) {
-        RoutesTabFragmentImpl routesTabFragmentImpl = new RoutesTabFragmentImpl();
-        Bundle bundle = new Bundle();
-        bundle.putSerializable(BUNDLE_TRANSPORT_TYPE, transportType);
-        routesTabFragmentImpl.setArguments(bundle);
-        return routesTabFragmentImpl;
-    }
-
-    @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            mType = (TransportType) getArguments().get(BUNDLE_TRANSPORT_TYPE);
-        }
-    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.tab_fragment, container, false);
         mUnbinder = ButterKnife.bind(this, view);
         if (mTabFragmentPresenter == null) {
-            mTabFragmentPresenter = new RoutesTabFragmentPresenterImpl();
+            mTabFragmentPresenter = new TramFragmentPresenterImpl();
         }
         mTabFragmentPresenter.bindView(this);
-        mTabFragmentPresenter.setTransportType(mType);
         mRoutesRecyclerView.setVisibility(View.GONE);
         EventBus.getDefault().register(this);
         return view;
-    }
-
-    @Override
-    public void onPause() {
-        super.onPause();
     }
 
     @Override
@@ -133,10 +107,9 @@ public class RoutesTabFragmentImpl extends Fragment implements RoutesTabFragment
 
     @Override
     public void updateData(TransportEntity transportEntity) {
-        Logger.d(mTramTrolleybusAdapter);
-        if (mTramTrolleybusAdapter != null) {
-            mTramTrolleybusAdapter.updateData(transportEntity);
-        }
+            if (mTramTrolleybusAdapter != null) {
+                mTramTrolleybusAdapter.updateData(transportEntity);
+            }
     }
 
     @Subscribe(sticky = true, threadMode = ThreadMode.MAIN)
@@ -160,5 +133,4 @@ public class RoutesTabFragmentImpl extends Fragment implements RoutesTabFragment
         getActivity().startService(new Intent(getActivity(), TransportRoutesService.class));
         mProgressBarNoItem.setVisibility(View.VISIBLE);
     }
-
 }
