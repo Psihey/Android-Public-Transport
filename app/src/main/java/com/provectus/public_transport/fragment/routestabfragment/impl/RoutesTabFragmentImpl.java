@@ -54,7 +54,7 @@ public class RoutesTabFragmentImpl extends Fragment implements RoutesTabFragment
     private RoutesTabFragmentPresenterImpl mTabFragmentPresenter;
     private TransportType mType;
     private Unbinder mUnbinder;
-    private  TramsAndTrolleyAdapter mTramTrolleybusAdapter;
+    private TramsAndTrolleyAdapter mTramTrolleybusAdapter;
     private MapsFragmentPresenter mMapsFragmentPresenter;
     private FavouritesFragmentPresenter mFavouritesFragmentPresenter;
 
@@ -69,7 +69,7 @@ public class RoutesTabFragmentImpl extends Fragment implements RoutesTabFragment
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (getArguments() != null){
+        if (getArguments() != null) {
             mType = (TransportType) getArguments().get(BUNDLE_TRANSPORT_TYPE);
         }
     }
@@ -89,6 +89,11 @@ public class RoutesTabFragmentImpl extends Fragment implements RoutesTabFragment
     }
 
     @Override
+    public void onPause() {
+        super.onPause();
+    }
+
+    @Override
     public void onDestroyView() {
         super.onDestroyView();
         if (mUnbinder != null) {
@@ -102,9 +107,7 @@ public class RoutesTabFragmentImpl extends Fragment implements RoutesTabFragment
     @Override
     public void initRecyclerView(List<TransportEntity> transportEntity) {
         mRoutesRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-        Logger.d(mMapsFragmentPresenter);
-        Logger.d(mFavouritesFragmentPresenter);
-        mTramTrolleybusAdapter = new TramsAndTrolleyAdapter(getContext(), transportEntity, mMapsFragmentPresenter,mFavouritesFragmentPresenter);
+        mTramTrolleybusAdapter = new TramsAndTrolleyAdapter(getContext(), transportEntity, mMapsFragmentPresenter, mFavouritesFragmentPresenter);
         mRoutesRecyclerView.setAdapter(mTramTrolleybusAdapter);
         mProgressBarNoItem.setVisibility(View.GONE);
         setErrorVisible(View.GONE);
@@ -126,7 +129,6 @@ public class RoutesTabFragmentImpl extends Fragment implements RoutesTabFragment
     public void serviceEndWorked() {
         mBtnLoading.setVisibility(View.GONE);
         mRoutesRecyclerView.setVisibility(View.VISIBLE);
-        Logger.d(mTramTrolleybusAdapter);
     }
 
     @Override
@@ -137,12 +139,12 @@ public class RoutesTabFragmentImpl extends Fragment implements RoutesTabFragment
         }
     }
 
-    @Subscribe(sticky = true,threadMode = ThreadMode.MAIN)
+    @Subscribe(sticky = true, threadMode = ThreadMode.MAIN)
     public void getMapsFragmentPresenter(BusEvents.SendMapsFragmentPresenter event) {
         mMapsFragmentPresenter = event.getMapsFragmentPresenter();
     }
 
-    @Subscribe(sticky = true,threadMode = ThreadMode.MAIN)
+    @Subscribe(sticky = true, threadMode = ThreadMode.MAIN)
     public void getFavouritesFragmentPresenter(BusEvents.SendFavouriteFragmentPresenter event) {
         mFavouritesFragmentPresenter = event.getFavouritesFragmentPresenter();
     }
