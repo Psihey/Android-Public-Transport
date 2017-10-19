@@ -286,7 +286,7 @@ public class MapsFragmentImpl extends Fragment
     public void getInfoTransport(int transportNumber, long transportId) {
         mTransportNumber = transportNumber;
         mTransportId = transportId;
-        mHandler.post(() ->  mBottomSheetRouteInfo.setState(BottomSheetBehavior.STATE_HIDDEN));
+        mHandler.post(() -> mBottomSheetRouteInfo.setState(BottomSheetBehavior.STATE_HIDDEN));
     }
 
     @Override
@@ -400,14 +400,14 @@ public class MapsFragmentImpl extends Fragment
             mImageViewRouteInfoIcon.setImageResource(R.drawable.ic_trolley_gray_24_dp);
         }
         mTextViewRouteInfoNumber.setText(getResources().getString(R.string.text_view_route_number, transportEntity.getNumber()));
-        mTextViewRouteInfoDistance.setText(getResources().getString(R.string.text_view_transport_route_distance, Double.toString(transportEntity.getDistance())));
+        mTextViewRouteInfoDistance.setText(getResources().getString(R.string.text_view_transport_route_distance, String.valueOf(transportEntity.getDistance())));
         mTextViewRouteInfoType.setText(transportType);
         if (transportEntity.isFavourites()) {
             mImageButtonFavouriteInfo.setImageResource(R.drawable.ic_favorite_blue_24_dp);
         } else {
             mImageButtonFavouriteInfo.setImageResource(R.drawable.ic_favorite_gray_24_dp);
         }
-        mTextViewRouteInfoFee.setText(getResources().getString(R.string.text_view_transport_fee, Double.toString(transportEntity.getCost())));
+        mTextViewRouteInfoFee.setText(getResources().getString(R.string.text_view_transport_fee, String.valueOf(transportEntity.getCost())));
     }
 
     @OnClick(R.id.ib_route_info_favorite_icon)
@@ -482,7 +482,7 @@ public class MapsFragmentImpl extends Fragment
 
             @Override
             public void onSlide(@NonNull View view, float v) {
-
+                //Ignore
             }
         });
         mBottomSheetTabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
@@ -494,7 +494,7 @@ public class MapsFragmentImpl extends Fragment
 
             @Override
             public void onTabUnselected(TabLayout.Tab tab) {
-
+                //Ignore
             }
 
             @Override
@@ -556,14 +556,14 @@ public class MapsFragmentImpl extends Fragment
                     mImageViewTransportIcon.setImageResource(R.drawable.ic_trolley_gray_24_dp);
                 }
                 mTextViewTransportType.setText(transportType);
-                mTextViewTransportFee.setText(getResources().getString(R.string.text_view_transport_fee, Double.toString(vehiclesModel.getCost())));
+                mTextViewTransportFee.setText(getResources().getString(R.string.text_view_transport_fee, String.valueOf(vehiclesModel.getCost())));
                 mTextViewTransportCapacity.setText(String.valueOf(vehiclesModel.getSeats()));
                 mTextViewSpeed.setText(getResources().getString(R.string.text_view_transport_speed, vehiclesModel.getSpeed()));
                 mTextViewInventoryNumber.setText(String.valueOf(vehiclesModel.getInventoryNumber()));
                 for (Map.Entry<Long, VehicleMarkerInfoModel> entry : mAllCurrentVehicleInfo.entrySet()) {
                     VehicleMarkerInfoModel model = entry.getValue();
                     if (vehiclesModel.getRouteId() == model.getServerId()) {
-                        mTextViewRouteDistance.setText(getResources().getString(R.string.text_view_transport_route_distance, Double.toString(model.getDistance())));
+                        mTextViewRouteDistance.setText(getResources().getString(R.string.text_view_transport_route_distance, String.valueOf(model.getDistance())));
                         mTextViewRouteNumber.setText(getResources().getString(R.string.text_view_route_number, model.getNumber()));
                     }
                 }
