@@ -12,14 +12,13 @@ import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
-import com.orhanobut.logger.Logger;
 import com.provectus.public_transport.R;
 import com.provectus.public_transport.adapter.TramsAndTrolleyAdapter;
 import com.provectus.public_transport.eventbus.BusEvents;
 import com.provectus.public_transport.fragment.favouritesfragment.FavouritesFragmentPresenter;
 import com.provectus.public_transport.fragment.mapfragment.MapsFragmentPresenter;
-import com.provectus.public_transport.fragment.routestabfragment.TransportFragment;
 import com.provectus.public_transport.fragment.routestabfragment.TramFragmentPresenter;
+import com.provectus.public_transport.fragment.routestabfragment.TransportFragment;
 import com.provectus.public_transport.model.TransportEntity;
 import com.provectus.public_transport.service.TransportRoutesService;
 import com.provectus.public_transport.utils.Utils;
@@ -85,7 +84,6 @@ public class TramFragmentImpl extends Fragment implements TransportFragment {
         mRoutesRecyclerView.setAdapter(mTramTrolleybusAdapter);
         mProgressBarNoItem.setVisibility(View.GONE);
         setErrorVisible(View.GONE);
-        Logger.d(mTramTrolleybusAdapter);
     }
 
     @Override
@@ -125,7 +123,6 @@ public class TramFragmentImpl extends Fragment implements TransportFragment {
     private void setErrorVisible(int visible) {
         mTextViewNoData.setVisibility(visible);
         mBtnUpdate.setVisibility(visible);
-        Logger.d(mTramTrolleybusAdapter);
     }
 
     private void startService() {
