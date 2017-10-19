@@ -42,6 +42,10 @@ public class TransportEntity {
     @TypeConverters({BooleanConverter.class})
     private boolean mIsFavourites;
 
+    @SerializedName("cost")
+    @ColumnInfo(name = "cost")
+    private double mCost;
+
     @SerializedName("segments")
     @Ignore
     private List<SegmentEntity> mSegments;
@@ -57,13 +61,14 @@ public class TransportEntity {
     @Ignore
     private boolean mIsSelected;
 
-    public TransportEntity(long mServerId, int mNumber, TransportType mType, double mDistance, boolean mIsAvailable, boolean mIsFavourites) {
+    public TransportEntity(long mServerId, int mNumber, TransportType mType, double mDistance, boolean mIsAvailable, boolean mIsFavourites, double cost) {
         this.mServerId = mServerId;
         this.mNumber = mNumber;
         this.mType = mType;
         this.mDistance = mDistance;
         this.mIsAvailable = mIsAvailable;
         this.mIsFavourites = mIsFavourites;
+        this.mCost = cost;
     }
 
     @Ignore
@@ -139,6 +144,10 @@ public class TransportEntity {
         this.mIsFavourites = mIsFavourites;
     }
 
+    public double getCost() {
+        return mCost;
+    }
+
     @Override
     public String toString() {
         return "TransportEntity{" +
@@ -148,12 +157,11 @@ public class TransportEntity {
                 ", mDistance=" + mDistance +
                 ", mIsAvailable=" + mIsAvailable +
                 ", mIsFavourites=" + mIsFavourites +
+                ", mCost=" + mCost +
                 ", mSegments=" + mSegments +
                 ", mDirectionEntity=" + mDirectionEntity +
                 ", mIndirectionEntity=" + mIndirectionEntity +
                 ", mIsSelected=" + mIsSelected +
                 '}';
     }
-
-
 }
