@@ -71,7 +71,8 @@ public class FavouritesSectionAdapter extends StatelessSection {
 
         FavouritesItemViewHolder itemViewHolder = (FavouritesItemViewHolder) holder;
         itemViewHolder.mTextViewTransportNumber.setText(mContext.getResources().getString(R.string.text_view_item_tram_trooley_transport_number, String.valueOf(mListTransportEntity.get(position).getNumber())));
-
+        itemViewHolder.mTextViewFavouritesFirstStop.setText(currentRoute.getFirstStop());
+        itemViewHolder.mTextViewFavouritesLastStop.setText(currentRoute.getLastStop());
         if (currentRoute.isSelected()) {
             holder.itemView.setBackgroundColor(ContextCompat.getColor(mContext, R.color.colorBottomSheetSelectedBackground));
         } else {
@@ -90,9 +91,9 @@ public class FavouritesSectionAdapter extends StatelessSection {
                 holder.itemView.setBackgroundColor(ContextCompat.getColor(mContext, R.color.colorBottomSheetSelectedBackground));
             }
 
-            if (currentRoute.getType() == TransportType.TROLLEYBUSES_TYPE){
+            if (currentRoute.getType() == TransportType.TROLLEYBUSES_TYPE) {
                 mTrolleybusFragmentPresenter.getDataForUpdateRecyclerView(currentRoute);
-            }else {
+            } else {
                 mTramFragmentPresenter.getDataForUpdateRecyclerView(currentRoute);
             }
             mMapsFragmentPresenter.onSelectCurrentRoute(currentRoute);
@@ -134,6 +135,10 @@ public class FavouritesSectionAdapter extends StatelessSection {
         TextView mTextViewTransportNumber;
         @BindView(R.id.iv_delete_favourites)
         ImageView mImageViewDeleteFavourites;
+        @BindView(R.id.tv_favourites_first_stop)
+        TextView mTextViewFavouritesFirstStop;
+        @BindView(R.id.tv_favourites_last_stop)
+        TextView mTextViewFavouritesLastStop;
 
         FavouritesItemViewHolder(View itemView) {
             super(itemView);

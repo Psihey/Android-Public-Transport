@@ -27,7 +27,7 @@ public class TramsAndTrolleyAdapter extends RecyclerView.Adapter<TramsAndTrolley
     private MapsFragmentPresenter mMapsFragmentPresenter;
     private FavouritesFragmentPresenter mFavouritesFragmentPresenter;
 
-    public TramsAndTrolleyAdapter(Context context, List<TransportEntity> data, MapsFragmentPresenter mapsFragmentPresenter,FavouritesFragmentPresenter favouritesFragmentPresenter) {
+    public TramsAndTrolleyAdapter(Context context, List<TransportEntity> data, MapsFragmentPresenter mapsFragmentPresenter, FavouritesFragmentPresenter favouritesFragmentPresenter) {
         this.mContext = context;
         this.mTransportRoutesData = data;
         this.mMapsFragmentPresenter = mapsFragmentPresenter;
@@ -45,7 +45,8 @@ public class TramsAndTrolleyAdapter extends RecyclerView.Adapter<TramsAndTrolley
         TransportEntity transportRoutes = mTransportRoutesData.get(position);
         holder.mTvRoutesNumber.setText(mContext.getResources().getString(R.string.text_view_item_tram_trooley_transport_number, String.valueOf(mTransportRoutesData.get(position).getNumber())));
         holder.itemView.setOnFocusChangeListener((v, hasFocus) -> transportRoutes.setIsSelected(hasFocus));
-
+        holder.mTvFirstStop.setText(transportRoutes.getFirstStop());
+        holder.mTvLastStop.setText(transportRoutes.getLastStop());
         setItemViewCondition(holder.itemView, transportRoutes);
 
         if (transportRoutes.isSelected()) {
@@ -100,6 +101,10 @@ public class TramsAndTrolleyAdapter extends RecyclerView.Adapter<TramsAndTrolley
         TextView mTvRoutesNumber;
         @BindView(R.id.image_button_route_info)
         ImageView mImageButtonRouteInfo;
+        @BindView(R.id.tv_first_stop)
+        TextView mTvFirstStop;
+        @BindView(R.id.tv_last_stop)
+        TextView mTvLastStop;
 
         TramsAndTrolleyViewHolder(View itemView) {
             super(itemView);

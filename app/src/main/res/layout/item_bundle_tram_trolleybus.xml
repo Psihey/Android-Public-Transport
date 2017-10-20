@@ -1,28 +1,48 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_width="match_parent"
     android:layout_height="48dp"
+    android:orientation="vertical"
     android:paddingLeft="16dp"
     android:paddingRight="16dp">
-    
+
     <TextView
         android:id="@+id/text_view_item_tram_trooley_transport_number"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_centerVertical="true"
         android:layout_alignParentStart="true"
+        android:layout_centerVertical="true"
         android:layout_marginStart="14dp"
         android:text="@string/text_view_item_tram_trooley_transport_number"
-        android:textColor="@color/text_item_view"/>
+        android:textColor="@color/text_item_view" />
+
+    <TextView
+        android:id="@+id/tv_first_stop"
+        android:layout_width="wrap_content"
+        android:layout_height="24dp"
+        android:layout_toEndOf="@+id/text_view_item_tram_trooley_transport_number"
+        android:layout_toStartOf="@+id/image_button_route_info"
+        android:gravity="center|bottom"
+        android:textColor="@color/text_item_view" />
+
+    <TextView
+        android:id="@+id/tv_last_stop"
+        android:layout_width="wrap_content"
+        android:layout_height="24dp"
+        android:layout_below="@+id/tv_first_stop"
+        android:layout_toEndOf="@+id/text_view_item_tram_trooley_transport_number"
+        android:layout_toStartOf="@+id/image_button_route_info"
+        android:gravity="center|top"
+        android:textColor="@color/text_item_view" />
 
     <ImageView
         android:id="@+id/image_button_route_info"
         android:layout_width="24dp"
         android:layout_height="24dp"
-        android:layout_marginTop="11dp"
-        android:layout_marginEnd="14dp"
         android:layout_alignParentEnd="true"
+        android:layout_marginEnd="14dp"
+        android:layout_marginTop="11dp"
         app:srcCompat="@drawable/ic_info_outline_black_24dp" />
 
 </RelativeLayout>
