@@ -10,6 +10,8 @@ import com.provectus.public_transport.persistence.database.DatabaseHelper;
 import org.greenrobot.eventbus.EventBus;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import io.reactivex.Completable;
@@ -65,6 +67,10 @@ public class FavouritesFragmentPresenterImpl implements FavouritesFragmentPresen
 
     private void getAllFavouritesFromDB() {
         DatabaseHelper.getPublicTransportDatabase().transportDao().getFavouritesRoute()
+                .map(list -> {
+                    Collections.sort(list, sortByNumber);
+                    return list;
+                })
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .doOnError(throwable -> Logger.d(throwable.getMessage()))
@@ -99,4 +105,6 @@ public class FavouritesFragmentPresenterImpl implements FavouritesFragmentPresen
             mFavouritesFragment.initRecyclerView(transportEntities);
         }
     }
+
+    private Comparator<TransportEntity> sortByNumber = (t1, t2) -> t1.getNumber() > t2.getNumber() ? 1 : -1;
 }
