@@ -91,7 +91,12 @@ public class TransportRoutesService extends IntentService {
                     TransportEntity currentTransportEntity = new TransportEntity(currentRoutes.getServerId(),
                             currentRoutes.getNumber(),
                             currentRoutes.getType(),
-                            currentRoutes.getDistance(), isAvailable, isFavourites,currentRoutes.getCost());
+                            currentRoutes.getDistance(),
+                            isAvailable,
+                            isFavourites,
+                            currentRoutes.getCost(),
+                            currentRoutes.getFirstStop(),
+                            currentRoutes.getLastStop());
                     for (DirectEntity directionEntity : currentRoutes.getDirectionEntity()) {
                         DirectEntity currentDirection = new DirectEntity(directionEntity.getLatitude(),
                                 directionEntity.getLongitude(),

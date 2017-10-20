@@ -46,6 +46,14 @@ public class TransportEntity {
     @ColumnInfo(name = "cost")
     private double mCost;
 
+    @SerializedName("firstStop")
+    @ColumnInfo(name = "firstStop")
+    private String mFirstStop;
+
+    @SerializedName("lastStop")
+    @ColumnInfo(name = "lastStop")
+    private String mLastStop;
+
     @SerializedName("segments")
     @Ignore
     private List<SegmentEntity> mSegments;
@@ -61,7 +69,15 @@ public class TransportEntity {
     @Ignore
     private boolean mIsSelected;
 
-    public TransportEntity(long mServerId, int mNumber, TransportType mType, double mDistance, boolean mIsAvailable, boolean mIsFavourites, double cost) {
+    public TransportEntity(long mServerId,
+                           int mNumber,
+                           TransportType mType,
+                           double mDistance,
+                           boolean mIsAvailable,
+                           boolean mIsFavourites,
+                           double cost,
+                           String firstStop,
+                           String lastStop) {
         this.mServerId = mServerId;
         this.mNumber = mNumber;
         this.mType = mType;
@@ -69,6 +85,8 @@ public class TransportEntity {
         this.mIsAvailable = mIsAvailable;
         this.mIsFavourites = mIsFavourites;
         this.mCost = cost;
+        this.mFirstStop = firstStop;
+        this.mLastStop = lastStop;
     }
 
     @Ignore
@@ -148,6 +166,14 @@ public class TransportEntity {
         return mCost;
     }
 
+    public String getFirstStop() {
+        return mFirstStop;
+    }
+
+    public String getLastStop() {
+        return mLastStop;
+    }
+
     @Override
     public String toString() {
         return "TransportEntity{" +
@@ -158,6 +184,8 @@ public class TransportEntity {
                 ", mIsAvailable=" + mIsAvailable +
                 ", mIsFavourites=" + mIsFavourites +
                 ", mCost=" + mCost +
+                ", mFirstStop='" + mFirstStop + '\'' +
+                ", mLastStop='" + mLastStop + '\'' +
                 ", mSegments=" + mSegments +
                 ", mDirectionEntity=" + mDirectionEntity +
                 ", mIndirectionEntity=" + mIndirectionEntity +
