@@ -84,7 +84,6 @@ public class FavouritesFragmentImpl extends Fragment implements FavouritesFragme
             }
         }
 
-        mFavouritesRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         mTramSection = new FavouritesSectionAdapter(getContext(), Const.TransportType.TRAMS, tramSection, mSectionAdapter, mMapsFragmentPresenter,mFavouritesFragmentPresenter,mRoutesTabFragmentPresenter,trolleybusFragmentPresenter);
         mTrolleybusSection = new FavouritesSectionAdapter(getContext(), Const.TransportType.TROLLEYBUSES, trolleybusSection, mSectionAdapter, mMapsFragmentPresenter,mFavouritesFragmentPresenter,mRoutesTabFragmentPresenter,trolleybusFragmentPresenter);
 

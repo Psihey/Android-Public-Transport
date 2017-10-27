@@ -34,6 +34,7 @@
     <string name="text_view_server_error">OFFLINE MODE server do not responding</string>
     <string name="text_view_item_tram_trooley_transport_number">№%1$s</string>
     <string name="text_view_frequently_used_routes">Frequently used routes</string>
+    <string name="text_view_stop_detail_stopping">Stopping</string>
 
     <integer-array name="route_color_array">
         <item>@color/routePinkColor</item>

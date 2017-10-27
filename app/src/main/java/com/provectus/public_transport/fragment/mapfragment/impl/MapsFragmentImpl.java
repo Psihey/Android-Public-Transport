@@ -16,6 +16,8 @@ import android.support.design.widget.TabLayout;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewPager;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -41,9 +43,12 @@ import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.maps.android.SphericalUtil;
 import com.orhanobut.logger.Logger;
 import com.provectus.public_transport.R;
+import com.provectus.public_transport.adapter.StopDetailSectionAdapter;
 import com.provectus.public_transport.adapter.TransportAndParkingViewPagerAdapter;
 import com.provectus.public_transport.fragment.mapfragment.MapsFragment;
 import com.provectus.public_transport.fragment.mapfragment.MapsFragmentPresenter;
+import com.provectus.public_transport.model.StopDetailEntity;
+import com.provectus.public_transport.model.StopEntity;
 import com.provectus.public_transport.model.TransportEntity;
 import com.provectus.public_transport.model.VehicleMarkerInfoModel;
 import com.provectus.public_transport.model.VehiclesModel;
@@ -66,7 +71,9 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import butterknife.Unbinder;
+import io.github.luizgrp.sectionedrecyclerviewadapter.SectionedRecyclerViewAdapter;
 import io.reactivex.Completable;
+import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
 
 import static android.os.Looper.getMainLooper;
@@ -96,8 +103,8 @@ public class MapsFragmentImpl extends Fragment
     RelativeLayout mRelativeLayoutBottomSheet;
     @BindView(R.id.constraint_container_vehicle_info)
     ConstraintLayout mConstraintVehicleContainer;
-    @BindView(R.id.constraint_layout_route)
-    ConstraintLayout mConstraintRouteContainer;
+    @BindView(R.id.relative_layout_container_route_detail)
+    RelativeLayout mRelativeRouteContainer;
     @BindView(R.id.tv_route_number)
     TextView mTextViewRouteNumber;
     @BindView(R.id.tv_transport_type_value)
@@ -129,6 +136,18 @@ public class MapsFragmentImpl extends Fragment
     TextView mTextViewRouteInfoFee;
     @BindView(R.id.tv_route_info_transport_route_distance_value)
     TextView mTextViewRouteInfoDistance;
+    @BindView(R.id.tv_first_stop_route_detail)
+    TextView mTextViewFirstStopRouteDetail;
+    @BindView(R.id.tv_last_stop_route_detail)
+    TextView mTextViewLastStopRouteDetail;
+
+
+    @BindView(R.id.relative_container_stop_detail)
+    RelativeLayout mRelativeContainerStopDetail;
+    @BindView(R.id.recycler_view_stop_detail)
+    RecyclerView mRecyclerViewStopDetail;
+    @BindView(R.id.tv_name_stop_stop_detail)
+    TextView mTextViewStopName;
 
     private MapsFragmentPresenter mMapsPresenter;
     private Unbinder mUnbinder;
@@ -148,10 +167,13 @@ public class MapsFragmentImpl extends Fragment
     private ViewPagerBottomSheetBehavior mViewPagerBottomSheetBehavior;
     private BottomSheetBehavior mBottomSheetVehicleInfo;
     private BottomSheetBehavior mBottomSheetRouteInfo;
+    private BottomSheetBehavior mBottomSheetStopDetail;
     private long mCurrentVehiclesId;
     private String mLastOnlineTime;
     private TransportEntity mCurrentTransportInfo;
     private Handler mHandler = new Handler(getMainLooper());
+    private Map<Integer, List<StopEntity>> mCurrentStopEntityOnMap = new ConcurrentHashMap<>();
+    private String mChosenStopName;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -175,9 +197,12 @@ public class MapsFragmentImpl extends Fragment
         mBottomSheetVehicleInfo = BottomSheetBehavior.from(mConstraintVehicleContainer);
         mBottomSheetVehicleInfo.setPeekHeight(PEEK_HEIGHT_INFO_BOTTOM_SHEET);
         mBottomSheetVehicleInfo.setHideable(true);
-        mBottomSheetRouteInfo = BottomSheetBehavior.from(mConstraintRouteContainer);
+        mBottomSheetRouteInfo = BottomSheetBehavior.from(mRelativeRouteContainer);
         mBottomSheetRouteInfo.setPeekHeight(PEEK_HEIGHT_INFO_BOTTOM_SHEET);
         mBottomSheetRouteInfo.setHideable(true);
+        mBottomSheetStopDetail = BottomSheetBehavior.from(mRelativeContainerStopDetail);
+        mBottomSheetStopDetail.setPeekHeight(PEEK_HEIGHT_INFO_BOTTOM_SHEET);
+        mBottomSheetStopDetail.setHideable(true);
     }
 
     @Override
@@ -203,13 +228,21 @@ public class MapsFragmentImpl extends Fragment
     public void onMapClick(LatLng latLng) {
         mBottomSheetVehicleInfo.setState(BottomSheetBehavior.STATE_COLLAPSED);
         mBottomSheetRouteInfo.setState(BottomSheetBehavior.STATE_COLLAPSED);
+        mBottomSheetStopDetail.setState(BottomSheetBehavior.STATE_COLLAPSED);
     }
 
     @Override
     public boolean onMarkerClick(Marker marker) {
         if (marker.getTag() != null) {
-            mBottomSheetVehicleInfo.setState(BottomSheetBehavior.STATE_EXPANDED);
-            setVehicleDataIntoInfoView(marker);
+            long number = (Long) marker.getTag();
+            if (number > 1000) {
+                mBottomSheetVehicleInfo.setState(BottomSheetBehavior.STATE_EXPANDED);
+                openVehicleInfo(marker);
+            } else {
+                mBottomSheetStopDetail.setState(BottomSheetBehavior.STATE_EXPANDED);
+                openStopInfo(marker);
+            }
+
         }
         return false;
     }
@@ -257,15 +290,20 @@ public class MapsFragmentImpl extends Fragment
     }
 
     @Override
-    public void drawStops(List<MarkerOptions> stopping) {
+    public void drawStops(List<StopEntity> stopping) {
         BitmapDescriptor stopIcon = BitmapDescriptorFactory.fromResource(R.drawable.ic_temp_stop);
         List<Marker> allStops = new ArrayList<>();
-        for (MarkerOptions markerOptions : stopping) {
-            Marker marker = mMap.addMarker(markerOptions);
+        for (StopEntity stopEntity : stopping) {
+            double lat = stopEntity.getLatitude();
+            double lng = stopEntity.getLongitude();
+            LatLng latLng = new LatLng(lat, lng);
+            Marker marker = mMap.addMarker(new MarkerOptions().position(latLng));
+            marker.setTag(stopEntity.getServerId());
             marker.setIcon(stopIcon);
             allStops.add(marker);
         }
         mAllCurrentStopsOnMap.put(mTransportNumber, allStops);
+        mCurrentStopEntityOnMap.put(mTransportNumber, stopping);
     }
 
     @Override
@@ -278,6 +316,13 @@ public class MapsFragmentImpl extends Fragment
                     marker.remove();
                 }
                 mAllCurrentStopsOnMap.remove(mTransportNumber);
+            }
+        }
+
+        for (Map.Entry<Integer, List<StopEntity>> entry : mCurrentStopEntityOnMap.entrySet()) {
+            Integer key = entry.getKey();
+            if (key == mTransportNumber) {
+                mCurrentStopEntityOnMap.remove(key);
             }
         }
     }
@@ -357,7 +402,7 @@ public class MapsFragmentImpl extends Fragment
     }
 
     @Override
-    public void openVehicleInfo(VehicleMarkerInfoModel vehicleMarkerInfoModel) {
+    public void sendVehicleInfo(VehicleMarkerInfoModel vehicleMarkerInfoModel) {
         if (mAllCurrentVehicleInfo.isEmpty()) {
             mAllCurrentVehicleInfo.put(mTransportId, vehicleMarkerInfoModel);
         } else {
@@ -385,12 +430,15 @@ public class MapsFragmentImpl extends Fragment
     @Override
     public void routeNotSelected() {
         mBottomSheetVehicleInfo.setState(BottomSheetBehavior.STATE_COLLAPSED);
+        mBottomSheetStopDetail.setState(BottomSheetBehavior.STATE_COLLAPSED);
     }
 
     @Override
     public void openRouteInfo(TransportEntity transportEntity) {
         mCurrentTransportInfo = transportEntity;
         String transportType;
+        mTextViewFirstStopRouteDetail.setText(mCurrentTransportInfo.getFirstStop());
+        mTextViewLastStopRouteDetail.setText(mCurrentTransportInfo.getLastStop());
         mBottomSheetRouteInfo.setState(BottomSheetBehavior.STATE_EXPANDED);
         if (transportEntity.getType().equals(TransportType.TRAM_TYPE)) {
             transportType = getString(R.string.transport_type_tram);
@@ -543,7 +591,50 @@ public class MapsFragmentImpl extends Fragment
         return color;
     }
 
-    private void setVehicleDataIntoInfoView(Marker marker) {
+    private void openStopInfo(Marker marker) {
+        for (Map.Entry<Integer, List<StopEntity>> entry : mCurrentStopEntityOnMap.entrySet()) {
+            List<StopEntity> currentMarkers = entry.getValue();
+            for (StopEntity currentMarker : currentMarkers) {
+                if (marker.getTag().equals(currentMarker.getServerId())) {
+                    mChosenStopName = currentMarker.getTitle();
+                    DatabaseHelper.getPublicTransportDatabase().stopDetailDao().getStopDetail(currentMarker.getServerId())
+                            .subscribeOn(Schedulers.io())
+                            .observeOn(AndroidSchedulers.mainThread())
+                            .doOnError(throwable -> Logger.d(throwable.getMessage()))
+                            .subscribe(this::getStopDetail);
+                }
+            }
+        }
+    }
+
+    private void getStopDetail(List<StopDetailEntity> stopDetailEntity) {
+
+        List<StopDetailEntity> tramList = new ArrayList<>();
+        List<StopDetailEntity> trolleybusList = new ArrayList<>();
+
+        for (StopDetailEntity currentStop : stopDetailEntity) {
+            if (currentStop.getTransportType().equals(TransportType.TRAM_TYPE)) {
+                    tramList.add(currentStop);
+            } else {
+                    trolleybusList.add(currentStop);
+            }
+        }
+
+        SectionedRecyclerViewAdapter sectionAdapter = new SectionedRecyclerViewAdapter();
+
+        StopDetailSectionAdapter tramSection = new StopDetailSectionAdapter(tramList, Const.TransportType.TRAMS);
+        StopDetailSectionAdapter trolleybusSection = new StopDetailSectionAdapter(trolleybusList, Const.TransportType.TROLLEYBUSES);
+
+        sectionAdapter.addSection(tramSection);
+        sectionAdapter.addSection(trolleybusSection);
+        mRecyclerViewStopDetail.setLayoutManager(new LinearLayoutManager(getContext()));
+        mRecyclerViewStopDetail.setAdapter(sectionAdapter);
+        mTextViewStopName.setText(mChosenStopName);
+    }
+
+
+
+    private void openVehicleInfo(Marker marker) {
         String transportType;
         for (VehiclesModel vehiclesModel : mAllVehicles) {
             if (marker.getTag().equals(vehiclesModel.getVehicleId())) {

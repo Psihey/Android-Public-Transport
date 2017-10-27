@@ -52,7 +52,7 @@ public interface TransportDao {
     Flowable<List<TransportEntity>> getFavouritesRoute();
 
     @Query("SELECT * FROM transports WHERE transport_id = :transportID ")
-    Maybe<TransportEntity> getAllTransports(long transportID);
+    Maybe<TransportEntity> getChosenTransport(long transportID);
 
     @Query("SELECT * FROM transports WHERE favourites = '1'")
     Maybe<List<TransportEntity>> getFavouritesRouteBeforeDeleteDB();
