@@ -138,8 +138,8 @@ public class TransportRoutesService extends IntentService {
                     }
                     mTransportEntity.add(currentTransportEntity);
                 }
-                removeAllFromTables();
-                initDataToDataBase();
+                removeDataFromDB();
+                initDataToDB();
             }
         } catch (IOException e) {
             Logger.d(e.getMessage());
@@ -159,24 +159,24 @@ public class TransportRoutesService extends IntentService {
                 }
 
             }
-            removeStopDetails();
-            initStopDetail();
+            removeStopDetailsFromDB();
+            initStopDetailToDB();
 
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
-    private void removeStopDetails() {
-        DatabaseHelper.getPublicTransportDatabase().stopDetailDao().getAllStopDetail().subscribe(this::gggg);
+    private void removeStopDetailsFromDB() {
+        DatabaseHelper.getPublicTransportDatabase().stopDetailDao().getAllStopDetail().subscribe(this::getAllStopDetailAndRemove);
     }
 
-    private void gggg(List<StopDetailEntity> stopDetailEntities){
+    private void getAllStopDetailAndRemove(List<StopDetailEntity> stopDetailEntities) {
         DatabaseHelper.getPublicTransportDatabase().stopDetailDao().deleteAll(stopDetailEntities);
         Logger.d("remove");
     }
 
-    private void initStopDetail() {
+    private void initStopDetailToDB() {
         DatabaseHelper.getPublicTransportDatabase().stopDetailDao().insertAll(mStopDetailEntities);
         Logger.d("init");
     }
@@ -202,7 +202,7 @@ public class TransportRoutesService extends IntentService {
         editor.apply();
     }
 
-    private void removeAllFromTables() {
+    private void removeDataFromDB() {
         DatabaseHelper.getPublicTransportDatabase().transportDao().getFavouritesRouteBeforeDeleteDB();
         DatabaseHelper.getPublicTransportDatabase().transportDao().deleteAll(mTransportEntity);
         DatabaseHelper.getPublicTransportDatabase().segmentDao().deleteAll(mSegmentEntity);
@@ -211,7 +211,7 @@ public class TransportRoutesService extends IntentService {
         DatabaseHelper.getPublicTransportDatabase().directionDao().deleteAll(mDirectionEntity);
     }
 
-    private void initDataToDataBase() {
+    private void initDataToDB() {
         DatabaseHelper.getPublicTransportDatabase().transportDao().insertAll(mTransportEntity);
         DatabaseHelper.getPublicTransportDatabase().segmentDao().insertAll(mSegmentEntity);
         DatabaseHelper.getPublicTransportDatabase().pointDao().insertAll(mPointEntity);

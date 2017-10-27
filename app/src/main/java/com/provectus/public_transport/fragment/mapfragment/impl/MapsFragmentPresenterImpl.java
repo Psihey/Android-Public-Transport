@@ -132,12 +132,6 @@ public class MapsFragmentPresenterImpl implements MapsFragmentPresenter {
         if (mIsSelectRoute && stopEntities.isEmpty()) {
             mMapsFragment.showErrorSnackbar(R.string.snack_bar_no_stops_for_this_route);
         }
-//        List<MarkerOptions> markerOption = new ArrayList<>();
-//        for (int i = 0; i < stopEntities.size(); i++) {
-//            double lat = stopEntities.get(i).getLatitude();
-//            double lng = stopEntities.get(i).getLongitude();
-//            markerOption.add(new MarkerOptions().position(new LatLng(lat, lng)));
-//        }
         mMapsFragment.drawStops(stopEntities);
     }
 

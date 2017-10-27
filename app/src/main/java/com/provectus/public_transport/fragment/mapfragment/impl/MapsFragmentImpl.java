@@ -614,9 +614,9 @@ public class MapsFragmentImpl extends Fragment
 
         for (StopDetailEntity currentStop : stopDetailEntity) {
             if (currentStop.getTransportType().equals(TransportType.TRAM_TYPE)) {
-                    tramList.add(currentStop);
+                tramList.add(currentStop);
             } else {
-                    trolleybusList.add(currentStop);
+                trolleybusList.add(currentStop);
             }
         }
 
@@ -631,7 +631,6 @@ public class MapsFragmentImpl extends Fragment
         mRecyclerViewStopDetail.setAdapter(sectionAdapter);
         mTextViewStopName.setText(mChosenStopName);
     }
-
 
 
     private void openVehicleInfo(Marker marker) {
