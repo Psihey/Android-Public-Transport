@@ -3,6 +3,7 @@ package com.provectus.public_transport.service.retrofit;
 import android.support.annotation.Nullable;
 
 import com.google.common.net.HttpHeaders;
+import com.provectus.public_transport.model.StoppingsModel;
 import com.provectus.public_transport.model.TransportEntity;
 import com.provectus.public_transport.model.VehiclesModel;
 
@@ -19,6 +20,9 @@ public interface RetrofitQueries {
 
     @GET("routes")
     Call<List<TransportEntity>> getAllRoutes(@Nullable @Header(HttpHeaders.IF_MODIFIED_SINCE) String date);
+
+    @GET("stoppings")
+    Call<List<StoppingsModel>> getAllStops();
 
     @GET("location")
     Observable<Response<List<VehiclesModel>>> getAllVehiclesForRoute(@Query("route[]") List<Long> routesId);

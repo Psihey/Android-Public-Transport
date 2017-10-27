@@ -11,7 +11,9 @@ import com.provectus.public_transport.model.DirectEntity;
 import com.provectus.public_transport.model.IndirectionModel;
 import com.provectus.public_transport.model.PointEntity;
 import com.provectus.public_transport.model.SegmentEntity;
+import com.provectus.public_transport.model.StopDetailEntity;
 import com.provectus.public_transport.model.StopEntity;
+import com.provectus.public_transport.model.StoppingsModel;
 import com.provectus.public_transport.model.TransportEntity;
 import com.provectus.public_transport.persistence.database.DatabaseHelper;
 import com.provectus.public_transport.service.retrofit.RetrofitProvider;
@@ -42,6 +44,7 @@ public class TransportRoutesService extends IntentService {
     private List<StopEntity> mStopEntity = new ArrayList<>();
     private List<DirectEntity> mDirectionEntity = new ArrayList<>();
     private List<TransportEntity> mCurrentFavourites = new ArrayList<>();
+    private List<StopDetailEntity> mStopDetailEntities = new ArrayList<>();
 
     public TransportRoutesService() {
         super(TransportRoutesService.class.getSimpleName());
@@ -68,10 +71,11 @@ public class TransportRoutesService extends IntentService {
     private void getRoutesFromServer() {
         String date = getDateForRequest();
 
-        Call<List<TransportEntity>> call = RetrofitProvider.getRetrofit().getAllRoutes(date);
+        Call<List<TransportEntity>> callTransport = RetrofitProvider.getRetrofit().getAllRoutes(date);
+        Call<List<StoppingsModel>> callStoppings = RetrofitProvider.getRetrofit().getAllStops();
 
         try {
-            Response<List<TransportEntity>> response = call.execute();
+            Response<List<TransportEntity>> response = callTransport.execute();
             Logger.d(response.code());
             if (response.code() == HttpURLConnection.HTTP_NOT_MODIFIED) {
                 Logger.d("There are no updates");
@@ -134,12 +138,46 @@ public class TransportRoutesService extends IntentService {
                     }
                     mTransportEntity.add(currentTransportEntity);
                 }
-                removeAllFromTables();
-                initDataToDataBase();
+                removeDataFromDB();
+                initDataToDB();
+            }
+            try {
+                Response<List<StoppingsModel>> responseStoppings = callStoppings.execute();
+                for (StoppingsModel currentStop : responseStoppings.body()) {
+                    StoppingsModel stoppingsModel = new StoppingsModel(currentStop.getStoppingID());
+                    for (StopDetailEntity currentStopDetailEntity : currentStop.getStopDetail()) {
+                        StopDetailEntity stopDetailEntity = new StopDetailEntity(stoppingsModel.getStoppingID(),
+                                currentStopDetailEntity.getFirstStopping(),
+                                currentStopDetailEntity.getLastStopping(),
+                                currentStopDetailEntity.getNumber(),
+                                currentStopDetailEntity.getTransportType());
+                        mStopDetailEntities.add(stopDetailEntity);
+                    }
+
+                }
+                removeStopDetailsFromDB();
+                initStopDetailToDB();
+
+            } catch (IOException e) {
+                e.printStackTrace();
             }
         } catch (IOException e) {
             Logger.d(e.getMessage());
         }
+    }
+
+    private void removeStopDetailsFromDB() {
+        DatabaseHelper.getPublicTransportDatabase().stopDetailDao().getAllStopDetail().subscribe(this::getAllStopDetailAndRemove);
+    }
+
+    private void getAllStopDetailAndRemove(List<StopDetailEntity> stopDetailEntities) {
+        DatabaseHelper.getPublicTransportDatabase().stopDetailDao().deleteAll(stopDetailEntities);
+        Logger.d("remove");
+    }
+
+    private void initStopDetailToDB() {
+        DatabaseHelper.getPublicTransportDatabase().stopDetailDao().insertAll(mStopDetailEntities);
+        Logger.d("init");
     }
 
     private
@@ -163,7 +201,7 @@ public class TransportRoutesService extends IntentService {
         editor.apply();
     }
 
-    private void removeAllFromTables() {
+    private void removeDataFromDB() {
         DatabaseHelper.getPublicTransportDatabase().transportDao().getFavouritesRouteBeforeDeleteDB();
         DatabaseHelper.getPublicTransportDatabase().transportDao().deleteAll(mTransportEntity);
         DatabaseHelper.getPublicTransportDatabase().segmentDao().deleteAll(mSegmentEntity);
@@ -172,7 +210,7 @@ public class TransportRoutesService extends IntentService {
         DatabaseHelper.getPublicTransportDatabase().directionDao().deleteAll(mDirectionEntity);
     }
 
-    private void initDataToDataBase() {
+    private void initDataToDB() {
         DatabaseHelper.getPublicTransportDatabase().transportDao().insertAll(mTransportEntity);
         DatabaseHelper.getPublicTransportDatabase().segmentDao().insertAll(mSegmentEntity);
         DatabaseHelper.getPublicTransportDatabase().pointDao().insertAll(mPointEntity);

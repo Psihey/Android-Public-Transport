@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginTop="16dp"
+    android:layout_marginStart="20dp">
+
+    <TextView
+        android:id="@+id/tv_stop_detail_transport_number"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="20sp"
+        android:textColor="#3c86fb"/>
+
+    <ImageView
+        android:id="@+id/iv_top_dot"
+        android:layout_width="3dp"
+        android:layout_height="3dp"
+        android:layout_marginTop="20.5dp"
+        android:layout_below="@+id/tv_stop_detail_transport_number"
+        android:src="@drawable/ic_small_dot_stop_detail"/>
+
+    <TextView
+        android:id="@+id/tv_first_stop_stop_detail"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_toEndOf="@+id/iv_top_dot"
+        android:layout_below="@+id/tv_stop_detail_transport_number"
+        android:layout_marginTop="10dp"
+        android:layout_marginStart="4.5dp"
+        android:textColor="@color/text_item_view"
+        android:gravity="start"
+        android:text="first"
+        android:textSize="12sp"/>
+    
+    <ImageView
+        android:id="@+id/iv_stick_center"
+        android:layout_width="1dp"
+        android:layout_height="6dp"
+        android:layout_marginTop="1dp"
+        android:layout_marginStart="1dp"
+        android:layout_below="@+id/iv_top_dot"
+        android:src="@drawable/ic_small_stick_stop_detail"/>
+
+    <ImageView
+        android:id="@+id/iv_bottom_dot"
+        android:layout_width="3dp"
+        android:layout_height="3dp"
+        android:layout_marginTop="1dp"
+        android:layout_below="@+id/iv_stick_center"
+        android:src="@drawable/ic_small_dot_stop_detail"/>
+
+    <TextView
+        android:id="@+id/tv_last_stop_stop_detail"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/tv_first_stop_stop_detail"
+        android:layout_toEndOf="@+id/iv_stick_center"
+        android:layout_marginStart="4.5dp"
+        android:textColor="@color/text_item_view"
+        android:gravity="start"
+        android:text="second"
+        android:textSize="12sp"/>
+
+</RelativeLayout>
