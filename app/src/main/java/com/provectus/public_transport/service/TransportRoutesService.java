@@ -141,29 +141,28 @@ public class TransportRoutesService extends IntentService {
                 removeDataFromDB();
                 initDataToDB();
             }
+            try {
+                Response<List<StoppingsModel>> responseStoppings = callStoppings.execute();
+                for (StoppingsModel currentStop : responseStoppings.body()) {
+                    StoppingsModel stoppingsModel = new StoppingsModel(currentStop.getStoppingID());
+                    for (StopDetailEntity currentStopDetailEntity : currentStop.getStopDetail()) {
+                        StopDetailEntity stopDetailEntity = new StopDetailEntity(stoppingsModel.getStoppingID(),
+                                currentStopDetailEntity.getFirstStopping(),
+                                currentStopDetailEntity.getLastStopping(),
+                                currentStopDetailEntity.getNumber(),
+                                currentStopDetailEntity.getTransportType());
+                        mStopDetailEntities.add(stopDetailEntity);
+                    }
+
+                }
+                removeStopDetailsFromDB();
+                initStopDetailToDB();
+
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         } catch (IOException e) {
             Logger.d(e.getMessage());
-        }
-
-        try {
-            Response<List<StoppingsModel>> responseStoppings = callStoppings.execute();
-            for (StoppingsModel currentStop : responseStoppings.body()) {
-                StoppingsModel stoppingsModel = new StoppingsModel(currentStop.getStoppingID());
-                for (StopDetailEntity currentStopDetailEntity : currentStop.getStopDetail()) {
-                    StopDetailEntity stopDetailEntity = new StopDetailEntity(stoppingsModel.getStoppingID(),
-                            currentStopDetailEntity.getFirstStopping(),
-                            currentStopDetailEntity.getLastStopping(),
-                            currentStopDetailEntity.getNumber(),
-                            currentStopDetailEntity.getTransportType());
-                    mStopDetailEntities.add(stopDetailEntity);
-                }
-
-            }
-            removeStopDetailsFromDB();
-            initStopDetailToDB();
-
-        } catch (IOException e) {
-            e.printStackTrace();
         }
     }
 

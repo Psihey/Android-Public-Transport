@@ -234,8 +234,7 @@ public class MapsFragmentImpl extends Fragment
     @Override
     public boolean onMarkerClick(Marker marker) {
         if (marker.getTag() != null) {
-            long number = (Long) marker.getTag();
-            if (number > 1000) {
+            if (marker.getTag() instanceof VehiclesModel) {
                 mBottomSheetVehicleInfo.setState(BottomSheetBehavior.STATE_EXPANDED);
                 openVehicleInfo(marker);
             } else {
@@ -274,7 +273,7 @@ public class MapsFragmentImpl extends Fragment
                 double lng = vehiclesModel.getLongitude();
                 LatLng latLn = new LatLng(lat, lng);
                 Marker marker = mMap.addMarker(new MarkerOptions().position(latLn));
-                marker.setTag(vehiclesModel.getVehicleId());
+                marker.setTag(vehiclesModel);
                 mAllMarkerVehicles.add(marker);
                 marker.setIcon(BitmapDescriptorFactory.fromBitmap(Utils.tintImage(Utils.drawVehicleDirection(this, azimuth, vehiclesModel.getType()), colorForVehicles(mAllCurrentRouteWithColorOnMap, vehiclesModel.getRouteId(), VEHICLE_TYPE))));
                 marker.setFlat(true);
@@ -298,7 +297,7 @@ public class MapsFragmentImpl extends Fragment
             double lng = stopEntity.getLongitude();
             LatLng latLng = new LatLng(lat, lng);
             Marker marker = mMap.addMarker(new MarkerOptions().position(latLng));
-            marker.setTag(stopEntity.getServerId());
+            marker.setTag(stopEntity);
             marker.setIcon(stopIcon);
             allStops.add(marker);
         }
@@ -592,18 +591,23 @@ public class MapsFragmentImpl extends Fragment
     }
 
     private void openStopInfo(Marker marker) {
+        StopEntity currentStopEntity = (StopEntity) marker.getTag();
+        long stopServerId = -1;
         for (Map.Entry<Integer, List<StopEntity>> entry : mCurrentStopEntityOnMap.entrySet()) {
             List<StopEntity> currentMarkers = entry.getValue();
             for (StopEntity currentMarker : currentMarkers) {
-                if (marker.getTag().equals(currentMarker.getServerId())) {
+                if (currentStopEntity.getServerId() == currentMarker.getServerId()) {
                     mChosenStopName = currentMarker.getTitle();
-                    DatabaseHelper.getPublicTransportDatabase().stopDetailDao().getStopDetail(currentMarker.getServerId())
-                            .subscribeOn(Schedulers.io())
-                            .observeOn(AndroidSchedulers.mainThread())
-                            .doOnError(throwable -> Logger.d(throwable.getMessage()))
-                            .subscribe(this::getStopDetail);
+                    stopServerId = currentMarker.getServerId();
                 }
             }
+        }
+        if (stopServerId != -1){
+            DatabaseHelper.getPublicTransportDatabase().stopDetailDao().getStopDetail(stopServerId)
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .doOnError(throwable -> Logger.d(throwable.getMessage()))
+                    .subscribe(this::getStopDetail);
         }
     }
 
@@ -635,8 +639,9 @@ public class MapsFragmentImpl extends Fragment
 
     private void openVehicleInfo(Marker marker) {
         String transportType;
+        VehiclesModel currentVehiclesModel = (VehiclesModel) marker.getTag();
         for (VehiclesModel vehiclesModel : mAllVehicles) {
-            if (marker.getTag().equals(vehiclesModel.getVehicleId())) {
+            if (currentVehiclesModel.getVehicleId() == vehiclesModel.getVehicleId()) {
                 mCurrentVehiclesId = vehiclesModel.getVehicleId();
                 if (vehiclesModel.getType().equals(TransportType.TRAM_TYPE)) {
                     transportType = getString(R.string.transport_type_tram);
