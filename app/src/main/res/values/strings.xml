@@ -35,6 +35,7 @@
     <string name="text_view_item_tram_trooley_transport_number">№%1$s</string>
     <string name="text_view_frequently_used_routes">Frequently used routes</string>
     <string name="text_view_stop_detail_stopping">Stopping</string>
+    <string name="snack_bar_no_stop_detail">No info is available for the stop, sorry</string>
 
     <integer-array name="route_color_array">
         <item>@color/routePinkColor</item>

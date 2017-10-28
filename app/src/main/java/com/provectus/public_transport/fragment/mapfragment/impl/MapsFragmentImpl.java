@@ -92,6 +92,10 @@ public class MapsFragmentImpl extends Fragment
     private static final int INTERNET_ERROR_OFFLINE_MODE = 1;
     private static final int SERVER_ERROR_OFFLINE_MODE = 2;
     private static final int PEEK_HEIGHT_INFO_BOTTOM_SHEET = 0;
+    private static final int STOP_SERVER_ID_NOT_CHOSEN = -1;
+    private static final int LIMIT_POINT_FOR_SMALL_ROUTE = 255;
+    private static final int STEP_POINT_FOR_SMALL_ROUTE = 5;
+    private static final int STEP_POINT_FOR_BIG_ROUTE = 10;
 
     @BindView(R.id.bottom_sheet_view_pager)
     ViewPager mViewPagerTransportAndParking;
@@ -359,12 +363,12 @@ public class MapsFragmentImpl extends Fragment
         Collections.reverse(routes.getPoints());
         for (LatLng currentLatLng : routes.getPoints()) {
             i++;
-            if (routes.getPoints().size() > 255) {
-                if (i % 10 == 0) {
+            if (routes.getPoints().size() > LIMIT_POINT_FOR_SMALL_ROUTE) {
+                if (i % STEP_POINT_FOR_SMALL_ROUTE == 0) {
                     currentArrowDirection.add(drawArrowsRoute(previousLatLng, currentLatLng));
                 }
             } else {
-                if (i % 5 == 0) {
+                if (i % STEP_POINT_FOR_BIG_ROUTE == 0) {
                     currentArrowDirection.add(drawArrowsRoute(previousLatLng, currentLatLng));
                 }
             }
@@ -592,7 +596,7 @@ public class MapsFragmentImpl extends Fragment
 
     private void openStopInfo(Marker marker) {
         StopEntity currentStopEntity = (StopEntity) marker.getTag();
-        long stopServerId = -1;
+        long stopServerId = STOP_SERVER_ID_NOT_CHOSEN;
         for (Map.Entry<Integer, List<StopEntity>> entry : mCurrentStopEntityOnMap.entrySet()) {
             List<StopEntity> currentMarkers = entry.getValue();
             for (StopEntity currentMarker : currentMarkers) {
@@ -602,7 +606,7 @@ public class MapsFragmentImpl extends Fragment
                 }
             }
         }
-        if (stopServerId != -1){
+        if (stopServerId != STOP_SERVER_ID_NOT_CHOSEN) {
             DatabaseHelper.getPublicTransportDatabase().stopDetailDao().getStopDetail(stopServerId)
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
@@ -612,28 +616,32 @@ public class MapsFragmentImpl extends Fragment
     }
 
     private void getStopDetail(List<StopDetailEntity> stopDetailEntity) {
+        if (stopDetailEntity != null && !stopDetailEntity.isEmpty()) {
+            List<StopDetailEntity> tramList = new ArrayList<>();
+            List<StopDetailEntity> trolleybusList = new ArrayList<>();
 
-        List<StopDetailEntity> tramList = new ArrayList<>();
-        List<StopDetailEntity> trolleybusList = new ArrayList<>();
-
-        for (StopDetailEntity currentStop : stopDetailEntity) {
-            if (currentStop.getTransportType().equals(TransportType.TRAM_TYPE)) {
-                tramList.add(currentStop);
-            } else {
-                trolleybusList.add(currentStop);
+            for (StopDetailEntity currentStop : stopDetailEntity) {
+                if (currentStop.getTransportType().equals(TransportType.TRAM_TYPE)) {
+                    tramList.add(currentStop);
+                } else {
+                    trolleybusList.add(currentStop);
+                }
             }
+
+            SectionedRecyclerViewAdapter sectionAdapter = new SectionedRecyclerViewAdapter();
+
+            StopDetailSectionAdapter tramSection = new StopDetailSectionAdapter(tramList, Const.TransportType.TRAMS);
+            StopDetailSectionAdapter trolleybusSection = new StopDetailSectionAdapter(trolleybusList, Const.TransportType.TROLLEYBUSES);
+
+            sectionAdapter.addSection(tramSection);
+            sectionAdapter.addSection(trolleybusSection);
+            mRecyclerViewStopDetail.setLayoutManager(new LinearLayoutManager(getContext()));
+            mRecyclerViewStopDetail.setAdapter(sectionAdapter);
+            mTextViewStopName.setText(mChosenStopName);
+        } else {
+            showErrorSnackbar(R.string.snack_bar_no_stop_detail);
         }
 
-        SectionedRecyclerViewAdapter sectionAdapter = new SectionedRecyclerViewAdapter();
-
-        StopDetailSectionAdapter tramSection = new StopDetailSectionAdapter(tramList, Const.TransportType.TRAMS);
-        StopDetailSectionAdapter trolleybusSection = new StopDetailSectionAdapter(trolleybusList, Const.TransportType.TROLLEYBUSES);
-
-        sectionAdapter.addSection(tramSection);
-        sectionAdapter.addSection(trolleybusSection);
-        mRecyclerViewStopDetail.setLayoutManager(new LinearLayoutManager(getContext()));
-        mRecyclerViewStopDetail.setAdapter(sectionAdapter);
-        mTextViewStopName.setText(mChosenStopName);
     }
 
 
