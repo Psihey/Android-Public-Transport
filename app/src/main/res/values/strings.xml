@@ -39,6 +39,8 @@
 
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
+    <string name="nav_item_send_feedback">Send Feedback</string>
+    <string name="nav_item_about_program">About</string>
 
 
     <integer-array name="route_color_array">
