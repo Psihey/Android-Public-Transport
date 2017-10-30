@@ -37,6 +37,10 @@
     <string name="text_view_stop_detail_stopping">Stopping</string>
     <string name="snack_bar_no_stop_detail">No info is available for the stop, sorry</string>
 
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+
+
     <integer-array name="route_color_array">
         <item>@color/routePinkColor</item>
         <item>@color/routeIndigoColor</item>

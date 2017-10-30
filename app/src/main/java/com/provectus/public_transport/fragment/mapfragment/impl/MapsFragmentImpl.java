@@ -59,6 +59,7 @@ import com.provectus.public_transport.utils.Utils;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
@@ -207,6 +208,7 @@ public class MapsFragmentImpl extends Fragment
         mBottomSheetStopDetail = BottomSheetBehavior.from(mRelativeContainerStopDetail);
         mBottomSheetStopDetail.setPeekHeight(PEEK_HEIGHT_INFO_BOTTOM_SHEET);
         mBottomSheetStopDetail.setHideable(true);
+
     }
 
     @Override
@@ -608,6 +610,10 @@ public class MapsFragmentImpl extends Fragment
         }
         if (stopServerId != STOP_SERVER_ID_NOT_CHOSEN) {
             DatabaseHelper.getPublicTransportDatabase().stopDetailDao().getStopDetail(stopServerId)
+                    .map(list -> {
+                        Collections.sort(list, sortByNumber);
+                        return list;
+                    })
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
                     .doOnError(throwable -> Logger.d(throwable.getMessage()))
@@ -684,5 +690,7 @@ public class MapsFragmentImpl extends Fragment
             }
         }
     }
+
+    private Comparator<StopDetailEntity> sortByNumber = (t1, t2) -> t1.getNumber() > t2.getNumber() ? 1 : -1;
 
 }
