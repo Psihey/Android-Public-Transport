@@ -2,7 +2,9 @@ package com.provectus.public_transport.activity;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -10,8 +12,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 
-import com.orhanobut.logger.Logger;
 import com.provectus.public_transport.R;
+import com.provectus.public_transport.fragment.AboutProgramFragment;
 import com.provectus.public_transport.fragment.mapfragment.impl.MapsFragmentImpl;
 import com.provectus.public_transport.service.TransportRoutesService;
 
@@ -27,8 +29,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     @BindView(R.id.nav_view)
     NavigationView mNavigationView;
 
-    private static final String [] mEmailForFeedback = {"public_transport@gmail.com"};
+    private static final String[] mEmailForFeedback = {"publictransportcustomercare@gmail.com"};
     private static final String mEmailTitleForFeedback = "Public Transport Android App";
+    private FragmentManager mFragmentManager;
+    private MapsFragmentImpl mMapsFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,7 +40,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
         startService(new Intent(this, TransportRoutesService.class));
-
+        mFragmentManager = getSupportFragmentManager();
         setSupportActionBar(mToolbar);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, mDrawerLayout, mToolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
@@ -44,14 +48,15 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         getSupportActionBar().setDisplayShowTitleEnabled(false);
         toggle.syncState();
         mNavigationView.setNavigationItemSelectedListener(this);
-
-        getSupportFragmentManager().beginTransaction().replace(R.id.container_fragment_map,
-                new MapsFragmentImpl(), MapsFragmentImpl.TAG_MAP_FRAGMENT).commit();
+        mMapsFragment = new MapsFragmentImpl();
+        mFragmentManager
+                .beginTransaction()
+                .replace(R.id.container_fragment_map, mMapsFragment, MapsFragmentImpl.TAG_MAP_FRAGMENT).commit();
     }
 
     @SuppressWarnings("StatementWithEmptyBody")
     @Override
-    public boolean onNavigationItemSelected(MenuItem item) {
+    public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         int id = item.getItemId();
 
         if (id == R.id.nav_send_feedback) {
@@ -63,7 +68,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 startActivity(intent);
             }
         } else if (id == R.id.nav_about_program) {
-            Logger.d("2222");
+            mFragmentManager
+                    .beginTransaction()
+                    .hide(mMapsFragment)
+                    .add(R.id.container_fragment_map, new AboutProgramFragment(), AboutProgramFragment.TAG_ABOUT_PROGRAM_FRAGMENT)
+                    .addToBackStack(null).commit();
         }
 
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);

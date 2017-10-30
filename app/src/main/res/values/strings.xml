@@ -41,6 +41,12 @@
     <string name="navigation_drawer_close">Close navigation drawer</string>
     <string name="nav_item_send_feedback">Send Feedback</string>
     <string name="nav_item_about_program">About</string>
+    <string name="text_view_about_program_public_transport">Public Transport</string>
+    <string name="text_view_version_code">Version Code : %1$d</string>
+    <string name="text_view_version_name">Version Name : %1$s</string>
+    <string name="tv_describe_app">Public Transport is a application for monitoring system of passenger/public transport in real time for residents of Odessa, designed for Android.</string>
+    <string name="text_view_contact_">Contact for communications and offers :</string>
+    <string name="text_view_contact_email">publictransportcustomercare@gmail.com</string>
 
 
     <integer-array name="route_color_array">
