@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_margin="16dp">
+
+    <ImageButton
+        android:id="@+id/im_btn_arrow_back"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:background="@drawable/ic_arrow_back_black_24dp" />
+
+    <View
+        android:id="@+id/view_separate_line"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginTop="40dp"
+        android:background="#b5b5b3" />
+
+    <ImageView
+        android:id="@+id/iv_map_icon"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/view_separate_line"
+        android:layout_marginTop="24dp"
+        android:src="@mipmap/ic_launcher" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/view_separate_line"
+        android:layout_marginStart="12dp"
+        android:layout_marginTop="42dp"
+        android:layout_toEndOf="@+id/iv_map_icon"
+        android:gravity="start"
+        android:text="@string/text_view_about_program_public_transport"
+        android:textColor="@color/text_item_view"
+        android:textSize="20sp" />
+
+    <TextView
+        android:id="@+id/tv_version_code"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/iv_map_icon"
+        android:layout_marginStart="12dp"
+        android:layout_toEndOf="@+id/iv_map_icon"
+        android:text="@string/text_view_version_code"
+        android:textColor="@color/text_item_view"
+        android:textSize="12sp" />
+
+    <TextView
+        android:id="@+id/tv_version_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/tv_version_code"
+        android:layout_marginStart="12dp"
+        android:layout_toEndOf="@+id/iv_map_icon"
+        android:text="@string/text_view_version_name"
+        android:textColor="@color/text_item_view"
+        android:textSize="12sp" />
+
+    <TextView
+        android:id="@+id/tv_describe_app"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/tv_version_name"
+        android:layout_marginTop="16dp"
+        android:gravity="start"
+        android:text="@string/tv_describe_app"
+        android:textColor="@color/text_item_view"
+        android:textSize="14sp" />
+
+    <TextView
+        android:id="@+id/tv_contact"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/tv_describe_app"
+        android:layout_marginTop="16dp"
+        android:text="@string/text_view_contact_"
+        android:textColor="@color/text_item_view"
+        android:textSize="14sp"/>
+
+    <TextView
+        android:id="@+id/tv_profuct_owner_email"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/tv_contact"
+        android:textColor="@color/text_item_view"
+        android:layout_marginStart="16dp"
+        android:text="@string/text_view_contact_email"
+        android:autoLink="email"
+        android:textSize="12sp" />
+
+</RelativeLayout>
