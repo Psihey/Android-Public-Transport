@@ -41,12 +41,14 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.maps.android.SphericalUtil;
+import com.google.maps.android.clustering.ClusterManager;
 import com.orhanobut.logger.Logger;
 import com.provectus.public_transport.R;
 import com.provectus.public_transport.adapter.StopDetailSectionAdapter;
 import com.provectus.public_transport.adapter.TransportAndParkingViewPagerAdapter;
 import com.provectus.public_transport.fragment.mapfragment.MapsFragment;
 import com.provectus.public_transport.fragment.mapfragment.MapsFragmentPresenter;
+import com.provectus.public_transport.model.ParkingEntity;
 import com.provectus.public_transport.model.StopDetailEntity;
 import com.provectus.public_transport.model.StopEntity;
 import com.provectus.public_transport.model.TransportEntity;
@@ -97,6 +99,8 @@ public class MapsFragmentImpl extends Fragment
     private static final int LIMIT_POINT_FOR_SMALL_ROUTE = 255;
     private static final int STEP_POINT_FOR_SMALL_ROUTE = 5;
     private static final int STEP_POINT_FOR_BIG_ROUTE = 10;
+    private static final String LOCATION_BUTTON_POSITION = "2";
+    private static final String COMPASS_BUTTON_POSITION = "5";
 
     @BindView(R.id.bottom_sheet_view_pager)
     ViewPager mViewPagerTransportAndParking;
@@ -179,11 +183,13 @@ public class MapsFragmentImpl extends Fragment
     private Handler mHandler = new Handler(getMainLooper());
     private Map<Integer, List<StopEntity>> mCurrentStopEntityOnMap = new ConcurrentHashMap<>();
     private String mChosenStopName;
+    private ClusterManager<ParkingEntity> mClusterManager;
+    private View rootView;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_maps, container, false);
-        mUnbinder = ButterKnife.bind(this, view);
+        rootView = inflater.inflate(R.layout.fragment_maps, container, false);
+        mUnbinder = ButterKnife.bind(this, rootView);
         SupportMapFragment mapFragment = (SupportMapFragment) getChildFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
@@ -193,7 +199,7 @@ public class MapsFragmentImpl extends Fragment
             mMapsPresenter = new MapsFragmentPresenterImpl();
         }
         mMapsPresenter.bindView(this);
-        return view;
+        return rootView;
     }
 
     @Override
@@ -208,7 +214,6 @@ public class MapsFragmentImpl extends Fragment
         mBottomSheetStopDetail = BottomSheetBehavior.from(mRelativeContainerStopDetail);
         mBottomSheetStopDetail.setPeekHeight(PEEK_HEIGHT_INFO_BOTTOM_SHEET);
         mBottomSheetStopDetail.setHideable(true);
-
     }
 
     @Override
@@ -226,6 +231,7 @@ public class MapsFragmentImpl extends Fragment
         mMap = googleMap;
         setDefaultCameraPosition();
         setMyLocationButton();
+        moveCompassButton();
         mMap.setOnMarkerClickListener(this);
         mMap.setOnMapClickListener(this);
     }
@@ -243,9 +249,11 @@ public class MapsFragmentImpl extends Fragment
             if (marker.getTag() instanceof VehiclesModel) {
                 mBottomSheetVehicleInfo.setState(BottomSheetBehavior.STATE_EXPANDED);
                 openVehicleInfo(marker);
-            } else {
+            } else if (marker.getTag() instanceof StopEntity) {
                 mBottomSheetStopDetail.setState(BottomSheetBehavior.STATE_EXPANDED);
                 openStopInfo(marker);
+            } else {
+                Logger.d("11111111111111111");
             }
 
         }
@@ -530,7 +538,9 @@ public class MapsFragmentImpl extends Fragment
         mViewPagerBottomSheetBehavior.setBottomSheetCallback(new ViewPagerBottomSheetBehavior.BottomSheetCallback() {
             @Override
             public void onStateChanged(@NonNull View view, int i) {
+                mBottomSheetVehicleInfo.setState(BottomSheetBehavior.STATE_COLLAPSED);
                 mBottomSheetRouteInfo.setState(BottomSheetBehavior.STATE_COLLAPSED);
+                mBottomSheetStopDetail.setState(BottomSheetBehavior.STATE_COLLAPSED);
             }
 
             @Override
@@ -543,6 +553,15 @@ public class MapsFragmentImpl extends Fragment
             public void onTabSelected(TabLayout.Tab tab) {
                 mViewPagerBottomSheetBehavior.setState(ViewPagerBottomSheetBehavior.STATE_EXPANDED);
                 mBottomSheetRouteInfo.setState(BottomSheetBehavior.STATE_COLLAPSED);
+                mBottomSheetVehicleInfo.setState(BottomSheetBehavior.STATE_COLLAPSED);
+                mBottomSheetStopDetail.setState(BottomSheetBehavior.STATE_COLLAPSED);
+                if (tab.getPosition() == 2) {
+                    mMap.clear();
+                    mClusterManager = new ClusterManager<>(getActivity(), mMap);
+                    mMap.setOnCameraIdleListener(mClusterManager);
+                    mMap.setOnMarkerClickListener(mClusterManager);
+                    getParkings();
+                }
             }
 
             @Override
@@ -557,16 +576,32 @@ public class MapsFragmentImpl extends Fragment
         });
     }
 
+    private void getParkings() {
+        DatabaseHelper.getPublicTransportDatabase().parkingDao().getAllParkings()
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .doOnError(throwable -> Logger.d(throwable.getMessage()))
+                .subscribe(this::getParking);
+    }
+
+    private void getParking(List<ParkingEntity> parkingEntities) {
+        for (ParkingEntity parkingEntity : parkingEntities) {
+            mClusterManager.addItem(parkingEntity);
+        }
+    }
+
     private void setDefaultCameraPosition() {
         mMap.setOnMapLoadedCallback(() -> {
             CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngBounds(new LatLngBounds
                     (Const.DefaultCameraPosition.ODESSA_FIRST_POINTS, Const.DefaultCameraPosition.ODESSA_SECOND_POINTS), Const.DefaultCameraPosition.ZOOM_ON_MAP);
             mMap.animateCamera(cameraUpdate);
+
         });
     }
 
     private void setMyLocationButton() {
         UiSettings settings = mMap.getUiSettings();
+        moveLocationButtonToBottom();
         if (ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
                 && ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(getActivity(), new String[]{
@@ -576,6 +611,22 @@ public class MapsFragmentImpl extends Fragment
         }
         mMap.setMyLocationEnabled(true);
         settings.setMyLocationButtonEnabled(true);
+    }
+
+    private void moveLocationButtonToBottom() {
+        View locationButton = ((View) rootView.findViewById(Integer.parseInt("1")).getParent()).findViewById(Integer.parseInt(LOCATION_BUTTON_POSITION));
+        RelativeLayout.LayoutParams locationButtonLayoutParams = (RelativeLayout.LayoutParams) locationButton.getLayoutParams();
+        locationButtonLayoutParams.addRule(RelativeLayout.ALIGN_PARENT_TOP, 0);
+        locationButtonLayoutParams.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, RelativeLayout.TRUE);
+        locationButtonLayoutParams.setMargins(0, 0, 30, 150);
+    }
+
+    private void moveCompassButton() {
+        View compassButton = ((View) rootView.findViewById(Integer.parseInt("1")).getParent()).findViewById(Integer.parseInt(COMPASS_BUTTON_POSITION));
+        RelativeLayout.LayoutParams compassButtonLayoutParams = (RelativeLayout.LayoutParams) compassButton.getLayoutParams();
+        compassButtonLayoutParams.addRule(RelativeLayout.ALIGN_PARENT_TOP, 0);
+        compassButtonLayoutParams.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, RelativeLayout.TRUE);
+        compassButtonLayoutParams.setMargins(0, 0, 30, 150);
     }
 
     private int colorForVehicles(Map<Long, Integer> allRoutes, long routeId, String type) {
@@ -623,6 +674,9 @@ public class MapsFragmentImpl extends Fragment
 
     private void getStopDetail(List<StopDetailEntity> stopDetailEntity) {
         if (stopDetailEntity != null && !stopDetailEntity.isEmpty()) {
+            if (mBottomSheetVehicleInfo.getState() == BottomSheetBehavior.STATE_EXPANDED){
+                mBottomSheetVehicleInfo.setState(BottomSheetBehavior.STATE_COLLAPSED);
+            }
             List<StopDetailEntity> tramList = new ArrayList<>();
             List<StopDetailEntity> trolleybusList = new ArrayList<>();
 
@@ -636,8 +690,8 @@ public class MapsFragmentImpl extends Fragment
 
             SectionedRecyclerViewAdapter sectionAdapter = new SectionedRecyclerViewAdapter();
 
-            StopDetailSectionAdapter tramSection = new StopDetailSectionAdapter(tramList, Const.TransportType.TRAMS);
-            StopDetailSectionAdapter trolleybusSection = new StopDetailSectionAdapter(trolleybusList, Const.TransportType.TROLLEYBUSES);
+            StopDetailSectionAdapter tramSection = new StopDetailSectionAdapter(getContext(), tramList, Const.TransportType.TRAMS);
+            StopDetailSectionAdapter trolleybusSection = new StopDetailSectionAdapter(getContext(), trolleybusList, Const.TransportType.TROLLEYBUSES);
 
             sectionAdapter.addSection(tramSection);
             sectionAdapter.addSection(trolleybusSection);

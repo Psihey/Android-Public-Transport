@@ -16,6 +16,6 @@ public interface SegmentDao {
     void insertAll(List<SegmentEntity> segments);
 
     @Delete()
-    void deleteAll(List<SegmentEntity> segmentsEntities);
+    void deleteAll(List<SegmentEntity> segments);
 
 }

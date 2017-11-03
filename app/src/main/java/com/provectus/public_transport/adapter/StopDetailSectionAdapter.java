@@ -1,6 +1,7 @@
 package com.provectus.public_transport.adapter;
 
 
+import android.content.Context;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.ImageView;
@@ -21,11 +22,13 @@ public class StopDetailSectionAdapter extends StatelessSection {
 
     private List<StopDetailEntity> mStopDetailList;
     private String mTitle;
+    private Context mContext;
 
-    public StopDetailSectionAdapter(List<StopDetailEntity> stopDetailEntityList, String title) {
+    public StopDetailSectionAdapter(Context context, List<StopDetailEntity> stopDetailEntityList, String title) {
         super(new SectionParameters.Builder(R.layout.item_item_stop_detail)
                 .headerResourceId(R.layout.item_header_detail_stop)
                 .build());
+        this.mContext = context;
         this.mStopDetailList = stopDetailEntityList;
         this.mTitle = title;
     }
@@ -46,7 +49,7 @@ public class StopDetailSectionAdapter extends StatelessSection {
 
         StopDetailEntity stopDetailEntity = mStopDetailList.get(position);
 
-        stopDetailItemViewHolder.mTextViewTransportNumber.setText(String.valueOf(stopDetailEntity.getNumber()));
+        stopDetailItemViewHolder.mTextViewTransportNumber.setText(mContext.getResources().getString(R.string.text_view_item_tram_trooley_transport_number, String.valueOf(mStopDetailList.get(position).getNumber())));
         stopDetailItemViewHolder.mTextViewFirstStop.setText(stopDetailEntity.getFirstStopping());
         stopDetailItemViewHolder.mTextViewLastStop.setText(stopDetailEntity.getLastStopping());
     }

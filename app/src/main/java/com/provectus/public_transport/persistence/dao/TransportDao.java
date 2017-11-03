@@ -22,7 +22,7 @@ public interface TransportDao {
     void insertAll(List<TransportEntity> transports);
 
     @Delete
-    void deleteAll(List<TransportEntity> transportEntities);
+    void deleteAll(List<TransportEntity> transports);
 
     @Query("SELECT * FROM transports WHERE transport_type = 'TRAM_TYPE'")
     Maybe<List<TransportEntity>> getAllTram();
