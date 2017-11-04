@@ -57,6 +57,7 @@ import com.provectus.public_transport.model.VehiclesModel;
 import com.provectus.public_transport.model.converter.TransportType;
 import com.provectus.public_transport.persistence.database.DatabaseHelper;
 import com.provectus.public_transport.utils.Const;
+import com.provectus.public_transport.utils.CustomClusterRenderer;
 import com.provectus.public_transport.utils.Utils;
 
 import java.util.ArrayList;
@@ -229,11 +230,15 @@ public class MapsFragmentImpl extends Fragment
     public void onMapReady(GoogleMap googleMap) {
         mIsMapReady = true;
         mMap = googleMap;
+        mClusterManager = new ClusterManager<>(getActivity(), mMap);
         setDefaultCameraPosition();
         setMyLocationButton();
         moveCompassButton();
         mMap.setOnMarkerClickListener(this);
         mMap.setOnMapClickListener(this);
+        mMap.setOnCameraIdleListener(mClusterManager);
+        final CustomClusterRenderer renderer = new CustomClusterRenderer(getActivity(), mMap, mClusterManager);
+        mClusterManager.setRenderer(renderer);
     }
 
     @Override
@@ -245,6 +250,7 @@ public class MapsFragmentImpl extends Fragment
 
     @Override
     public boolean onMarkerClick(Marker marker) {
+
         if (marker.getTag() != null) {
             if (marker.getTag() instanceof VehiclesModel) {
                 mBottomSheetVehicleInfo.setState(BottomSheetBehavior.STATE_EXPANDED);
@@ -252,10 +258,12 @@ public class MapsFragmentImpl extends Fragment
             } else if (marker.getTag() instanceof StopEntity) {
                 mBottomSheetStopDetail.setState(BottomSheetBehavior.STATE_EXPANDED);
                 openStopInfo(marker);
-            } else {
-                Logger.d("11111111111111111");
+            } else if (marker.getTag() instanceof ParkingEntity) {
+                Logger.d("111111111");
+                ParkingEntity parkingEntity = (ParkingEntity)marker.getTag();
+                Logger.d(parkingEntity.getAddress());
+                Logger.d(parkingEntity.getPlaces());
             }
-
         }
         return false;
     }
@@ -557,9 +565,6 @@ public class MapsFragmentImpl extends Fragment
                 mBottomSheetStopDetail.setState(BottomSheetBehavior.STATE_COLLAPSED);
                 if (tab.getPosition() == 2) {
                     mMap.clear();
-                    mClusterManager = new ClusterManager<>(getActivity(), mMap);
-                    mMap.setOnCameraIdleListener(mClusterManager);
-                    mMap.setOnMarkerClickListener(mClusterManager);
                     getParkings();
                 }
             }
@@ -588,6 +593,7 @@ public class MapsFragmentImpl extends Fragment
         for (ParkingEntity parkingEntity : parkingEntities) {
             mClusterManager.addItem(parkingEntity);
         }
+        mClusterManager.cluster();
     }
 
     private void setDefaultCameraPosition() {
@@ -674,7 +680,7 @@ public class MapsFragmentImpl extends Fragment
 
     private void getStopDetail(List<StopDetailEntity> stopDetailEntity) {
         if (stopDetailEntity != null && !stopDetailEntity.isEmpty()) {
-            if (mBottomSheetVehicleInfo.getState() == BottomSheetBehavior.STATE_EXPANDED){
+            if (mBottomSheetVehicleInfo.getState() == BottomSheetBehavior.STATE_EXPANDED) {
                 mBottomSheetVehicleInfo.setState(BottomSheetBehavior.STATE_COLLAPSED);
             }
             List<StopDetailEntity> tramList = new ArrayList<>();

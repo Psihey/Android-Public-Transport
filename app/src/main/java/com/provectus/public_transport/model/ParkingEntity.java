@@ -5,10 +5,12 @@ import android.arch.persistence.room.ColumnInfo;
 import android.arch.persistence.room.Entity;
 import android.arch.persistence.room.Ignore;
 import android.arch.persistence.room.PrimaryKey;
+import android.arch.persistence.room.TypeConverters;
 
 import com.google.android.gms.maps.model.LatLng;
 import com.google.gson.annotations.SerializedName;
 import com.google.maps.android.clustering.ClusterItem;
+import com.provectus.public_transport.model.converter.ParkingType;
 
 @Entity(tableName = "parking")
 public class ParkingEntity implements ClusterItem {
@@ -34,12 +36,13 @@ public class ParkingEntity implements ClusterItem {
 
     @SerializedName("type")
     @ColumnInfo(name = "type")
-    private String mType;
+    @TypeConverters({ParkingType.class})
+    private ParkingType mType;
 
     @Ignore
     private final LatLng mPosition;
 
-    public ParkingEntity(double latitude, double longitude, int places, String address, String type) {
+    public ParkingEntity(double latitude, double longitude, int places, String address,ParkingType type) {
         mPosition = new LatLng(latitude, longitude);
         this.mLatitude = latitude;
         this.mLongitude = longitude;
@@ -72,7 +75,7 @@ public class ParkingEntity implements ClusterItem {
         return mAddress;
     }
 
-    public String getType() {
+    public ParkingType getType() {
         return mType;
     }
 
@@ -103,4 +106,6 @@ public class ParkingEntity implements ClusterItem {
                 ", mPosition=" + mPosition +
                 '}';
     }
+
+
 }
