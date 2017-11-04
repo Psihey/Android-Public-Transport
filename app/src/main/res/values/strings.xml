@@ -26,7 +26,7 @@
     <string name="transport_type_tram">Tram</string>
     <string name="transport_type_trolleybus">Trolleybus</string>
     <string name="text_view_speed">Speed</string>
-    <string name="text_view_number">Number</string>
+    <string name="text_view_number">Inventory Number</string>
     <string name="text_view_capacity">Capacity</string>
     <string name="text_view_fee">Fare</string>
     <string name="text_view_distance">The length of the route</string>
@@ -47,6 +47,8 @@
     <string name="tv_describe_app">Public Transport is a application for monitoring system of passenger/public transport in real time for residents of Odessa, designed for Android.</string>
     <string name="text_view_contact_">Contact for communications and offers :</string>
     <string name="text_view_contact_email">publictransportcustomercare@gmail.com</string>
+    <string name="text_view_parking_number_of_places">Number of places : %1$d</string>
+    <string name="text_view_parking_parking_type">Parking type : %1$s</string>
 
 
     <integer-array name="route_color_array">

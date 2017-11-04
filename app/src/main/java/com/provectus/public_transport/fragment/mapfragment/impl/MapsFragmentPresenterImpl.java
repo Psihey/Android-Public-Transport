@@ -70,6 +70,14 @@ public class MapsFragmentPresenterImpl implements MapsFragmentPresenter {
     }
 
     @Override
+    public void stopGetVehicles() {
+        if (mCompositeDisposable != null) {
+            mCompositeDisposable.dispose();
+        }
+        mCurrentVehicles.clear();
+    }
+
+    @Override
     public void onSelectCurrentRoute(TransportEntity event) {
         mIsSelectRoute = event.isSelected();
         String transportType = event.getType().toString();

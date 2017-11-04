@@ -23,7 +23,7 @@ public enum ParkingType {
             return ParkingType.OFFICIAL_TYPE;
         } else if (Objects.equals(value, "SEASON_TYPE")) {
             return ParkingType.SEASON_TYPE;
-        } else if (Objects.equals(value, " ALLDAY_TYPE")) {
+        } else if (Objects.equals(value, "ALLDAY_TYPE")) {
             return ParkingType.ALLDAY_TYPE;
         } else return ParkingType.UNDEFINED_TYPE;
     }

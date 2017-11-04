@@ -39,7 +39,7 @@ public class BusEvents {
         }
     }
 
-    public static class SendMapsFragmentPresenter{
+    public static class SendMapsFragmentPresenter {
         private MapsFragmentPresenter mMapsFragmentPresenter;
 
         public SendMapsFragmentPresenter(MapsFragmentPresenter mMapsFragmentPresenter) {
@@ -51,7 +51,7 @@ public class BusEvents {
         }
     }
 
-    public static class SendFavouriteFragmentPresenter{
+    public static class SendFavouriteFragmentPresenter {
         private FavouritesFragmentPresenter mFavouritesFragmentPresenter;
 
         public SendFavouriteFragmentPresenter(FavouritesFragmentPresenter mFavouritesFragmentPresenter) {
@@ -84,6 +84,13 @@ public class BusEvents {
 
         public TrolleybusFragmentPresenterImpl getTrolleybusFragmentPresenter() {
             return trolleybusFragmentPresenter;
+        }
+    }
+
+    public static class UpdateRecyclerView {
+
+        public UpdateRecyclerView() {
+
         }
     }
 }

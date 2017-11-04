@@ -46,6 +46,7 @@ import com.orhanobut.logger.Logger;
 import com.provectus.public_transport.R;
 import com.provectus.public_transport.adapter.StopDetailSectionAdapter;
 import com.provectus.public_transport.adapter.TransportAndParkingViewPagerAdapter;
+import com.provectus.public_transport.eventbus.BusEvents;
 import com.provectus.public_transport.fragment.mapfragment.MapsFragment;
 import com.provectus.public_transport.fragment.mapfragment.MapsFragmentPresenter;
 import com.provectus.public_transport.model.ParkingEntity;
@@ -59,6 +60,8 @@ import com.provectus.public_transport.persistence.database.DatabaseHelper;
 import com.provectus.public_transport.utils.Const;
 import com.provectus.public_transport.utils.CustomClusterRenderer;
 import com.provectus.public_transport.utils.Utils;
+
+import org.greenrobot.eventbus.EventBus;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -159,6 +162,15 @@ public class MapsFragmentImpl extends Fragment
     @BindView(R.id.tv_name_stop_stop_detail)
     TextView mTextViewStopName;
 
+    @BindView(R.id.relative_container_parking_detail)
+    RelativeLayout mRelativeLayoutParkingDetail;
+    @BindView(R.id.tv_parking_name)
+    TextView mTextViewParkingName;
+    @BindView(R.id.tv_parking_place)
+    TextView mTextViewParkingPlace;
+    @BindView(R.id.tv_parking_type)
+    TextView mTextViewParkingType;
+
     private MapsFragmentPresenter mMapsPresenter;
     private Unbinder mUnbinder;
     private GoogleMap mMap;
@@ -178,6 +190,7 @@ public class MapsFragmentImpl extends Fragment
     private BottomSheetBehavior mBottomSheetVehicleInfo;
     private BottomSheetBehavior mBottomSheetRouteInfo;
     private BottomSheetBehavior mBottomSheetStopDetail;
+    private BottomSheetBehavior mBottomSheetParkingDetail;
     private long mCurrentVehiclesId;
     private String mLastOnlineTime;
     private TransportEntity mCurrentTransportInfo;
@@ -215,6 +228,9 @@ public class MapsFragmentImpl extends Fragment
         mBottomSheetStopDetail = BottomSheetBehavior.from(mRelativeContainerStopDetail);
         mBottomSheetStopDetail.setPeekHeight(PEEK_HEIGHT_INFO_BOTTOM_SHEET);
         mBottomSheetStopDetail.setHideable(true);
+        mBottomSheetParkingDetail = BottomSheetBehavior.from(mRelativeLayoutParkingDetail);
+        mBottomSheetParkingDetail.setPeekHeight(PEEK_HEIGHT_INFO_BOTTOM_SHEET);
+        mBottomSheetParkingDetail.setHideable(true);
     }
 
     @Override
@@ -246,11 +262,11 @@ public class MapsFragmentImpl extends Fragment
         mBottomSheetVehicleInfo.setState(BottomSheetBehavior.STATE_COLLAPSED);
         mBottomSheetRouteInfo.setState(BottomSheetBehavior.STATE_COLLAPSED);
         mBottomSheetStopDetail.setState(BottomSheetBehavior.STATE_COLLAPSED);
+        mBottomSheetParkingDetail.setState(BottomSheetBehavior.STATE_COLLAPSED);
     }
 
     @Override
     public boolean onMarkerClick(Marker marker) {
-
         if (marker.getTag() != null) {
             if (marker.getTag() instanceof VehiclesModel) {
                 mBottomSheetVehicleInfo.setState(BottomSheetBehavior.STATE_EXPANDED);
@@ -259,10 +275,8 @@ public class MapsFragmentImpl extends Fragment
                 mBottomSheetStopDetail.setState(BottomSheetBehavior.STATE_EXPANDED);
                 openStopInfo(marker);
             } else if (marker.getTag() instanceof ParkingEntity) {
-                Logger.d("111111111");
-                ParkingEntity parkingEntity = (ParkingEntity)marker.getTag();
-                Logger.d(parkingEntity.getAddress());
-                Logger.d(parkingEntity.getPlaces());
+                mBottomSheetParkingDetail.setState(BottomSheetBehavior.STATE_EXPANDED);
+                openParkingInfo(marker);
             }
         }
         return false;
@@ -559,23 +573,34 @@ public class MapsFragmentImpl extends Fragment
         mBottomSheetTabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override
             public void onTabSelected(TabLayout.Tab tab) {
-                mViewPagerBottomSheetBehavior.setState(ViewPagerBottomSheetBehavior.STATE_EXPANDED);
+                if  (tab.getPosition() == 2) {
+                    mMap.clear();
+                    EventBus.getDefault().post(new BusEvents.UpdateRecyclerView());
+                    mViewPagerBottomSheetBehavior.setState(ViewPagerBottomSheetBehavior.STATE_COLLAPSED);
+                    mMapsPresenter.stopGetVehicles();
+                    getParkings();
+                } else {
+                    mViewPagerBottomSheetBehavior.setState(ViewPagerBottomSheetBehavior.STATE_EXPANDED);
+                }
                 mBottomSheetRouteInfo.setState(BottomSheetBehavior.STATE_COLLAPSED);
                 mBottomSheetVehicleInfo.setState(BottomSheetBehavior.STATE_COLLAPSED);
                 mBottomSheetStopDetail.setState(BottomSheetBehavior.STATE_COLLAPSED);
-                if (tab.getPosition() == 2) {
-                    mMap.clear();
-                    getParkings();
-                }
             }
 
             @Override
             public void onTabUnselected(TabLayout.Tab tab) {
-                //Ignore
+                if (tab.getPosition() == 2) {
+                    mMap.clear();
+                    mClusterManager.clearItems();
+                    mBottomSheetParkingDetail.setState(BottomSheetBehavior.STATE_COLLAPSED);
+                }
             }
 
             @Override
             public void onTabReselected(TabLayout.Tab tab) {
+                if (tab.getPosition() == 2) {
+                    mViewPagerBottomSheetBehavior.setState(ViewPagerBottomSheetBehavior.STATE_COLLAPSED);
+                }
                 mViewPagerBottomSheetBehavior.setState(ViewPagerBottomSheetBehavior.STATE_EXPANDED);
             }
         });
@@ -710,6 +735,29 @@ public class MapsFragmentImpl extends Fragment
 
     }
 
+    private void openParkingInfo(Marker marker) {
+        ParkingEntity parkingEntity = (ParkingEntity)marker.getTag();
+        if (parkingEntity != null){
+            String parkingType = null;
+            switch (parkingEntity.getType()){
+                case ALLDAY_TYPE:
+                    parkingType = "Round the clock";
+                    break;
+                case OFFICIAL_TYPE:
+                    parkingType = "Official";
+                    break;
+                case SEASON_TYPE:
+                    parkingType = "Season";
+                    break;
+                case UNDEFINED_TYPE:
+                    parkingType = "Daytime";
+                    break;
+            }
+            mTextViewParkingName.setText(parkingEntity.getAddress());
+            mTextViewParkingPlace.setText(getResources().getString(R.string.text_view_parking_number_of_places,parkingEntity.getPlaces()));
+            mTextViewParkingType.setText(getResources().getString(R.string.text_view_parking_parking_type,parkingType));
+        }
+    }
 
     private void openVehicleInfo(Marker marker) {
         String transportType;

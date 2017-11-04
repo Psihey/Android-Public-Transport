@@ -8,6 +8,8 @@ import com.provectus.public_transport.model.TransportEntity;
 import com.provectus.public_transport.persistence.database.DatabaseHelper;
 
 import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -23,11 +25,12 @@ public class FavouritesFragmentPresenterImpl implements FavouritesFragmentPresen
     private FavouritesFragment mFavouritesFragment;
     private List<TransportEntity> mListForUpdate;
     private List<TransportEntity> mAllSelectedRoutes = new ArrayList<>();
-    private  TransportEntity mTransportRoute;
+    private TransportEntity mTransportRoute;
 
     @Override
     public void bindView(FavouritesFragment favouritesFragment) {
         this.mFavouritesFragment = favouritesFragment;
+        EventBus.getDefault().register(this);
         EventBus.getDefault().postSticky(new BusEvents.SendFavouriteFragmentPresenter(this));
         getAllFavouritesFromDB();
     }
@@ -45,7 +48,8 @@ public class FavouritesFragmentPresenterImpl implements FavouritesFragmentPresen
         Completable.defer(() -> Completable.fromCallable(this::updateFavouritesDB))
                 .subscribeOn(Schedulers.computation())
                 .subscribe(
-                        () -> {},
+                        () -> {
+                        },
                         throwable -> Logger.d(throwable.getMessage())
                 );
     }
@@ -58,11 +62,22 @@ public class FavouritesFragmentPresenterImpl implements FavouritesFragmentPresen
     @Override
     public void updateRecyclerView(List<TransportEntity> transportEntities) {
         mFavouritesFragment.updateData(transportEntities);
-        for (TransportEntity transportEntity : transportEntities){
-            if (transportEntity.isSelected()){
+        for (TransportEntity transportEntity : transportEntities) {
+            if (transportEntity.isSelected()) {
                 mAllSelectedRoutes.add(transportEntity);
             }
         }
+    }
+
+    @Override
+    public void unregisteredEventBus() {
+        EventBus.getDefault().unregister(this);
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void updateRecyclerView(BusEvents.UpdateRecyclerView updateRecyclerView) {
+        mListForUpdate = null;
+        getAllFavouritesFromDB();
     }
 
     private void getAllFavouritesFromDB() {
@@ -88,9 +103,9 @@ public class FavouritesFragmentPresenterImpl implements FavouritesFragmentPresen
                         newEntity.setIsSelected(recentEntity.isSelected());
                     }
                 }
-                if (mAllSelectedRoutes != null){
-                    for (TransportEntity newClickEntity : mAllSelectedRoutes){
-                        if (newEntity.getServerId() == newClickEntity.getServerId()){
+                if (mAllSelectedRoutes != null) {
+                    for (TransportEntity newClickEntity : mAllSelectedRoutes) {
+                        if (newEntity.getServerId() == newClickEntity.getServerId()) {
                             newEntity.setIsSelected(newClickEntity.isSelected());
                         }
                     }
@@ -99,7 +114,7 @@ public class FavouritesFragmentPresenterImpl implements FavouritesFragmentPresen
             mListForUpdate.clear();
             mListForUpdate.addAll(transportEntities);
         } else {
-                mListForUpdate = transportEntities;
+            mListForUpdate = transportEntities;
         }
         if (mFavouritesFragment != null) {
             mFavouritesFragment.initRecyclerView(transportEntities);

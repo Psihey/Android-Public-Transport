@@ -55,16 +55,21 @@ public class TramFragmentPresenterImpl implements com.provectus.public_transport
         mTramFragment.serviceEndWorked();
     }
 
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void updateRecyclerView(BusEvents.UpdateRecyclerView updateRecyclerView) {
+        getDataFromDB();
+    }
+
     private void getDataFromDB() {
-            DatabaseHelper.getPublicTransportDatabase().transportDao().getAllTram()
-                    .map(list -> {
-                        Collections.sort(list, sortByNumber);
-                        return list;
-                    })
-                    .subscribeOn(Schedulers.io())
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .doOnError(throwable -> Logger.d(throwable.getMessage()))
-                    .subscribe(this::getTransportFromDB);
+        DatabaseHelper.getPublicTransportDatabase().transportDao().getAllTram()
+                .map(list -> {
+                    Collections.sort(list, sortByNumber);
+                    return list;
+                })
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .doOnError(throwable -> Logger.d(throwable.getMessage()))
+                .subscribe(this::getTransportFromDB);
     }
 
     private void getTransportFromDB(List<TransportEntity> transportEntities) {

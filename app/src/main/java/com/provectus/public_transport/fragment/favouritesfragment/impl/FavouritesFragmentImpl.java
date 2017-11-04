@@ -66,6 +66,7 @@ public class FavouritesFragmentImpl extends Fragment implements FavouritesFragme
         if (mUnbinder != null) {
             mUnbinder.unbind();
         }
+        mFavouritesFragmentPresenter.unregisteredEventBus();
         mFavouritesFragmentPresenter.unbindView();
         EventBus.getDefault().unregister(this);
     }
