@@ -105,6 +105,7 @@ public class MapsFragmentImpl extends Fragment
     private static final int STEP_POINT_FOR_BIG_ROUTE = 10;
     private static final String LOCATION_BUTTON_POSITION = "2";
     private static final String COMPASS_BUTTON_POSITION = "5";
+    private static final int PARKING_TAB_POSITION = 2;
 
     @BindView(R.id.bottom_sheet_view_pager)
     ViewPager mViewPagerTransportAndParking;
@@ -573,9 +574,9 @@ public class MapsFragmentImpl extends Fragment
         mBottomSheetTabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override
             public void onTabSelected(TabLayout.Tab tab) {
-                if  (tab.getPosition() == 2) {
+                if  (tab.getPosition() == PARKING_TAB_POSITION) {
                     mMap.clear();
-                    EventBus.getDefault().post(new BusEvents.UpdateRecyclerView());
+                    EventBus.getDefault().post(new BusEvents.UnselectedAllItems());
                     mViewPagerBottomSheetBehavior.setState(ViewPagerBottomSheetBehavior.STATE_COLLAPSED);
                     mMapsPresenter.stopGetVehicles();
                     getParkings();
@@ -589,7 +590,7 @@ public class MapsFragmentImpl extends Fragment
 
             @Override
             public void onTabUnselected(TabLayout.Tab tab) {
-                if (tab.getPosition() == 2) {
+                if (tab.getPosition() == PARKING_TAB_POSITION) {
                     mMap.clear();
                     mClusterManager.clearItems();
                     mBottomSheetParkingDetail.setState(BottomSheetBehavior.STATE_COLLAPSED);
@@ -598,7 +599,7 @@ public class MapsFragmentImpl extends Fragment
 
             @Override
             public void onTabReselected(TabLayout.Tab tab) {
-                if (tab.getPosition() == 2) {
+                if (tab.getPosition() == PARKING_TAB_POSITION) {
                     mViewPagerBottomSheetBehavior.setState(ViewPagerBottomSheetBehavior.STATE_COLLAPSED);
                 }
                 mViewPagerBottomSheetBehavior.setState(ViewPagerBottomSheetBehavior.STATE_EXPANDED);
@@ -611,10 +612,10 @@ public class MapsFragmentImpl extends Fragment
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .doOnError(throwable -> Logger.d(throwable.getMessage()))
-                .subscribe(this::getParking);
+                .subscribe(this::getAndDrawAllParking);
     }
 
-    private void getParking(List<ParkingEntity> parkingEntities) {
+    private void getAndDrawAllParking(List<ParkingEntity> parkingEntities) {
         for (ParkingEntity parkingEntity : parkingEntities) {
             mClusterManager.addItem(parkingEntity);
         }

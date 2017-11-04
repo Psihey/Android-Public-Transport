@@ -57,7 +57,7 @@ public class TrolleybusFragmentPresenterImpl implements TrolleybusFagmentPresent
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
-    public void updateRecyclerView(BusEvents.UpdateRecyclerView updateRecyclerView) {
+    public void updateRecyclerView(BusEvents.UnselectedAllItems updateRecyclerView) {
         getDataFromDB();
     }
 

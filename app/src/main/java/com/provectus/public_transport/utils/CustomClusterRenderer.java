@@ -13,10 +13,11 @@ import com.provectus.public_transport.R;
 import com.provectus.public_transport.model.ParkingEntity;
 
 public class CustomClusterRenderer extends DefaultClusterRenderer<ParkingEntity> {
-    final BitmapDescriptor markerBlue = BitmapDescriptorFactory.fromResource(R.drawable.ic_location_pin_blue);
-    final BitmapDescriptor markerRed = BitmapDescriptorFactory.fromResource(R.drawable.ic_location_pin_red);
-    final BitmapDescriptor markerYellow = BitmapDescriptorFactory.fromResource(R.drawable.ic_location_pin_orange);
-    final BitmapDescriptor markerGreen = BitmapDescriptorFactory.fromResource(R.drawable.ic_location_pin_green);
+
+    private final BitmapDescriptor mMarkerBlue = BitmapDescriptorFactory.fromResource(R.drawable.ic_location_pin_blue);
+    private final BitmapDescriptor mMarkerRed = BitmapDescriptorFactory.fromResource(R.drawable.ic_location_pin_red);
+    private final BitmapDescriptor mMarkerYellow = BitmapDescriptorFactory.fromResource(R.drawable.ic_location_pin_orange);
+    private final BitmapDescriptor mMarkerGreen = BitmapDescriptorFactory.fromResource(R.drawable.ic_location_pin_green);
 
     public CustomClusterRenderer(Context context, GoogleMap map, ClusterManager<ParkingEntity> clusterManager) {
         super(context, map, clusterManager);
@@ -31,16 +32,16 @@ public class CustomClusterRenderer extends DefaultClusterRenderer<ParkingEntity>
     protected void onBeforeClusterItemRendered(ParkingEntity item, MarkerOptions markerOptions) {
         switch (item.getType()) {
             case OFFICIAL_TYPE:
-                markerOptions.icon(markerYellow).snippet(item.getSnippet());
+                markerOptions.icon(mMarkerYellow).snippet(item.getSnippet());
                 break;
             case ALLDAY_TYPE:
-                markerOptions.icon(markerBlue).snippet(item.getSnippet());
+                markerOptions.icon(mMarkerBlue).snippet(item.getSnippet());
                 break;
             case SEASON_TYPE:
-                markerOptions.icon(markerRed).snippet(item.getSnippet());
+                markerOptions.icon(mMarkerRed).snippet(item.getSnippet());
                 break;
             case UNDEFINED_TYPE:
-                markerOptions.icon(markerGreen).snippet(item.getSnippet());
+                markerOptions.icon(mMarkerGreen).snippet(item.getSnippet());
                 break;
         }
     }

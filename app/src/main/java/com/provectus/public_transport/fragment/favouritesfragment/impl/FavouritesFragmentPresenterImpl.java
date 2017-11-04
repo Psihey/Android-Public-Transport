@@ -75,7 +75,7 @@ public class FavouritesFragmentPresenterImpl implements FavouritesFragmentPresen
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
-    public void updateRecyclerView(BusEvents.UpdateRecyclerView updateRecyclerView) {
+    public void updateRecyclerView(BusEvents.UnselectedAllItems updateRecyclerView) {
         mListForUpdate = null;
         getAllFavouritesFromDB();
     }

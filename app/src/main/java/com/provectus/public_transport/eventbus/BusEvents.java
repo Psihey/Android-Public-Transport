@@ -87,9 +87,9 @@ public class BusEvents {
         }
     }
 
-    public static class UpdateRecyclerView {
+    public static class UnselectedAllItems {
 
-        public UpdateRecyclerView() {
+        public UnselectedAllItems() {
 
         }
     }
