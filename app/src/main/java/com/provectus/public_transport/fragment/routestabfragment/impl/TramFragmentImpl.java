@@ -21,6 +21,7 @@ import com.provectus.public_transport.fragment.routestabfragment.TramFragmentPre
 import com.provectus.public_transport.fragment.routestabfragment.TransportFragment;
 import com.provectus.public_transport.model.TransportEntity;
 import com.provectus.public_transport.service.TransportRoutesService;
+import com.provectus.public_transport.utils.Const;
 import com.provectus.public_transport.utils.Utils;
 
 import org.greenrobot.eventbus.EventBus;
@@ -83,7 +84,7 @@ public class TramFragmentImpl extends Fragment implements TransportFragment {
     public void initRecyclerView(List<TransportEntity> transportEntity) {
         mRoutesRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         mTramAdapter = new TramsAndTrolleyAdapter(getContext(), transportEntity, mMapsFragmentPresenter, mFavouritesFragmentPresenter);
-        EventBus.getDefault().post(new BusEvents.SendTramsAndTrolleyAdapter(mTramAdapter,1));
+        EventBus.getDefault().post(new BusEvents.SendTramsAndTrolleyAdapter(mTramAdapter, Const.TransportType.TRAMS_ADAPTER));
         mRoutesRecyclerView.setAdapter(mTramAdapter);
         mProgressBarNoItem.setVisibility(View.GONE);
         setErrorVisible(View.GONE);

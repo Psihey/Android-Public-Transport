@@ -259,12 +259,11 @@ public class MapsFragmentImpl extends Fragment
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void getTramsAndTrolleybusAdapter(BusEvents.SendTramsAndTrolleyAdapter adapter) {
-        if (adapter.getType() == 1) {
+        if (adapter.getType() == Const.TransportType.TRAMS_ADAPTER) {
             mTramsAdapter = adapter.getTramsAndTrolleyAdapter();
-        } else {
+        } else if (adapter.getType() == Const.TransportType.TROLLEYBUSES_ADAPTER) {
             mTrolleybusAdapter = adapter.getTramsAndTrolleyAdapter();
         }
-
     }
 
     @Override
