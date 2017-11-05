@@ -34,6 +34,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="46dp"
                 android:background="?attr/colorPrimary"
+                app:collapseIcon="@drawable/ic_arrow_back_gray_24dp"
                 app:popupTheme="@style/AppTheme.PopupOverlay" />
 
         </android.support.design.widget.AppBarLayout>

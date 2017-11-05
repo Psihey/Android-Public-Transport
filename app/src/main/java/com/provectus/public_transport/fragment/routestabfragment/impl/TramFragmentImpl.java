@@ -46,10 +46,12 @@ public class TramFragmentImpl extends Fragment implements TransportFragment {
     Button mBtnUpdate;
     @BindView(R.id.tv_wait_for_loading)
     TextView mBtnLoading;
+    @BindView(R.id.tv_no_find_search_result)
+    TextView mTextViewNoFindResult;
 
     private TramFragmentPresenter mTabFragmentPresenter;
     private Unbinder mUnbinder;
-    private TramsAndTrolleyAdapter mTramTrolleybusAdapter;
+    private  TramsAndTrolleyAdapter mTramAdapter;
     private MapsFragmentPresenter mMapsFragmentPresenter;
     private FavouritesFragmentPresenter mFavouritesFragmentPresenter;
 
@@ -80,8 +82,9 @@ public class TramFragmentImpl extends Fragment implements TransportFragment {
     @Override
     public void initRecyclerView(List<TransportEntity> transportEntity) {
         mRoutesRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-        mTramTrolleybusAdapter = new TramsAndTrolleyAdapter(getContext(), transportEntity, mMapsFragmentPresenter, mFavouritesFragmentPresenter);
-        mRoutesRecyclerView.setAdapter(mTramTrolleybusAdapter);
+        mTramAdapter = new TramsAndTrolleyAdapter(getContext(), transportEntity, mMapsFragmentPresenter, mFavouritesFragmentPresenter);
+        EventBus.getDefault().post(new BusEvents.SendTramsAndTrolleyAdapter(mTramAdapter,1));
+        mRoutesRecyclerView.setAdapter(mTramAdapter);
         mProgressBarNoItem.setVisibility(View.GONE);
         setErrorVisible(View.GONE);
     }
@@ -105,8 +108,8 @@ public class TramFragmentImpl extends Fragment implements TransportFragment {
 
     @Override
     public void updateData(TransportEntity transportEntity) {
-            if (mTramTrolleybusAdapter != null) {
-                mTramTrolleybusAdapter.updateData(transportEntity);
+            if (mTramAdapter != null) {
+                mTramAdapter.updateData(transportEntity);
             }
     }
 

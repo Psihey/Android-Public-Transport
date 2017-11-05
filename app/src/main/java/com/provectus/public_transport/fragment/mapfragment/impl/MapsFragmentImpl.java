@@ -15,10 +15,15 @@ import android.support.design.widget.Snackbar;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
+import android.support.v4.view.MenuItemCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.SearchView;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
@@ -45,6 +50,7 @@ import com.google.maps.android.clustering.ClusterManager;
 import com.orhanobut.logger.Logger;
 import com.provectus.public_transport.R;
 import com.provectus.public_transport.adapter.StopDetailSectionAdapter;
+import com.provectus.public_transport.adapter.TramsAndTrolleyAdapter;
 import com.provectus.public_transport.adapter.TransportAndParkingViewPagerAdapter;
 import com.provectus.public_transport.eventbus.BusEvents;
 import com.provectus.public_transport.fragment.mapfragment.MapsFragment;
@@ -62,6 +68,8 @@ import com.provectus.public_transport.utils.CustomClusterRenderer;
 import com.provectus.public_transport.utils.Utils;
 
 import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -200,6 +208,9 @@ public class MapsFragmentImpl extends Fragment
     private String mChosenStopName;
     private ClusterManager<ParkingEntity> mClusterManager;
     private View rootView;
+    private TramsAndTrolleyAdapter mTramsAdapter;
+    private TramsAndTrolleyAdapter mTrolleybusAdapter;
+
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -214,6 +225,8 @@ public class MapsFragmentImpl extends Fragment
             mMapsPresenter = new MapsFragmentPresenterImpl();
         }
         mMapsPresenter.bindView(this);
+        setHasOptionsMenu(true);
+        EventBus.getDefault().register(this);
         return rootView;
     }
 
@@ -241,6 +254,60 @@ public class MapsFragmentImpl extends Fragment
             mUnbinder.unbind();
         }
         mMapsPresenter.unbindView();
+        EventBus.getDefault().unregister(this);
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void getTramsAndTrolleybusAdapter(BusEvents.SendTramsAndTrolleyAdapter adapter) {
+        if (adapter.getType() == 1) {
+            mTramsAdapter = adapter.getTramsAndTrolleyAdapter();
+        } else {
+            mTrolleybusAdapter = adapter.getTramsAndTrolleyAdapter();
+        }
+
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.menu_search, menu);
+        MenuItem search = menu.findItem(R.id.search);
+
+        MenuItemCompat.setOnActionExpandListener(search, new MenuItemCompat.OnActionExpandListener() {
+            @Override
+            public boolean onMenuItemActionExpand(MenuItem item) {
+                mViewPagerBottomSheetBehavior.setState(ViewPagerBottomSheetBehavior.STATE_EXPANDED);
+                return true;
+            }
+
+            @Override
+            public boolean onMenuItemActionCollapse(MenuItem item) {
+                mViewPagerBottomSheetBehavior.setState(ViewPagerBottomSheetBehavior.STATE_COLLAPSED);
+                return true;
+            }
+        });
+        SearchView searchView = (SearchView) MenuItemCompat.getActionView(search);
+        SearchView.SearchAutoComplete searchText = (SearchView.SearchAutoComplete) searchView.findViewById(android.support.v7.appcompat.R.id.search_src_text);
+        searchText.setHintTextColor(Color.GRAY);
+        searchText.setTextColor(Color.BLACK);
+        ImageView searchIconClose = (ImageView) searchView.findViewById(android.support.v7.appcompat.R.id.search_close_btn);
+        searchIconClose.setImageResource(R.drawable.ic_close_gray_24dp);
+        searchRoute(searchView);
+    }
+
+    private void searchRoute(SearchView searchView) {
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                mTramsAdapter.getFilter().filter(newText);
+                mTrolleybusAdapter.getFilter().filter(newText);
+                return true;
+            }
+        });
     }
 
     @Override
@@ -574,7 +641,7 @@ public class MapsFragmentImpl extends Fragment
         mBottomSheetTabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override
             public void onTabSelected(TabLayout.Tab tab) {
-                if  (tab.getPosition() == PARKING_TAB_POSITION) {
+                if (tab.getPosition() == PARKING_TAB_POSITION) {
                     mMap.clear();
                     EventBus.getDefault().post(new BusEvents.UnselectedAllItems());
                     mViewPagerBottomSheetBehavior.setState(ViewPagerBottomSheetBehavior.STATE_COLLAPSED);
@@ -737,10 +804,10 @@ public class MapsFragmentImpl extends Fragment
     }
 
     private void openParkingInfo(Marker marker) {
-        ParkingEntity parkingEntity = (ParkingEntity)marker.getTag();
-        if (parkingEntity != null){
+        ParkingEntity parkingEntity = (ParkingEntity) marker.getTag();
+        if (parkingEntity != null) {
             String parkingType = null;
-            switch (parkingEntity.getType()){
+            switch (parkingEntity.getType()) {
                 case ALLDAY_TYPE:
                     parkingType = getString(R.string.maps_fragment_round_the_clock_parking);
                     break;
@@ -755,8 +822,8 @@ public class MapsFragmentImpl extends Fragment
                     break;
             }
             mTextViewParkingName.setText(parkingEntity.getAddress());
-            mTextViewParkingPlace.setText(getResources().getString(R.string.text_view_parking_number_of_places,parkingEntity.getPlaces()));
-            mTextViewParkingType.setText(getResources().getString(R.string.text_view_parking_parking_type,parkingType));
+            mTextViewParkingPlace.setText(getResources().getString(R.string.text_view_parking_number_of_places, parkingEntity.getPlaces()));
+            mTextViewParkingType.setText(getResources().getString(R.string.text_view_parking_parking_type, parkingType));
         }
     }
 

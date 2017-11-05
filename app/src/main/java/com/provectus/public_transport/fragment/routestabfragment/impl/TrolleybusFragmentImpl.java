@@ -45,10 +45,12 @@ public class TrolleybusFragmentImpl extends Fragment implements TransportFragmen
     Button mBtnUpdate;
     @BindView(R.id.tv_wait_for_loading)
     TextView mBtnLoading;
+    @BindView(R.id.tv_no_find_search_result)
+    TextView mTextViewNoFindResult;
 
     private TrolleybusFragmentPresenterImpl mTabFragmentPresenter;
     private Unbinder mUnbinder;
-    private TramsAndTrolleyAdapter mTramTrolleybusAdapter;
+    private TramsAndTrolleyAdapter mTrolleybusAdapter;
     private MapsFragmentPresenter mMapsFragmentPresenter;
     private FavouritesFragmentPresenter mFavouritesFragmentPresenter;
 
@@ -79,8 +81,9 @@ public class TrolleybusFragmentImpl extends Fragment implements TransportFragmen
     @Override
     public void initRecyclerView(List<TransportEntity> transportEntity) {
         mRoutesRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-        mTramTrolleybusAdapter = new TramsAndTrolleyAdapter(getContext(), transportEntity, mMapsFragmentPresenter, mFavouritesFragmentPresenter);
-        mRoutesRecyclerView.setAdapter(mTramTrolleybusAdapter);
+        mTrolleybusAdapter = new TramsAndTrolleyAdapter(getContext(), transportEntity, mMapsFragmentPresenter, mFavouritesFragmentPresenter);
+        EventBus.getDefault().post(new BusEvents.SendTramsAndTrolleyAdapter(mTrolleybusAdapter,2));
+        mRoutesRecyclerView.setAdapter(mTrolleybusAdapter);
         mProgressBarNoItem.setVisibility(View.GONE);
         setErrorVisible(View.GONE);
     }
@@ -105,10 +108,11 @@ public class TrolleybusFragmentImpl extends Fragment implements TransportFragmen
     @Override
     public void updateData(TransportEntity transportEntity) {
 
-            if (mTramTrolleybusAdapter != null) {
-                mTramTrolleybusAdapter.updateData(transportEntity);
+            if (mTrolleybusAdapter != null) {
+                mTrolleybusAdapter.updateData(transportEntity);
             }
     }
+
 
     @Subscribe(sticky = true, threadMode = ThreadMode.MAIN)
     public void getMapsFragmentPresenter(BusEvents.SendMapsFragmentPresenter event) {
