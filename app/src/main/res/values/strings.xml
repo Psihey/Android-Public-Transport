@@ -49,7 +49,11 @@
     <string name="text_view_contact_email">publictransportcustomercare@gmail.com</string>
     <string name="text_view_parking_number_of_places">Number of places : %1$d</string>
     <string name="text_view_parking_parking_type">Parking type : %1$s</string>
-
+    <string name="main_activity_email_title">Feedback on the operation of the PublicTransport application</string>
+    <string name="maps_fragment_round_the_clock_parking">Round the clock</string>
+    <string name="maps_fragment_official_parking">Official</string>
+    <string name="maps_fragment_season_parking">Season</string>
+    <string name="maps_fragment_daytime_parking">Daytime</string>
 
     <integer-array name="route_color_array">
         <item>@color/routePinkColor</item>
@@ -58,5 +62,9 @@
         <item>@color/routePurpleColor</item>
         <item>@color/routeOrangeColor</item>
     </integer-array>
+
+    <string-array name="main_activity_email_address_array">
+        <item>publictransportcustomercare@gmail.com</item>
+    </string-array>
 
 </resources>

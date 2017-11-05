@@ -742,16 +742,16 @@ public class MapsFragmentImpl extends Fragment
             String parkingType = null;
             switch (parkingEntity.getType()){
                 case ALLDAY_TYPE:
-                    parkingType = "Round the clock";
+                    parkingType = getString(R.string.maps_fragment_round_the_clock_parking);
                     break;
                 case OFFICIAL_TYPE:
-                    parkingType = "Official";
+                    parkingType = getString(R.string.maps_fragment_official_parking);
                     break;
                 case SEASON_TYPE:
-                    parkingType = "Season";
+                    parkingType = getString(R.string.maps_fragment_season_parking);
                     break;
                 case UNDEFINED_TYPE:
-                    parkingType = "Daytime";
+                    parkingType = getString(R.string.maps_fragment_daytime_parking);
                     break;
             }
             mTextViewParkingName.setText(parkingEntity.getAddress());

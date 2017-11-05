@@ -52,7 +52,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/vehicles_detail_layout_margin_start"
-        android:layout_marginTop="50dp"
+        android:layout_marginTop="55dp"
         android:visibility="invisible"
         android:layout_below="@+id/view_separate_line_bottom"/>
 

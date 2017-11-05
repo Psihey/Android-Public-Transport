@@ -29,8 +29,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     @BindView(R.id.nav_view)
     NavigationView mNavigationView;
 
-    private static final String[] mEmailForFeedback = {"publictransportcustomercare@gmail.com"};
-    private static final String mEmailTitleForFeedback = "Feedback on the operation of the PublicTransport application";
     private FragmentManager mFragmentManager;
     private MapsFragmentImpl mMapsFragment;
 
@@ -62,8 +60,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         if (id == R.id.nav_send_feedback) {
             Intent intent = new Intent(Intent.ACTION_SEND);
             intent.setType("message/rfc822");
-            intent.putExtra(Intent.EXTRA_EMAIL, mEmailForFeedback);
-            intent.putExtra(Intent.EXTRA_SUBJECT, mEmailTitleForFeedback);
+            intent.putExtra(Intent.EXTRA_EMAIL, getResources().getStringArray(R.array.main_activity_email_address_array));
+            intent.putExtra(Intent.EXTRA_SUBJECT, getResources().getString(R.string.main_activity_email_title));
             if (intent.resolveActivity(getPackageManager()) != null) {
                 startActivity(intent);
             }
