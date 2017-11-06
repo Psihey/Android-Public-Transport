@@ -9,6 +9,7 @@ import com.orhanobut.logger.Logger;
 import com.provectus.public_transport.eventbus.BusEvents;
 import com.provectus.public_transport.model.DirectEntity;
 import com.provectus.public_transport.model.IndirectionModel;
+import com.provectus.public_transport.model.ParkingEntity;
 import com.provectus.public_transport.model.PointEntity;
 import com.provectus.public_transport.model.SegmentEntity;
 import com.provectus.public_transport.model.StopDetailEntity;
@@ -38,13 +39,14 @@ public class TransportRoutesService extends IntentService {
     private static final String TIME_ZONE_GMT = "GMT";
     private static final String PREFS_NAME = "HttpCodePrefs";
     private static final String PREFS_KEY = "code";
-    private List<TransportEntity> mTransportEntity = new ArrayList<>();
-    private List<SegmentEntity> mSegmentEntity = new ArrayList<>();
-    private List<PointEntity> mPointEntity = new ArrayList<>();
-    private List<StopEntity> mStopEntity = new ArrayList<>();
-    private List<DirectEntity> mDirectionEntity = new ArrayList<>();
+    private List<TransportEntity> mTransportEntities = new ArrayList<>();
+    private List<SegmentEntity> mSegmentEntities = new ArrayList<>();
+    private List<PointEntity> mPointEntities = new ArrayList<>();
+    private List<StopEntity> mStopEntities = new ArrayList<>();
+    private List<DirectEntity> mDirectionEntities = new ArrayList<>();
     private List<TransportEntity> mCurrentFavourites = new ArrayList<>();
     private List<StopDetailEntity> mStopDetailEntities = new ArrayList<>();
+    private List<ParkingEntity> mParkingEntities = new ArrayList<>();
 
     public TransportRoutesService() {
         super(TransportRoutesService.class.getSimpleName());
@@ -73,6 +75,7 @@ public class TransportRoutesService extends IntentService {
 
         Call<List<TransportEntity>> callTransport = RetrofitProvider.getRetrofit().getAllRoutes(date);
         Call<List<StoppingsModel>> callStoppings = RetrofitProvider.getRetrofit().getAllStops();
+        Call<List<ParkingEntity>> callParkings = RetrofitProvider.getRetrofit().getAllParkings();
 
         try {
             Response<List<TransportEntity>> response = callTransport.execute();
@@ -83,87 +86,130 @@ public class TransportRoutesService extends IntentService {
             } else if (response.isSuccessful() && response.body() != null && !response.body().isEmpty()) {
                 getAllCurrentFavourite();
                 putLastModifiedDateToPreference();
-                for (TransportEntity currentRoutes : response.body()) {
-                    boolean isAvailable = true;
-                    boolean isFavourites = false;
-                    for (TransportEntity transportEntity : mCurrentFavourites) {
-                        if (transportEntity.getServerId() == currentRoutes.getServerId()) {
-                            isFavourites = true;
-                        }
-                    }
-                    List<PointEntity> pointsForCurrentRoute = new ArrayList<>();
-                    TransportEntity currentTransportEntity = new TransportEntity(currentRoutes.getServerId(),
-                            currentRoutes.getNumber(),
-                            currentRoutes.getType(),
-                            currentRoutes.getDistance(),
-                            isAvailable,
-                            isFavourites,
-                            currentRoutes.getCost(),
-                            currentRoutes.getFirstStop(),
-                            currentRoutes.getLastStop());
-                    for (DirectEntity directionEntity : currentRoutes.getDirectionEntity()) {
-                        DirectEntity currentDirection = new DirectEntity(directionEntity.getLatitude(),
-                                directionEntity.getLongitude(),
-                                directionEntity.getPosition(),
-                                currentTransportEntity.getServerId());
-                        mDirectionEntity.add(currentDirection);
-                    }
-                    for (IndirectionModel indirectionEntity : currentRoutes.getIndirectionEntity()) {
-                        DirectEntity currentIndirection = new DirectEntity(indirectionEntity.getLatitude(),
-                                indirectionEntity.getLongitude(),
-                                indirectionEntity.getPosition(),
-                                currentTransportEntity.getServerId());
-                        mDirectionEntity.add(currentIndirection);
-                    }
-                    for (SegmentEntity currentSegment : currentRoutes.getSegments()) {
-                        SegmentEntity currentSegmentEntity = new SegmentEntity(currentSegment.getServerId(),
-                                currentSegment.getDirection(),
-                                currentSegment.getPosition(),
-                                currentTransportEntity.getServerId());
-                        mSegmentEntity.add(currentSegmentEntity);
-                        for (PointEntity currentPoint : currentSegment.getPoints()) {
-                            pointsForCurrentRoute.add(currentPoint);
-                            mPointEntity.add(new PointEntity(currentPoint.getLatitude(),
-                                    currentPoint.getLongitude(), currentPoint.getPosition(),
-                                    currentSegmentEntity.getServerId()));
-                        }
-                        mStopEntity.add(new StopEntity(currentSegment.getStopEntity().getServerId(), currentSegment.getStopEntity().getLatitude(),
-                                currentSegment.getStopEntity().getLongitude(),
-                                currentSegment.getStopEntity().getTitle(),
-                                currentSegmentEntity.getServerId()));
-                    }
-                    if (pointsForCurrentRoute.isEmpty()) {
-                        isAvailable = false;
-                        currentTransportEntity.setIsAvailable(isAvailable);
-                    }
-                    mTransportEntity.add(currentTransportEntity);
-                }
-                removeDataFromDB();
-                initDataToDB();
-            }
-            try {
-                Response<List<StoppingsModel>> responseStoppings = callStoppings.execute();
-                for (StoppingsModel currentStop : responseStoppings.body()) {
-                    StoppingsModel stoppingsModel = new StoppingsModel(currentStop.getStoppingID());
-                    for (StopDetailEntity currentStopDetailEntity : currentStop.getStopDetail()) {
-                        StopDetailEntity stopDetailEntity = new StopDetailEntity(stoppingsModel.getStoppingID(),
-                                currentStopDetailEntity.getFirstStopping(),
-                                currentStopDetailEntity.getLastStopping(),
-                                currentStopDetailEntity.getNumber(),
-                                currentStopDetailEntity.getTransportType());
-                        mStopDetailEntities.add(stopDetailEntity);
-                    }
+                initTransportEntity(response);
+                initStopDetailEntity(callStoppings);
+                initParkingEntity(callParkings);
 
-                }
-                removeStopDetailsFromDB();
-                initStopDetailToDB();
-
-            } catch (IOException e) {
-                e.printStackTrace();
             }
+
         } catch (IOException e) {
             Logger.d(e.getMessage());
         }
+
+
+    }
+
+    private void initParkingEntity(Call<List<ParkingEntity>> callParkings) {
+        try {
+            Response<List<ParkingEntity>> responseParking = callParkings.execute();
+            for (ParkingEntity parkingEntity : responseParking.body()) {
+                ParkingEntity currentParkingEntity = new ParkingEntity(parkingEntity.getLatitude(),
+                        parkingEntity.getLongitude(),
+                        parkingEntity.getPlaces(),
+                        parkingEntity.getAddress(),
+                        parkingEntity.getType());
+                mParkingEntities.add(currentParkingEntity);
+            }
+            removeParkingFromDB();
+            initParkingToDB();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void initStopDetailEntity(Call<List<StoppingsModel>> callStoppings) {
+        try {
+            Response<List<StoppingsModel>> responseStoppings = callStoppings.execute();
+            for (StoppingsModel currentStop : responseStoppings.body()) {
+                StoppingsModel stoppingsModel = new StoppingsModel(currentStop.getStoppingID());
+                for (StopDetailEntity currentStopDetailEntity : currentStop.getStopDetail()) {
+                    StopDetailEntity stopDetailEntity = new StopDetailEntity(stoppingsModel.getStoppingID(),
+                            currentStopDetailEntity.getFirstStopping(),
+                            currentStopDetailEntity.getLastStopping(),
+                            currentStopDetailEntity.getNumber(),
+                            currentStopDetailEntity.getTransportType());
+                    mStopDetailEntities.add(stopDetailEntity);
+                }
+
+            }
+            removeStopDetailsFromDB();
+            initStopDetailToDB();
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void initTransportEntity(Response<List<TransportEntity>> response) {
+        for (TransportEntity currentRoutes : response.body()) {
+            boolean isAvailable = true;
+            boolean isFavourites = false;
+            for (TransportEntity transportEntity : mCurrentFavourites) {
+                if (transportEntity.getServerId() == currentRoutes.getServerId()) {
+                    isFavourites = true;
+                }
+            }
+            List<PointEntity> pointsForCurrentRoute = new ArrayList<>();
+            TransportEntity currentTransportEntity = new TransportEntity(currentRoutes.getServerId(),
+                    currentRoutes.getNumber(),
+                    currentRoutes.getType(),
+                    currentRoutes.getDistance(),
+                    isAvailable,
+                    isFavourites,
+                    currentRoutes.getCost(),
+                    currentRoutes.getFirstStop(),
+                    currentRoutes.getLastStop());
+            for (DirectEntity directionEntity : currentRoutes.getDirectionEntity()) {
+                DirectEntity currentDirection = new DirectEntity(directionEntity.getLatitude(),
+                        directionEntity.getLongitude(),
+                        directionEntity.getPosition(),
+                        currentTransportEntity.getServerId());
+                mDirectionEntities.add(currentDirection);
+            }
+            for (IndirectionModel indirectionEntity : currentRoutes.getIndirectionEntity()) {
+                DirectEntity currentIndirection = new DirectEntity(indirectionEntity.getLatitude(),
+                        indirectionEntity.getLongitude(),
+                        indirectionEntity.getPosition(),
+                        currentTransportEntity.getServerId());
+                mDirectionEntities.add(currentIndirection);
+            }
+            for (SegmentEntity currentSegment : currentRoutes.getSegments()) {
+                SegmentEntity currentSegmentEntity = new SegmentEntity(currentSegment.getServerId(),
+                        currentSegment.getDirection(),
+                        currentSegment.getPosition(),
+                        currentTransportEntity.getServerId());
+                mSegmentEntities.add(currentSegmentEntity);
+                for (PointEntity currentPoint : currentSegment.getPoints()) {
+                    pointsForCurrentRoute.add(currentPoint);
+                    mPointEntities.add(new PointEntity(currentPoint.getLatitude(),
+                            currentPoint.getLongitude(), currentPoint.getPosition(),
+                            currentSegmentEntity.getServerId()));
+                }
+                mStopEntities.add(new StopEntity(currentSegment.getStopEntity().getServerId(), currentSegment.getStopEntity().getLatitude(),
+                        currentSegment.getStopEntity().getLongitude(),
+                        currentSegment.getStopEntity().getTitle(),
+                        currentSegmentEntity.getServerId()));
+            }
+            if (pointsForCurrentRoute.isEmpty()) {
+                isAvailable = false;
+                currentTransportEntity.setIsAvailable(isAvailable);
+            }
+            mTransportEntities.add(currentTransportEntity);
+        }
+        removeDataFromDB();
+        initDataToDB();
+    }
+
+    private void removeParkingFromDB() {
+        DatabaseHelper.getPublicTransportDatabase().parkingDao().getAllParkings().subscribe(this::getAllParkingAndRemove);
+    }
+
+    private void getAllParkingAndRemove(List<ParkingEntity> parkingEntities){
+        DatabaseHelper.getPublicTransportDatabase().parkingDao().deleteAll(parkingEntities);
+    }
+
+    private void initParkingToDB() {
+        DatabaseHelper.getPublicTransportDatabase().parkingDao().insertAll(mParkingEntities);
     }
 
     private void removeStopDetailsFromDB() {
@@ -172,12 +218,10 @@ public class TransportRoutesService extends IntentService {
 
     private void getAllStopDetailAndRemove(List<StopDetailEntity> stopDetailEntities) {
         DatabaseHelper.getPublicTransportDatabase().stopDetailDao().deleteAll(stopDetailEntities);
-        Logger.d("remove");
     }
 
     private void initStopDetailToDB() {
         DatabaseHelper.getPublicTransportDatabase().stopDetailDao().insertAll(mStopDetailEntities);
-        Logger.d("init");
     }
 
     private
@@ -203,19 +247,19 @@ public class TransportRoutesService extends IntentService {
 
     private void removeDataFromDB() {
         DatabaseHelper.getPublicTransportDatabase().transportDao().getFavouritesRouteBeforeDeleteDB();
-        DatabaseHelper.getPublicTransportDatabase().transportDao().deleteAll(mTransportEntity);
-        DatabaseHelper.getPublicTransportDatabase().segmentDao().deleteAll(mSegmentEntity);
-        DatabaseHelper.getPublicTransportDatabase().pointDao().deleteAll(mPointEntity);
-        DatabaseHelper.getPublicTransportDatabase().stopDao().deleteAll(mStopEntity);
-        DatabaseHelper.getPublicTransportDatabase().directionDao().deleteAll(mDirectionEntity);
+        DatabaseHelper.getPublicTransportDatabase().transportDao().deleteAll(mTransportEntities);
+        DatabaseHelper.getPublicTransportDatabase().segmentDao().deleteAll(mSegmentEntities);
+        DatabaseHelper.getPublicTransportDatabase().pointDao().deleteAll(mPointEntities);
+        DatabaseHelper.getPublicTransportDatabase().stopDao().deleteAll(mStopEntities);
+        DatabaseHelper.getPublicTransportDatabase().directionDao().deleteAll(mDirectionEntities);
     }
 
     private void initDataToDB() {
-        DatabaseHelper.getPublicTransportDatabase().transportDao().insertAll(mTransportEntity);
-        DatabaseHelper.getPublicTransportDatabase().segmentDao().insertAll(mSegmentEntity);
-        DatabaseHelper.getPublicTransportDatabase().pointDao().insertAll(mPointEntity);
-        DatabaseHelper.getPublicTransportDatabase().stopDao().insertAll(mStopEntity);
-        DatabaseHelper.getPublicTransportDatabase().directionDao().insertAll(mDirectionEntity);
+        DatabaseHelper.getPublicTransportDatabase().transportDao().insertAll(mTransportEntities);
+        DatabaseHelper.getPublicTransportDatabase().segmentDao().insertAll(mSegmentEntities);
+        DatabaseHelper.getPublicTransportDatabase().pointDao().insertAll(mPointEntities);
+        DatabaseHelper.getPublicTransportDatabase().stopDao().insertAll(mStopEntities);
+        DatabaseHelper.getPublicTransportDatabase().directionDao().insertAll(mDirectionEntities);
         EventBus.getDefault().post(new BusEvents.DataBaseInitialized());
         Logger.d("Database is initialized");
     }

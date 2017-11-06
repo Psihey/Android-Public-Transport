@@ -16,23 +16,12 @@
         android:textSize="20sp"
         android:textColor="@color/text_item_view"/>
 
-    <TextView
-        android:id="@+id/tv_stopping_stop_detail"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="20dp"
-        android:layout_marginTop="10dp"
-        android:layout_below="@+id/tv_name_stop_stop_detail"
-        android:textColor="@color/text_item_view"
-        android:textSize="14sp"
-        android:text="@string/text_view_stop_detail_stopping"/>
-
     <View
         android:id="@+id/view_separate_line"
         android:layout_width="match_parent"
         android:layout_height="1dp"
-        android:layout_marginTop="12.5dp"
-        android:layout_below="@+id/tv_stopping_stop_detail"
+        android:layout_marginTop="22.5dp"
+        android:layout_below="@+id/tv_name_stop_stop_detail"
         android:background="#b5b5b3" />
 
     <android.support.v7.widget.RecyclerView

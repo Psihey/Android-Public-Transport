@@ -56,6 +56,11 @@ public class TrolleybusFragmentPresenterImpl implements TrolleybusFagmentPresent
         mTrolleybusFragment.serviceEndWorked();
     }
 
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void updateRecyclerView(BusEvents.UnselectedAllItems updateRecyclerView) {
+        getDataFromDB();
+    }
+
     private void getDataFromDB() {
             DatabaseHelper.getPublicTransportDatabase().transportDao().getAllTrolleybuses()
                     .map(list -> {

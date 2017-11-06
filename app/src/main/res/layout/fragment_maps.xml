@@ -30,6 +30,8 @@
             android:textColor="@android:color/white"
             android:visibility="gone" />
 
+        <include layout="@layout/bottom_sheet_parking_detail"/>
+
         <include layout="@layout/bottom_sheet_stop_detail" />
 
         <include layout="@layout/bottom_sheet_vehicle_detail" />

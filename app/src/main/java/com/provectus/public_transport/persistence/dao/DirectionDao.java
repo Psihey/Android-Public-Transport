@@ -8,14 +8,12 @@ import com.provectus.public_transport.model.DirectEntity;
 
 import java.util.List;
 
-/**
- * Created by Psihey on 19.09.2017.
- */
+
 @Dao
 public interface DirectionDao {
     @Insert
-    void insertAll(List<DirectEntity> direction);
+    void insertAll(List<DirectEntity> directions);
 
     @Delete()
-    void deleteAll(List<DirectEntity> directionEntities);
+    void deleteAll(List<DirectEntity> directions);
 }

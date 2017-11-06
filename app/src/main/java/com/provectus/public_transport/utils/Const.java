@@ -22,7 +22,10 @@ public final class Const {
 
         }
         public static final String TRAMS = "Trams";
+        public static final int TRAMS_ADAPTER = 1;
         public static final String TROLLEYBUSES = "Trolleybuses";
+        public static final int TROLLEYBUSES_ADAPTER = 2;
+
 
     }
 

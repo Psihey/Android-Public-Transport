@@ -15,10 +15,15 @@ import android.support.design.widget.Snackbar;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
+import android.support.v4.view.MenuItemCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.SearchView;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
@@ -41,12 +46,16 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.maps.android.SphericalUtil;
+import com.google.maps.android.clustering.ClusterManager;
 import com.orhanobut.logger.Logger;
 import com.provectus.public_transport.R;
 import com.provectus.public_transport.adapter.StopDetailSectionAdapter;
+import com.provectus.public_transport.adapter.TramsAndTrolleyAdapter;
 import com.provectus.public_transport.adapter.TransportAndParkingViewPagerAdapter;
+import com.provectus.public_transport.eventbus.BusEvents;
 import com.provectus.public_transport.fragment.mapfragment.MapsFragment;
 import com.provectus.public_transport.fragment.mapfragment.MapsFragmentPresenter;
+import com.provectus.public_transport.model.ParkingEntity;
 import com.provectus.public_transport.model.StopDetailEntity;
 import com.provectus.public_transport.model.StopEntity;
 import com.provectus.public_transport.model.TransportEntity;
@@ -55,7 +64,12 @@ import com.provectus.public_transport.model.VehiclesModel;
 import com.provectus.public_transport.model.converter.TransportType;
 import com.provectus.public_transport.persistence.database.DatabaseHelper;
 import com.provectus.public_transport.utils.Const;
+import com.provectus.public_transport.utils.CustomClusterRenderer;
 import com.provectus.public_transport.utils.Utils;
+
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -97,6 +111,9 @@ public class MapsFragmentImpl extends Fragment
     private static final int LIMIT_POINT_FOR_SMALL_ROUTE = 255;
     private static final int STEP_POINT_FOR_SMALL_ROUTE = 5;
     private static final int STEP_POINT_FOR_BIG_ROUTE = 10;
+    private static final String LOCATION_BUTTON_POSITION = "2";
+    private static final String COMPASS_BUTTON_POSITION = "5";
+    private static final int PARKING_TAB_POSITION = 2;
 
     @BindView(R.id.bottom_sheet_view_pager)
     ViewPager mViewPagerTransportAndParking;
@@ -154,6 +171,15 @@ public class MapsFragmentImpl extends Fragment
     @BindView(R.id.tv_name_stop_stop_detail)
     TextView mTextViewStopName;
 
+    @BindView(R.id.relative_container_parking_detail)
+    RelativeLayout mRelativeLayoutParkingDetail;
+    @BindView(R.id.tv_parking_name)
+    TextView mTextViewParkingName;
+    @BindView(R.id.tv_parking_place)
+    TextView mTextViewParkingPlace;
+    @BindView(R.id.tv_parking_type)
+    TextView mTextViewParkingType;
+
     private MapsFragmentPresenter mMapsPresenter;
     private Unbinder mUnbinder;
     private GoogleMap mMap;
@@ -173,17 +199,23 @@ public class MapsFragmentImpl extends Fragment
     private BottomSheetBehavior mBottomSheetVehicleInfo;
     private BottomSheetBehavior mBottomSheetRouteInfo;
     private BottomSheetBehavior mBottomSheetStopDetail;
+    private BottomSheetBehavior mBottomSheetParkingDetail;
     private long mCurrentVehiclesId;
     private String mLastOnlineTime;
     private TransportEntity mCurrentTransportInfo;
     private Handler mHandler = new Handler(getMainLooper());
     private Map<Integer, List<StopEntity>> mCurrentStopEntityOnMap = new ConcurrentHashMap<>();
     private String mChosenStopName;
+    private ClusterManager<ParkingEntity> mClusterManager;
+    private View rootView;
+    private TramsAndTrolleyAdapter mTramsAdapter;
+    private TramsAndTrolleyAdapter mTrolleybusAdapter;
+
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_maps, container, false);
-        mUnbinder = ButterKnife.bind(this, view);
+        rootView = inflater.inflate(R.layout.fragment_maps, container, false);
+        mUnbinder = ButterKnife.bind(this, rootView);
         SupportMapFragment mapFragment = (SupportMapFragment) getChildFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
@@ -193,7 +225,9 @@ public class MapsFragmentImpl extends Fragment
             mMapsPresenter = new MapsFragmentPresenterImpl();
         }
         mMapsPresenter.bindView(this);
-        return view;
+        setHasOptionsMenu(true);
+        EventBus.getDefault().register(this);
+        return rootView;
     }
 
     @Override
@@ -208,7 +242,9 @@ public class MapsFragmentImpl extends Fragment
         mBottomSheetStopDetail = BottomSheetBehavior.from(mRelativeContainerStopDetail);
         mBottomSheetStopDetail.setPeekHeight(PEEK_HEIGHT_INFO_BOTTOM_SHEET);
         mBottomSheetStopDetail.setHideable(true);
-
+        mBottomSheetParkingDetail = BottomSheetBehavior.from(mRelativeLayoutParkingDetail);
+        mBottomSheetParkingDetail.setPeekHeight(PEEK_HEIGHT_INFO_BOTTOM_SHEET);
+        mBottomSheetParkingDetail.setHideable(true);
     }
 
     @Override
@@ -218,16 +254,74 @@ public class MapsFragmentImpl extends Fragment
             mUnbinder.unbind();
         }
         mMapsPresenter.unbindView();
+        EventBus.getDefault().unregister(this);
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void getTramsAndTrolleybusAdapter(BusEvents.SendTramsAndTrolleyAdapter adapter) {
+        if (adapter.getType() == Const.TransportType.TRAMS_ADAPTER) {
+            mTramsAdapter = adapter.getTramsAndTrolleyAdapter();
+        } else if (adapter.getType() == Const.TransportType.TROLLEYBUSES_ADAPTER) {
+            mTrolleybusAdapter = adapter.getTramsAndTrolleyAdapter();
+        }
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.menu_search, menu);
+        MenuItem search = menu.findItem(R.id.search);
+
+        MenuItemCompat.setOnActionExpandListener(search, new MenuItemCompat.OnActionExpandListener() {
+            @Override
+            public boolean onMenuItemActionExpand(MenuItem item) {
+                mViewPagerBottomSheetBehavior.setState(ViewPagerBottomSheetBehavior.STATE_EXPANDED);
+                return true;
+            }
+
+            @Override
+            public boolean onMenuItemActionCollapse(MenuItem item) {
+                mViewPagerBottomSheetBehavior.setState(ViewPagerBottomSheetBehavior.STATE_COLLAPSED);
+                return true;
+            }
+        });
+        SearchView searchView = (SearchView) MenuItemCompat.getActionView(search);
+        SearchView.SearchAutoComplete searchText = (SearchView.SearchAutoComplete) searchView.findViewById(android.support.v7.appcompat.R.id.search_src_text);
+        searchText.setHintTextColor(Color.GRAY);
+        searchText.setTextColor(Color.BLACK);
+        ImageView searchIconClose = (ImageView) searchView.findViewById(android.support.v7.appcompat.R.id.search_close_btn);
+        searchIconClose.setImageResource(R.drawable.ic_close_gray_24dp);
+        searchRoute(searchView);
+    }
+
+    private void searchRoute(SearchView searchView) {
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                mTramsAdapter.getFilter().filter(newText);
+                mTrolleybusAdapter.getFilter().filter(newText);
+                return true;
+            }
+        });
     }
 
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mIsMapReady = true;
         mMap = googleMap;
+        mClusterManager = new ClusterManager<>(getActivity(), mMap);
         setDefaultCameraPosition();
         setMyLocationButton();
+        moveCompassButton();
         mMap.setOnMarkerClickListener(this);
         mMap.setOnMapClickListener(this);
+        mMap.setOnCameraIdleListener(mClusterManager);
+        final CustomClusterRenderer renderer = new CustomClusterRenderer(getActivity(), mMap, mClusterManager);
+        mClusterManager.setRenderer(renderer);
     }
 
     @Override
@@ -235,6 +329,7 @@ public class MapsFragmentImpl extends Fragment
         mBottomSheetVehicleInfo.setState(BottomSheetBehavior.STATE_COLLAPSED);
         mBottomSheetRouteInfo.setState(BottomSheetBehavior.STATE_COLLAPSED);
         mBottomSheetStopDetail.setState(BottomSheetBehavior.STATE_COLLAPSED);
+        mBottomSheetParkingDetail.setState(BottomSheetBehavior.STATE_COLLAPSED);
     }
 
     @Override
@@ -243,11 +338,13 @@ public class MapsFragmentImpl extends Fragment
             if (marker.getTag() instanceof VehiclesModel) {
                 mBottomSheetVehicleInfo.setState(BottomSheetBehavior.STATE_EXPANDED);
                 openVehicleInfo(marker);
-            } else {
+            } else if (marker.getTag() instanceof StopEntity) {
                 mBottomSheetStopDetail.setState(BottomSheetBehavior.STATE_EXPANDED);
                 openStopInfo(marker);
+            } else if (marker.getTag() instanceof ParkingEntity) {
+                mBottomSheetParkingDetail.setState(BottomSheetBehavior.STATE_EXPANDED);
+                openParkingInfo(marker);
             }
-
         }
         return false;
     }
@@ -530,7 +627,9 @@ public class MapsFragmentImpl extends Fragment
         mViewPagerBottomSheetBehavior.setBottomSheetCallback(new ViewPagerBottomSheetBehavior.BottomSheetCallback() {
             @Override
             public void onStateChanged(@NonNull View view, int i) {
+                mBottomSheetVehicleInfo.setState(BottomSheetBehavior.STATE_COLLAPSED);
                 mBottomSheetRouteInfo.setState(BottomSheetBehavior.STATE_COLLAPSED);
+                mBottomSheetStopDetail.setState(BottomSheetBehavior.STATE_COLLAPSED);
             }
 
             @Override
@@ -541,20 +640,52 @@ public class MapsFragmentImpl extends Fragment
         mBottomSheetTabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override
             public void onTabSelected(TabLayout.Tab tab) {
-                mViewPagerBottomSheetBehavior.setState(ViewPagerBottomSheetBehavior.STATE_EXPANDED);
+                if (tab.getPosition() == PARKING_TAB_POSITION) {
+                    mMap.clear();
+                    EventBus.getDefault().post(new BusEvents.UnselectedAllItems());
+                    mViewPagerBottomSheetBehavior.setState(ViewPagerBottomSheetBehavior.STATE_COLLAPSED);
+                    mMapsPresenter.stopGetVehicles();
+                    getParkings();
+                } else {
+                    mViewPagerBottomSheetBehavior.setState(ViewPagerBottomSheetBehavior.STATE_EXPANDED);
+                }
                 mBottomSheetRouteInfo.setState(BottomSheetBehavior.STATE_COLLAPSED);
+                mBottomSheetVehicleInfo.setState(BottomSheetBehavior.STATE_COLLAPSED);
+                mBottomSheetStopDetail.setState(BottomSheetBehavior.STATE_COLLAPSED);
             }
 
             @Override
             public void onTabUnselected(TabLayout.Tab tab) {
-                //Ignore
+                if (tab.getPosition() == PARKING_TAB_POSITION) {
+                    mMap.clear();
+                    mClusterManager.clearItems();
+                    mBottomSheetParkingDetail.setState(BottomSheetBehavior.STATE_COLLAPSED);
+                }
             }
 
             @Override
             public void onTabReselected(TabLayout.Tab tab) {
+                if (tab.getPosition() == PARKING_TAB_POSITION) {
+                    mViewPagerBottomSheetBehavior.setState(ViewPagerBottomSheetBehavior.STATE_COLLAPSED);
+                }
                 mViewPagerBottomSheetBehavior.setState(ViewPagerBottomSheetBehavior.STATE_EXPANDED);
             }
         });
+    }
+
+    private void getParkings() {
+        DatabaseHelper.getPublicTransportDatabase().parkingDao().getAllParkings()
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .doOnError(throwable -> Logger.d(throwable.getMessage()))
+                .subscribe(this::getAndDrawAllParking);
+    }
+
+    private void getAndDrawAllParking(List<ParkingEntity> parkingEntities) {
+        for (ParkingEntity parkingEntity : parkingEntities) {
+            mClusterManager.addItem(parkingEntity);
+        }
+        mClusterManager.cluster();
     }
 
     private void setDefaultCameraPosition() {
@@ -562,11 +693,13 @@ public class MapsFragmentImpl extends Fragment
             CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngBounds(new LatLngBounds
                     (Const.DefaultCameraPosition.ODESSA_FIRST_POINTS, Const.DefaultCameraPosition.ODESSA_SECOND_POINTS), Const.DefaultCameraPosition.ZOOM_ON_MAP);
             mMap.animateCamera(cameraUpdate);
+
         });
     }
 
     private void setMyLocationButton() {
         UiSettings settings = mMap.getUiSettings();
+        moveLocationButtonToBottom();
         if (ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
                 && ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(getActivity(), new String[]{
@@ -576,6 +709,22 @@ public class MapsFragmentImpl extends Fragment
         }
         mMap.setMyLocationEnabled(true);
         settings.setMyLocationButtonEnabled(true);
+    }
+
+    private void moveLocationButtonToBottom() {
+        View locationButton = ((View) rootView.findViewById(Integer.parseInt("1")).getParent()).findViewById(Integer.parseInt(LOCATION_BUTTON_POSITION));
+        RelativeLayout.LayoutParams locationButtonLayoutParams = (RelativeLayout.LayoutParams) locationButton.getLayoutParams();
+        locationButtonLayoutParams.addRule(RelativeLayout.ALIGN_PARENT_TOP, 0);
+        locationButtonLayoutParams.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, RelativeLayout.TRUE);
+        locationButtonLayoutParams.setMargins(0, 0, 30, 150);
+    }
+
+    private void moveCompassButton() {
+        View compassButton = ((View) rootView.findViewById(Integer.parseInt("1")).getParent()).findViewById(Integer.parseInt(COMPASS_BUTTON_POSITION));
+        RelativeLayout.LayoutParams compassButtonLayoutParams = (RelativeLayout.LayoutParams) compassButton.getLayoutParams();
+        compassButtonLayoutParams.addRule(RelativeLayout.ALIGN_PARENT_TOP, 0);
+        compassButtonLayoutParams.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, RelativeLayout.TRUE);
+        compassButtonLayoutParams.setMargins(0, 0, 30, 150);
     }
 
     private int colorForVehicles(Map<Long, Integer> allRoutes, long routeId, String type) {
@@ -623,6 +772,9 @@ public class MapsFragmentImpl extends Fragment
 
     private void getStopDetail(List<StopDetailEntity> stopDetailEntity) {
         if (stopDetailEntity != null && !stopDetailEntity.isEmpty()) {
+            if (mBottomSheetVehicleInfo.getState() == BottomSheetBehavior.STATE_EXPANDED) {
+                mBottomSheetVehicleInfo.setState(BottomSheetBehavior.STATE_COLLAPSED);
+            }
             List<StopDetailEntity> tramList = new ArrayList<>();
             List<StopDetailEntity> trolleybusList = new ArrayList<>();
 
@@ -636,8 +788,8 @@ public class MapsFragmentImpl extends Fragment
 
             SectionedRecyclerViewAdapter sectionAdapter = new SectionedRecyclerViewAdapter();
 
-            StopDetailSectionAdapter tramSection = new StopDetailSectionAdapter(tramList, Const.TransportType.TRAMS);
-            StopDetailSectionAdapter trolleybusSection = new StopDetailSectionAdapter(trolleybusList, Const.TransportType.TROLLEYBUSES);
+            StopDetailSectionAdapter tramSection = new StopDetailSectionAdapter(getContext(), tramList, Const.TransportType.TRAMS);
+            StopDetailSectionAdapter trolleybusSection = new StopDetailSectionAdapter(getContext(), trolleybusList, Const.TransportType.TROLLEYBUSES);
 
             sectionAdapter.addSection(tramSection);
             sectionAdapter.addSection(trolleybusSection);
@@ -650,6 +802,29 @@ public class MapsFragmentImpl extends Fragment
 
     }
 
+    private void openParkingInfo(Marker marker) {
+        ParkingEntity parkingEntity = (ParkingEntity) marker.getTag();
+        if (parkingEntity != null) {
+            String parkingType = null;
+            switch (parkingEntity.getType()) {
+                case ALLDAY_TYPE:
+                    parkingType = getString(R.string.maps_fragment_round_the_clock_parking);
+                    break;
+                case OFFICIAL_TYPE:
+                    parkingType = getString(R.string.maps_fragment_official_parking);
+                    break;
+                case SEASON_TYPE:
+                    parkingType = getString(R.string.maps_fragment_season_parking);
+                    break;
+                case UNDEFINED_TYPE:
+                    parkingType = getString(R.string.maps_fragment_daytime_parking);
+                    break;
+            }
+            mTextViewParkingName.setText(parkingEntity.getAddress());
+            mTextViewParkingPlace.setText(getResources().getString(R.string.text_view_parking_number_of_places, parkingEntity.getPlaces()));
+            mTextViewParkingType.setText(getResources().getString(R.string.text_view_parking_parking_type, parkingType));
+        }
+    }
 
     private void openVehicleInfo(Marker marker) {
         String transportType;

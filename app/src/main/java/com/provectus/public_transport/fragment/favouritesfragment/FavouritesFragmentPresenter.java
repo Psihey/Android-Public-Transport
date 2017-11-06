@@ -14,4 +14,6 @@ public interface FavouritesFragmentPresenter {
     void deleteFavourites(TransportEntity transportEntity);
 
     void updateRecyclerView(List<TransportEntity> transportEntities);
+
+    void unregisteredEventBus();
 }

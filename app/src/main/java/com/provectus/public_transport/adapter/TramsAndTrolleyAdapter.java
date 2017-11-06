@@ -6,6 +6,8 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Filter;
+import android.widget.Filterable;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -14,15 +16,17 @@ import com.provectus.public_transport.fragment.favouritesfragment.FavouritesFrag
 import com.provectus.public_transport.fragment.mapfragment.MapsFragmentPresenter;
 import com.provectus.public_transport.model.TransportEntity;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-public class TramsAndTrolleyAdapter extends RecyclerView.Adapter<TramsAndTrolleyAdapter.TramsAndTrolleyViewHolder> {
+public class TramsAndTrolleyAdapter extends RecyclerView.Adapter<TramsAndTrolleyAdapter.TramsAndTrolleyViewHolder> implements Filterable {
     private static final float mItemViewTransparentAvailable = 1;
     private static final float mItemViewTransparentNotAvailable = 0.4f;
     private List<TransportEntity> mTransportRoutesData;
+    private List<TransportEntity> mFilteredList;
     private Context mContext;
     private MapsFragmentPresenter mMapsFragmentPresenter;
     private FavouritesFragmentPresenter mFavouritesFragmentPresenter;
@@ -32,6 +36,7 @@ public class TramsAndTrolleyAdapter extends RecyclerView.Adapter<TramsAndTrolley
         this.mTransportRoutesData = data;
         this.mMapsFragmentPresenter = mapsFragmentPresenter;
         this.mFavouritesFragmentPresenter = favouritesFragmentPresenter;
+        this.mFilteredList = data;
     }
 
     @Override
@@ -42,8 +47,8 @@ public class TramsAndTrolleyAdapter extends RecyclerView.Adapter<TramsAndTrolley
 
     @Override
     public void onBindViewHolder(TramsAndTrolleyViewHolder holder, int position) {
-        TransportEntity transportRoutes = mTransportRoutesData.get(position);
-        holder.mTvRoutesNumber.setText(mContext.getResources().getString(R.string.text_view_item_tram_trooley_transport_number, String.valueOf(mTransportRoutesData.get(position).getNumber())));
+        final TransportEntity transportRoutes = mFilteredList.get(position);
+        holder.mTvRoutesNumber.setText(mContext.getResources().getString(R.string.text_view_item_tram_trooley_transport_number, String.valueOf(transportRoutes.getNumber())));
         holder.itemView.setOnFocusChangeListener((v, hasFocus) -> transportRoutes.setIsSelected(hasFocus));
         holder.mTvFirstStop.setText(transportRoutes.getFirstStop());
         holder.mTvLastStop.setText(transportRoutes.getLastStop());
@@ -65,7 +70,7 @@ public class TramsAndTrolleyAdapter extends RecyclerView.Adapter<TramsAndTrolley
             }
 
             mMapsFragmentPresenter.onSelectCurrentRoute(transportRoutes);
-            mFavouritesFragmentPresenter.updateRecyclerView(mTransportRoutesData);
+            mFavouritesFragmentPresenter.updateRecyclerView(mFilteredList);
         });
 
         holder.mImageButtonRouteInfo.setOnClickListener(v -> mMapsFragmentPresenter.getRouteInformation(transportRoutes));
@@ -73,9 +78,10 @@ public class TramsAndTrolleyAdapter extends RecyclerView.Adapter<TramsAndTrolley
 
     @Override
     public int getItemCount() {
-        return mTransportRoutesData.size();
+        if (mFilteredList != null) {
+            return mFilteredList.size();
+        } else return 0;
     }
-
 
     private void setItemViewCondition(View itemView, TransportEntity transportEntity) {
         if (!transportEntity.isAvailable()) {
@@ -96,6 +102,39 @@ public class TramsAndTrolleyAdapter extends RecyclerView.Adapter<TramsAndTrolley
         }
     }
 
+    @Override
+    public Filter getFilter() {
+        return new Filter() {
+            @Override
+            protected FilterResults performFiltering(CharSequence charSequence) {
+                String charString = charSequence.toString();
+                if (charString.isEmpty()) {
+                    mFilteredList = mTransportRoutesData;
+                } else {
+                    List<TransportEntity> filteredList = new ArrayList<>();
+                    for (TransportEntity transportEntity : mTransportRoutesData) {
+                        if (String.valueOf(transportEntity.getNumber()).contains(charString)
+                                || transportEntity.getFirstStop().contains(charSequence)
+                                || transportEntity.getLastStop().contains(charSequence)) {
+                            filteredList.add(transportEntity);
+                        }
+                    }
+                    mFilteredList = filteredList;
+                }
+
+                FilterResults filterResults = new FilterResults();
+                filterResults.values = mFilteredList;
+                return filterResults;
+            }
+
+            @Override
+            protected void publishResults(CharSequence charSequence, FilterResults filterResults) {
+                mFilteredList = (List<TransportEntity>) filterResults.values;
+                notifyDataSetChanged();
+            }
+        };
+    }
+
     class TramsAndTrolleyViewHolder extends RecyclerView.ViewHolder {
         @BindView(R.id.text_view_item_tram_trooley_transport_number)
         TextView mTvRoutesNumber;
@@ -111,5 +150,7 @@ public class TramsAndTrolleyAdapter extends RecyclerView.Adapter<TramsAndTrolley
             ButterKnife.bind(this, itemView);
         }
     }
+
+
 
 }

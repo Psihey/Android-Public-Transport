@@ -16,6 +16,6 @@ public interface PointDao {
     void insertAll(List<PointEntity> points);
 
     @Delete()
-    void deleteAll(List<PointEntity> pointEntities);
+    void deleteAll(List<PointEntity> points);
 
 }

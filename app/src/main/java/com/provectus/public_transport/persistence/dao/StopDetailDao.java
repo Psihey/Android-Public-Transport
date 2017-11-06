@@ -16,10 +16,10 @@ import io.reactivex.Maybe;
 public interface StopDetailDao {
 
     @Insert
-    void insertAll(List<StopDetailEntity> transports);
+    void insertAll(List<StopDetailEntity> stopDetails);
 
     @Delete
-    void deleteAll(List<StopDetailEntity> transportEntities);
+    void deleteAll(List<StopDetailEntity> stopDetails);
 
     @Query("SELECT * FROM stoppingDetail ")
     Maybe<List<StopDetailEntity>> getAllStopDetail();

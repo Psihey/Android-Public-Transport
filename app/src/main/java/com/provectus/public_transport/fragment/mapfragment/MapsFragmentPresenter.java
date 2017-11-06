@@ -20,4 +20,6 @@ public interface MapsFragmentPresenter {
     void onSelectCurrentRoute(TransportEntity route);
 
     void getRouteInformation(TransportEntity transportEntity);
+
+    void stopGetVehicles();
 }

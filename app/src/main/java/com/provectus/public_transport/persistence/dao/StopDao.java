@@ -16,5 +16,5 @@ public interface StopDao {
     void insertAll(List<StopEntity> stopping);
 
     @Delete()
-    void deleteAll(List<StopEntity> stopEntities);
+    void deleteAll(List<StopEntity> stops);
 }
