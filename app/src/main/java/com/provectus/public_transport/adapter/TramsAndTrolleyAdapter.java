@@ -113,9 +113,13 @@ public class TramsAndTrolleyAdapter extends RecyclerView.Adapter<TramsAndTrolley
                 } else {
                     List<TransportEntity> filteredList = new ArrayList<>();
                     for (TransportEntity transportEntity : mTransportRoutesData) {
+                        String firstStop = transportEntity.getFirstStop().toLowerCase();
+                        String lastStop = transportEntity.getLastStop().toLowerCase();
+                        String searchStringForStops = charString.toLowerCase();
+
                         if (String.valueOf(transportEntity.getNumber()).contains(charString)
-                                || transportEntity.getFirstStop().contains(charSequence)
-                                || transportEntity.getLastStop().contains(charSequence)) {
+                                || firstStop.contains(searchStringForStops)
+                                || lastStop.contains(searchStringForStops)) {
                             filteredList.add(transportEntity);
                         }
                     }
@@ -150,7 +154,6 @@ public class TramsAndTrolleyAdapter extends RecyclerView.Adapter<TramsAndTrolley
             ButterKnife.bind(this, itemView);
         }
     }
-
 
 
 }

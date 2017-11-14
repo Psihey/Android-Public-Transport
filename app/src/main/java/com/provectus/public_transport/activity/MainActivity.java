@@ -60,6 +60,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         if (id == R.id.nav_send_feedback) {
             Intent intent = new Intent(Intent.ACTION_SEND);
             intent.setType("message/rfc822");
+            intent.setPackage("com.google.android.gm");
             intent.putExtra(Intent.EXTRA_EMAIL, getResources().getStringArray(R.array.main_activity_email_address_array));
             intent.putExtra(Intent.EXTRA_SUBJECT, getResources().getString(R.string.main_activity_email_title));
             if (intent.resolveActivity(getPackageManager()) != null) {
