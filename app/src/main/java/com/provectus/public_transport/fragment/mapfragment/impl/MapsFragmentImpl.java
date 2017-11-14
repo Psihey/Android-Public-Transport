@@ -210,7 +210,8 @@ public class MapsFragmentImpl extends Fragment
     private View rootView;
     private TramsAndTrolleyAdapter mTramsAdapter;
     private TramsAndTrolleyAdapter mTrolleybusAdapter;
-
+    private final int[] mCurrentTabSelected = new int[1];
+    private MenuItem mMenuItemSearch;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -269,12 +270,15 @@ public class MapsFragmentImpl extends Fragment
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         inflater.inflate(R.menu.menu_search, menu);
-        MenuItem search = menu.findItem(R.id.search);
+        mMenuItemSearch = menu.findItem(R.id.search);
 
-        MenuItemCompat.setOnActionExpandListener(search, new MenuItemCompat.OnActionExpandListener() {
+        MenuItemCompat.setOnActionExpandListener(mMenuItemSearch, new MenuItemCompat.OnActionExpandListener() {
             @Override
             public boolean onMenuItemActionExpand(MenuItem item) {
                 mViewPagerBottomSheetBehavior.setState(ViewPagerBottomSheetBehavior.STATE_EXPANDED);
+                if (mCurrentTabSelected[0] == PARKING_TAB_POSITION) {
+                    mBottomSheetTabLayout.getTabAt(TransportAndParkingViewPagerAdapter.POSITION_BUS).select();
+                }
                 return true;
             }
 
@@ -284,7 +288,7 @@ public class MapsFragmentImpl extends Fragment
                 return true;
             }
         });
-        SearchView searchView = (SearchView) MenuItemCompat.getActionView(search);
+        SearchView searchView = (SearchView) MenuItemCompat.getActionView(mMenuItemSearch);
         SearchView.SearchAutoComplete searchText = (SearchView.SearchAutoComplete) searchView.findViewById(android.support.v7.appcompat.R.id.search_src_text);
         searchText.setHintTextColor(Color.GRAY);
         searchText.setTextColor(Color.BLACK);
@@ -630,18 +634,25 @@ public class MapsFragmentImpl extends Fragment
                 mBottomSheetVehicleInfo.setState(BottomSheetBehavior.STATE_COLLAPSED);
                 mBottomSheetRouteInfo.setState(BottomSheetBehavior.STATE_COLLAPSED);
                 mBottomSheetStopDetail.setState(BottomSheetBehavior.STATE_COLLAPSED);
+                if (mCurrentTabSelected[0] == PARKING_TAB_POSITION && mViewPagerBottomSheetBehavior.getState() == BottomSheetBehavior.STATE_DRAGGING) {
+                    mViewPagerBottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
+                }
             }
 
             @Override
             public void onSlide(@NonNull View view, float v) {
-                //Ignore
+                //ignore
             }
         });
         mBottomSheetTabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override
             public void onTabSelected(TabLayout.Tab tab) {
                 if (tab.getPosition() == PARKING_TAB_POSITION) {
+                    if (mMenuItemSearch.isActionViewExpanded()) {
+                        mMenuItemSearch.collapseActionView();
+                    }
                     mMap.clear();
+                    mCurrentTabSelected[0] = PARKING_TAB_POSITION;
                     EventBus.getDefault().post(new BusEvents.UnselectedAllItems());
                     mViewPagerBottomSheetBehavior.setState(ViewPagerBottomSheetBehavior.STATE_COLLAPSED);
                     mMapsPresenter.stopGetVehicles();
@@ -667,8 +678,9 @@ public class MapsFragmentImpl extends Fragment
             public void onTabReselected(TabLayout.Tab tab) {
                 if (tab.getPosition() == PARKING_TAB_POSITION) {
                     mViewPagerBottomSheetBehavior.setState(ViewPagerBottomSheetBehavior.STATE_COLLAPSED);
-                }
-                mViewPagerBottomSheetBehavior.setState(ViewPagerBottomSheetBehavior.STATE_EXPANDED);
+
+                } else
+                    mViewPagerBottomSheetBehavior.setState(ViewPagerBottomSheetBehavior.STATE_EXPANDED);
             }
         });
     }
