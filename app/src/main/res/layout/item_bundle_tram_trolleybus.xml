@@ -9,7 +9,7 @@
 
     <TextView
         android:id="@+id/text_view_item_tram_trooley_transport_number"
-        android:layout_width="wrap_content"
+        android:layout_width="50dp"
         android:layout_height="wrap_content"
         android:layout_alignParentStart="true"
         android:layout_centerVertical="true"
@@ -17,13 +17,43 @@
         android:text="@string/text_view_item_tram_trooley_transport_number"
         android:textColor="@color/text_item_view" />
 
+    <ImageView
+        android:id="@+id/iv_top_dot"
+        android:layout_width="3dp"
+        android:layout_height="3dp"
+        android:layout_marginTop="18dp"
+        android:layout_marginStart="36dp"
+        android:layout_toEndOf="@+id/text_view_item_tram_trooley_transport_number"
+        android:src="@drawable/ic_small_dot_stop_detail" />
+
+    <ImageView
+        android:id="@+id/iv_stick_center"
+        android:layout_width="1dp"
+        android:layout_height="6dp"
+        android:layout_marginTop="1dp"
+        android:layout_marginStart="36.8dp"
+        android:layout_toEndOf="@+id/text_view_item_tram_trooley_transport_number"
+        android:layout_below="@+id/iv_top_dot"
+        android:src="@drawable/ic_small_stick_stop_detail"/>
+
+    <ImageView
+        android:id="@+id/iv_bottom_dot"
+        android:layout_width="3dp"
+        android:layout_height="3dp"
+        android:layout_marginTop="1dp"
+        android:layout_marginStart="36dp"
+        android:layout_below="@+id/iv_stick_center"
+        android:layout_toEndOf="@+id/text_view_item_tram_trooley_transport_number"
+        android:src="@drawable/ic_small_dot_stop_detail" />
+
     <TextView
         android:id="@+id/tv_first_stop"
         android:layout_width="wrap_content"
         android:layout_height="24dp"
-        android:layout_toEndOf="@+id/text_view_item_tram_trooley_transport_number"
+        android:layout_marginStart="8dp"
+        android:layout_toEndOf="@+id/iv_top_dot"
         android:layout_toStartOf="@+id/image_button_route_info"
-        android:gravity="center|bottom"
+        android:gravity="start|bottom"
         android:textColor="@color/text_item_view" />
 
     <TextView
@@ -31,9 +61,10 @@
         android:layout_width="wrap_content"
         android:layout_height="24dp"
         android:layout_below="@+id/tv_first_stop"
-        android:layout_toEndOf="@+id/text_view_item_tram_trooley_transport_number"
+        android:layout_marginStart="8dp"
+        android:layout_toEndOf="@+id/iv_top_dot"
         android:layout_toStartOf="@+id/image_button_route_info"
-        android:gravity="center|top"
+        android:gravity="start|top"
         android:textColor="@color/text_item_view" />
 
     <ImageView

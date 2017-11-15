@@ -44,7 +44,7 @@
     <string name="text_view_about_program_public_transport">Public Transport</string>
     <string name="text_view_version_code">Version Code : %1$d</string>
     <string name="text_view_version_name">Version Name : %1$s</string>
-    <string name="tv_describe_app">Public Transport is a application for monitoring system of passenger/public transport in real time for residents of Odessa, designed for Android.</string>
+    <string name="tv_describe_app">Public Transport is an application for monitoring system of passenger/public transport in real time for residents of Odessa, designed for Android.</string>
     <string name="text_view_contact_">Contact for communications and offers :</string>
     <string name="text_view_contact_email">publictransportcustomercare@gmail.com</string>
     <string name="text_view_parking_number_of_places">Number of places : %1$d</string>
@@ -54,6 +54,7 @@
     <string name="maps_fragment_official_parking">Official</string>
     <string name="maps_fragment_season_parking">Season</string>
     <string name="maps_fragment_daytime_parking">Daytime</string>
+    <string name="main_activity_snack_bar_no_gmail_agent">There is no Gmail Agent. Please install!</string>
 
     <integer-array name="route_color_array">
         <item>@color/routePinkColor</item>
