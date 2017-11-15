@@ -5,7 +5,6 @@ import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.design.widget.BaseTransientBottomBar;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.FragmentManager;
@@ -77,7 +76,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     startActivity(intent);
                 }
             } else {
-                Snackbar snackbar = Snackbar.make(mDrawerLayout, R.string.main_activity_snack_bar_no_gmail_agent, BaseTransientBottomBar.LENGTH_LONG);
+                Snackbar snackbar = Snackbar.make(mDrawerLayout, R.string.main_activity_snack_bar_no_gmail_agent, Snackbar.LENGTH_LONG);
                 snackbar.show();
             }
 
