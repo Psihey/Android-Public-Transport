@@ -95,7 +95,7 @@ import static android.os.Looper.getMainLooper;
 
 
 public class MapsFragmentImpl extends Fragment
-        implements MapsFragment, GoogleMap.OnMapClickListener, OnMapReadyCallback, GoogleMap.OnMarkerClickListener {
+        implements MapsFragment, GoogleMap.OnMapClickListener, OnMapReadyCallback, GoogleMap.OnMarkerClickListener,TabLayout.OnTabSelectedListener {
 
     public static final String TAG_MAP_FRAGMENT = "fragment_map";
     private static final int REQUEST_LOCATION_PERMISSIONS = 1;
@@ -210,7 +210,7 @@ public class MapsFragmentImpl extends Fragment
     private View rootView;
     private TramsAndTrolleyAdapter mTramsAdapter;
     private TramsAndTrolleyAdapter mTrolleybusAdapter;
-    private final int[] mCurrentTabSelected = new int[1];
+    private int mCurrentTabSelected;
     private MenuItem mMenuItemSearch;
 
     @Override
@@ -276,7 +276,7 @@ public class MapsFragmentImpl extends Fragment
             @Override
             public boolean onMenuItemActionExpand(MenuItem item) {
                 mViewPagerBottomSheetBehavior.setState(ViewPagerBottomSheetBehavior.STATE_EXPANDED);
-                if (mCurrentTabSelected[0] == PARKING_TAB_POSITION) {
+                if (mCurrentTabSelected == PARKING_TAB_POSITION) {
                     mBottomSheetTabLayout.getTabAt(TransportAndParkingViewPagerAdapter.POSITION_BUS).select();
                 }
                 return true;
@@ -297,20 +297,43 @@ public class MapsFragmentImpl extends Fragment
         searchRoute(searchView);
     }
 
-    private void searchRoute(SearchView searchView) {
-        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
-            @Override
-            public boolean onQueryTextSubmit(String query) {
-                return false;
-            }
 
-            @Override
-            public boolean onQueryTextChange(String newText) {
-                mTramsAdapter.getFilter().filter(newText);
-                mTrolleybusAdapter.getFilter().filter(newText);
-                return true;
+    @Override
+    public void onTabSelected(TabLayout.Tab tab) {
+        if (tab.getPosition() == PARKING_TAB_POSITION) {
+            if (mMenuItemSearch.isActionViewExpanded()) {
+                mMenuItemSearch.collapseActionView();
             }
-        });
+            mMap.clear();
+            mCurrentTabSelected = PARKING_TAB_POSITION;
+            EventBus.getDefault().post(new BusEvents.UnselectedAllItems());
+            mViewPagerBottomSheetBehavior.setState(ViewPagerBottomSheetBehavior.STATE_COLLAPSED);
+            mMapsPresenter.stopGetVehicles();
+            getParkings();
+        } else {
+            mViewPagerBottomSheetBehavior.setState(ViewPagerBottomSheetBehavior.STATE_EXPANDED);
+        }
+        mBottomSheetRouteInfo.setState(BottomSheetBehavior.STATE_COLLAPSED);
+        mBottomSheetVehicleInfo.setState(BottomSheetBehavior.STATE_COLLAPSED);
+        mBottomSheetStopDetail.setState(BottomSheetBehavior.STATE_COLLAPSED);
+    }
+
+    @Override
+    public void onTabUnselected(TabLayout.Tab tab) {
+        if (tab.getPosition() == PARKING_TAB_POSITION) {
+            mMap.clear();
+            mClusterManager.clearItems();
+            mBottomSheetParkingDetail.setState(BottomSheetBehavior.STATE_COLLAPSED);
+        }
+    }
+
+    @Override
+    public void onTabReselected(TabLayout.Tab tab) {
+        if (tab.getPosition() == PARKING_TAB_POSITION) {
+            mViewPagerBottomSheetBehavior.setState(ViewPagerBottomSheetBehavior.STATE_COLLAPSED);
+
+        } else
+            mViewPagerBottomSheetBehavior.setState(ViewPagerBottomSheetBehavior.STATE_EXPANDED);
     }
 
     @Override
@@ -587,6 +610,22 @@ public class MapsFragmentImpl extends Fragment
                 );
     }
 
+    private void searchRoute(SearchView searchView) {
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                mTramsAdapter.getFilter().filter(newText);
+                mTrolleybusAdapter.getFilter().filter(newText);
+                return true;
+            }
+        });
+    }
+
     private boolean updateFavouritesDB() {
         DatabaseHelper.getPublicTransportDatabase().transportDao().updateFavourites(mCurrentTransportInfo);
         return true;
@@ -626,6 +665,7 @@ public class MapsFragmentImpl extends Fragment
         mBottomSheetTabLayout.getTabAt(TransportAndParkingViewPagerAdapter.POSITION_TRAM).setIcon(R.drawable.tram_tab_drawable_state);
         mBottomSheetTabLayout.getTabAt(TransportAndParkingViewPagerAdapter.POSITION_PARKING).setIcon(R.drawable.parking_tab_drawable_state);
         mBottomSheetTabLayout.getTabAt(TransportAndParkingViewPagerAdapter.POSITION_FAVOURITES).setIcon(R.drawable.favourites_tab_drawable_state);
+        mBottomSheetTabLayout.addOnTabSelectedListener(this);
         BottomSheetUtils.setupViewPager(mViewPagerTransportAndParking);
         mViewPagerBottomSheetBehavior = ViewPagerBottomSheetBehavior.from(mRelativeLayoutBottomSheet);
         mViewPagerBottomSheetBehavior.setBottomSheetCallback(new ViewPagerBottomSheetBehavior.BottomSheetCallback() {
@@ -634,7 +674,7 @@ public class MapsFragmentImpl extends Fragment
                 mBottomSheetVehicleInfo.setState(BottomSheetBehavior.STATE_COLLAPSED);
                 mBottomSheetRouteInfo.setState(BottomSheetBehavior.STATE_COLLAPSED);
                 mBottomSheetStopDetail.setState(BottomSheetBehavior.STATE_COLLAPSED);
-                if (mCurrentTabSelected[0] == PARKING_TAB_POSITION && mViewPagerBottomSheetBehavior.getState() == BottomSheetBehavior.STATE_DRAGGING) {
+                if (mCurrentTabSelected == PARKING_TAB_POSITION && mViewPagerBottomSheetBehavior.getState() == BottomSheetBehavior.STATE_DRAGGING) {
                     mViewPagerBottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
                 }
             }
@@ -644,45 +684,7 @@ public class MapsFragmentImpl extends Fragment
                 //ignore
             }
         });
-        mBottomSheetTabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
-            @Override
-            public void onTabSelected(TabLayout.Tab tab) {
-                if (tab.getPosition() == PARKING_TAB_POSITION) {
-                    if (mMenuItemSearch.isActionViewExpanded()) {
-                        mMenuItemSearch.collapseActionView();
-                    }
-                    mMap.clear();
-                    mCurrentTabSelected[0] = PARKING_TAB_POSITION;
-                    EventBus.getDefault().post(new BusEvents.UnselectedAllItems());
-                    mViewPagerBottomSheetBehavior.setState(ViewPagerBottomSheetBehavior.STATE_COLLAPSED);
-                    mMapsPresenter.stopGetVehicles();
-                    getParkings();
-                } else {
-                    mViewPagerBottomSheetBehavior.setState(ViewPagerBottomSheetBehavior.STATE_EXPANDED);
-                }
-                mBottomSheetRouteInfo.setState(BottomSheetBehavior.STATE_COLLAPSED);
-                mBottomSheetVehicleInfo.setState(BottomSheetBehavior.STATE_COLLAPSED);
-                mBottomSheetStopDetail.setState(BottomSheetBehavior.STATE_COLLAPSED);
-            }
 
-            @Override
-            public void onTabUnselected(TabLayout.Tab tab) {
-                if (tab.getPosition() == PARKING_TAB_POSITION) {
-                    mMap.clear();
-                    mClusterManager.clearItems();
-                    mBottomSheetParkingDetail.setState(BottomSheetBehavior.STATE_COLLAPSED);
-                }
-            }
-
-            @Override
-            public void onTabReselected(TabLayout.Tab tab) {
-                if (tab.getPosition() == PARKING_TAB_POSITION) {
-                    mViewPagerBottomSheetBehavior.setState(ViewPagerBottomSheetBehavior.STATE_COLLAPSED);
-
-                } else
-                    mViewPagerBottomSheetBehavior.setState(ViewPagerBottomSheetBehavior.STATE_EXPANDED);
-            }
-        });
     }
 
     private void getParkings() {
