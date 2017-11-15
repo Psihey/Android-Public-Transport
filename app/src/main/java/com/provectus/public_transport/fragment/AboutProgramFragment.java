@@ -36,9 +36,14 @@ public class AboutProgramFragment extends Fragment {
         View rootView = inflater.inflate(R.layout.fragment_about_program, container, false);
         mUnbinder = ButterKnife.bind(this, rootView);
         ((AppCompatActivity) getActivity()).getSupportActionBar().hide();
-        mTextViewVersionCode.setText(getResources().getString(R.string.text_view_version_code,BuildConfig.VERSION_CODE));
-        mTextViewVersionName.setText(getResources().getString(R.string.text_view_version_name,BuildConfig.VERSION_NAME));
         return rootView;
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        mTextViewVersionCode.setText(getResources().getString(R.string.text_view_version_code, BuildConfig.VERSION_CODE));
+        mTextViewVersionName.setText(getResources().getString(R.string.text_view_version_name, BuildConfig.VERSION_NAME));
     }
 
     @OnClick(R.id.im_btn_arrow_back)
