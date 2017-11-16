@@ -114,6 +114,7 @@ public class MapsFragmentImpl extends Fragment
     private static final String LOCATION_BUTTON_POSITION = "2";
     private static final String COMPASS_BUTTON_POSITION = "5";
     private static final int PARKING_TAB_POSITION = 2;
+    private static final int NOT_PARKING_TAB_POSITION = -1;
 
     @BindView(R.id.bottom_sheet_view_pager)
     ViewPager mViewPagerTransportAndParking;
@@ -232,8 +233,8 @@ public class MapsFragmentImpl extends Fragment
     }
 
     @Override
-    public void onResume() {
-        super.onResume();
+    public void onStart() {
+        super.onStart();
         mBottomSheetVehicleInfo = BottomSheetBehavior.from(mConstraintVehicleContainer);
         mBottomSheetVehicleInfo.setPeekHeight(PEEK_HEIGHT_INFO_BOTTOM_SHEET);
         mBottomSheetVehicleInfo.setHideable(true);
@@ -304,13 +305,16 @@ public class MapsFragmentImpl extends Fragment
             if (mMenuItemSearch.isActionViewExpanded()) {
                 mMenuItemSearch.collapseActionView();
             }
-            mMap.clear();
+            if (checkOnReadyMap()){
+                mMap.clear();
+            }
             mCurrentTabSelected = PARKING_TAB_POSITION;
             EventBus.getDefault().post(new BusEvents.UnselectedAllItems());
             mViewPagerBottomSheetBehavior.setState(ViewPagerBottomSheetBehavior.STATE_COLLAPSED);
             mMapsPresenter.stopGetVehicles();
             getParkings();
         } else {
+            mCurrentTabSelected = NOT_PARKING_TAB_POSITION;
             mViewPagerBottomSheetBehavior.setState(ViewPagerBottomSheetBehavior.STATE_EXPANDED);
         }
         mBottomSheetRouteInfo.setState(BottomSheetBehavior.STATE_COLLAPSED);
@@ -321,7 +325,9 @@ public class MapsFragmentImpl extends Fragment
     @Override
     public void onTabUnselected(TabLayout.Tab tab) {
         if (tab.getPosition() == PARKING_TAB_POSITION) {
-            mMap.clear();
+            if (checkOnReadyMap()){
+                mMap.clear();
+            }
             mClusterManager.clearItems();
             mBottomSheetParkingDetail.setState(BottomSheetBehavior.STATE_COLLAPSED);
         }
@@ -331,7 +337,6 @@ public class MapsFragmentImpl extends Fragment
     public void onTabReselected(TabLayout.Tab tab) {
         if (tab.getPosition() == PARKING_TAB_POSITION) {
             mViewPagerBottomSheetBehavior.setState(ViewPagerBottomSheetBehavior.STATE_COLLAPSED);
-
         } else
             mViewPagerBottomSheetBehavior.setState(ViewPagerBottomSheetBehavior.STATE_EXPANDED);
     }
@@ -619,8 +624,10 @@ public class MapsFragmentImpl extends Fragment
 
             @Override
             public boolean onQueryTextChange(String newText) {
-                mTramsAdapter.getFilter().filter(newText);
-                mTrolleybusAdapter.getFilter().filter(newText);
+                if (mTramsAdapter !=null && mTrolleybusAdapter !=null){
+                    mTramsAdapter.getFilter().filter(newText);
+                    mTrolleybusAdapter.getFilter().filter(newText);
+                }
                 return true;
             }
         });
@@ -671,12 +678,13 @@ public class MapsFragmentImpl extends Fragment
         mViewPagerBottomSheetBehavior.setBottomSheetCallback(new ViewPagerBottomSheetBehavior.BottomSheetCallback() {
             @Override
             public void onStateChanged(@NonNull View view, int i) {
-                mBottomSheetVehicleInfo.setState(BottomSheetBehavior.STATE_COLLAPSED);
-                mBottomSheetRouteInfo.setState(BottomSheetBehavior.STATE_COLLAPSED);
-                mBottomSheetStopDetail.setState(BottomSheetBehavior.STATE_COLLAPSED);
                 if (mCurrentTabSelected == PARKING_TAB_POSITION && mViewPagerBottomSheetBehavior.getState() == BottomSheetBehavior.STATE_DRAGGING) {
                     mViewPagerBottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
                 }
+
+                mBottomSheetVehicleInfo.setState(BottomSheetBehavior.STATE_COLLAPSED);
+                mBottomSheetRouteInfo.setState(BottomSheetBehavior.STATE_COLLAPSED);
+                mBottomSheetStopDetail.setState(BottomSheetBehavior.STATE_COLLAPSED);
             }
 
             @Override

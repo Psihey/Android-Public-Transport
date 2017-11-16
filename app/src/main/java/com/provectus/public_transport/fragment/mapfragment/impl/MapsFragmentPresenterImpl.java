@@ -41,7 +41,6 @@ public class MapsFragmentPresenterImpl implements MapsFragmentPresenter {
     private long mCurrentRouteServerId;
     private CompositeDisposable mCompositeDisposable;
     private List<Long> mCurrentVehicles = new ArrayList<>();
-    private TransportEntity mEntityForRouteInfo;
 
 
     @Override
@@ -116,16 +115,9 @@ public class MapsFragmentPresenterImpl implements MapsFragmentPresenter {
     }
 
     private void getChosenTransportFromDB(TransportEntity transportEntity) {
-        mEntityForRouteInfo = transportEntity;
-        DatabaseHelper.getPublicTransportDatabase().transportDao().getStopsForCurrentTransport(transportEntity.getNumber(), transportEntity.getType().toString())
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .doOnError(throwable -> Logger.d(throwable.getMessage()))
-                .subscribe(this::getChosenStopFromDB);
-    }
-
-    private void getChosenStopFromDB(List<StopEntity> stopEntity) {
-        mMapsFragment.openRouteInfo(mEntityForRouteInfo);
+        if (mMapsFragment !=null && transportEntity!=null){
+            mMapsFragment.openRouteInfo(transportEntity);
+        }
     }
 
     private void getDirectionFromDB(List<DirectEntity> segmentEntities) {
@@ -200,7 +192,7 @@ public class MapsFragmentPresenterImpl implements MapsFragmentPresenter {
             if (throwable instanceof SocketTimeoutException) {
                 mMapsFragment.showErrorSnackbar(R.string.snack_bar_no_vehicles_no_internet_connection);
             } else if (throwable instanceof ConnectException) {
-                mMapsFragment.showErrorSnackbar(R.string.snack_bar_no_vehicles_server_not_response);
+                mMapsFragment.showErrorSnackbar(R.string.snack_bar_no_vehicles_no_internet_connection);
             }
         }
     }

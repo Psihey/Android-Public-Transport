@@ -18,7 +18,7 @@
     <string name="snack_bar_no_vehicles_for_this_route">No data on vehicles</string>
     <string name="alert_dialog_google_play_error_title">Google Play Error</string>
     <string name="alert_dialog_google_play_error_message">Problems with the Google Play Service. The Application is closing.</string>
-    <string name="alert_dialog_google_play_error_button">Ok</string>
+    <string name="alert_dialog_google_play_error_button">OK</string>
     <string name="text_view_route_number">Route №%1$d</string>
     <string name="text_view_transport_speed">%1$d km/h</string>
     <string name="text_view_transport_fee">%1$s UAH</string>
@@ -54,7 +54,8 @@
     <string name="maps_fragment_official_parking">Official</string>
     <string name="maps_fragment_season_parking">Season</string>
     <string name="maps_fragment_daytime_parking">Daytime</string>
-    <string name="main_activity_snack_bar_no_gmail_agent">There is no Gmail Agent. Please install!</string>
+    <string name="main_activity_snack_bar_no_mail_agents">There are no any Mail Agent. Please install!</string>
+    <string name="main_activity_chooser_dialog">Which application is opening?</string>
 
     <integer-array name="route_color_array">
         <item>@color/routePinkColor</item>
