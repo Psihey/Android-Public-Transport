@@ -56,6 +56,7 @@
     <string name="maps_fragment_daytime_parking">Daytime</string>
     <string name="main_activity_snack_bar_no_mail_agents">There are no any Mail Agent. Please install!</string>
     <string name="main_activity_chooser_dialog">Which application is opening?</string>
+    <string name="menu_search">Search</string>
 
     <integer-array name="route_color_array">
         <item>@color/routePinkColor</item>

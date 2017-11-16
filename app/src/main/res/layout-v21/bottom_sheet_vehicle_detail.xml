@@ -172,7 +172,7 @@
         android:background="#b5b5b3"
         app:layout_constraintTop_toBottomOf="@+id/tv_transport_route_distance"
         android:elevation="28dp"
-        tools:layout_editor_absoluteX="8dp" />
+        tools:layout_editor_absoluteX="8dp"/>
 
     <TextView
         android:layout_width="wrap_content"

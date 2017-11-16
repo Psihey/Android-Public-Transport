@@ -20,13 +20,13 @@ import android.support.v4.view.ViewPager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
+import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -154,7 +154,7 @@ public class MapsFragmentImpl extends Fragment
     @BindView(R.id.tv_transport_route_info_type_value)
     TextView mTextViewRouteInfoType;
     @BindView(R.id.ib_route_info_favorite_icon)
-    ImageButton mImageButtonFavouriteInfo;
+    ImageView mImageButtonFavouriteInfo;
     @BindView(R.id.tv_route_info_transport_fee_value)
     TextView mTextViewRouteInfoFee;
     @BindView(R.id.tv_route_info_transport_route_distance_value)
@@ -296,6 +296,8 @@ public class MapsFragmentImpl extends Fragment
         ImageView searchIconClose = (ImageView) searchView.findViewById(android.support.v7.appcompat.R.id.search_close_btn);
         searchIconClose.setImageResource(R.drawable.ic_close_gray_24dp);
         searchRoute(searchView);
+        Toolbar toolbar = (Toolbar) getActivity().findViewById(R.id.toolbar);
+        toolbar.setOnClickListener(v -> mMenuItemSearch.expandActionView());
     }
 
 
