@@ -41,18 +41,16 @@ public class TramFragmentImpl extends Fragment implements TransportFragment {
     RecyclerView mRoutesRecyclerView;
     @BindView(R.id.tab_fragment_progress_bar)
     ProgressBar mProgressBarNoItem;
-    @BindView(R.id.tv_tab_fragment_no_data)
-    TextView mTextViewNoData;
     @BindView(R.id.bottom_sheet_btn_update)
     Button mBtnUpdate;
     @BindView(R.id.tv_wait_for_loading)
     TextView mBtnLoading;
-    @BindView(R.id.tv_no_find_search_result)
-    TextView mTextViewNoFindResult;
+    @BindView(R.id.tv_server_no_responding)
+    TextView mTextViewNoServerResponding;
 
     private TramFragmentPresenter mTabFragmentPresenter;
     private Unbinder mUnbinder;
-    private  TramsAndTrolleyAdapter mTramAdapter;
+    private TramsAndTrolleyAdapter mTramAdapter;
     private MapsFragmentPresenter mMapsFragmentPresenter;
     private FavouritesFragmentPresenter mFavouritesFragmentPresenter;
 
@@ -87,6 +85,7 @@ public class TramFragmentImpl extends Fragment implements TransportFragment {
         EventBus.getDefault().post(new BusEvents.SendTramsAndTrolleyAdapter(mTramAdapter, Const.TransportType.TRAMS_ADAPTER));
         mRoutesRecyclerView.setAdapter(mTramAdapter);
         mProgressBarNoItem.setVisibility(View.GONE);
+        mTextViewNoServerResponding.setVisibility(View.INVISIBLE);
         setErrorVisible(View.GONE);
     }
 
@@ -109,9 +108,9 @@ public class TramFragmentImpl extends Fragment implements TransportFragment {
 
     @Override
     public void updateData(TransportEntity transportEntity) {
-            if (mTramAdapter != null) {
-                mTramAdapter.updateData(transportEntity);
-            }
+        if (mTramAdapter != null) {
+            mTramAdapter.updateData(transportEntity);
+        }
     }
 
     @Subscribe(sticky = true, threadMode = ThreadMode.MAIN)
@@ -124,8 +123,16 @@ public class TramFragmentImpl extends Fragment implements TransportFragment {
         mFavouritesFragmentPresenter = event.getFavouritesFragmentPresenter();
     }
 
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void serverNotResponding(BusEvents.ServerNotResponding event) {
+        if (mTramAdapter == null) {
+            setErrorVisible(View.GONE);
+            mTextViewNoServerResponding.setVisibility(View.VISIBLE);
+        }
+    }
+
     private void setErrorVisible(int visible) {
-        mTextViewNoData.setVisibility(visible);
         mBtnUpdate.setVisibility(visible);
     }
 

@@ -22,4 +22,6 @@ public interface MapsFragmentPresenter {
     void getRouteInformation(TransportEntity transportEntity);
 
     void stopGetVehicles();
+
+    void getAllParking();
 }

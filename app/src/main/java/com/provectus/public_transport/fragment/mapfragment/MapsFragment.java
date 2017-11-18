@@ -1,6 +1,7 @@
 package com.provectus.public_transport.fragment.mapfragment;
 
 import com.google.android.gms.maps.model.PolylineOptions;
+import com.provectus.public_transport.model.ParkingEntity;
 import com.provectus.public_transport.model.StopEntity;
 import com.provectus.public_transport.model.TransportEntity;
 import com.provectus.public_transport.model.VehicleMarkerInfoModel;
@@ -38,5 +39,7 @@ public interface MapsFragment {
     void routeNotSelected();
 
     void openRouteInfo(TransportEntity transportEntity);
+
+    void addAllParkingToCluster(List<ParkingEntity> parkingEntities);
 
 }

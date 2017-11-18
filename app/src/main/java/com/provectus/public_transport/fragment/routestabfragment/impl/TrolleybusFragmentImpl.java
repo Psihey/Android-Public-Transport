@@ -40,14 +40,12 @@ public class TrolleybusFragmentImpl extends Fragment implements TransportFragmen
     RecyclerView mRoutesRecyclerView;
     @BindView(R.id.tab_fragment_progress_bar)
     ProgressBar mProgressBarNoItem;
-    @BindView(R.id.tv_tab_fragment_no_data)
-    TextView mTextViewNoData;
     @BindView(R.id.bottom_sheet_btn_update)
     Button mBtnUpdate;
     @BindView(R.id.tv_wait_for_loading)
     TextView mBtnLoading;
-    @BindView(R.id.tv_no_find_search_result)
-    TextView mTextViewNoFindResult;
+    @BindView(R.id.tv_server_no_responding)
+    TextView mTextViewNoServerResponding;
 
     private TrolleybusFragmentPresenterImpl mTabFragmentPresenter;
     private Unbinder mUnbinder;
@@ -86,6 +84,7 @@ public class TrolleybusFragmentImpl extends Fragment implements TransportFragmen
         EventBus.getDefault().post(new BusEvents.SendTramsAndTrolleyAdapter(mTrolleybusAdapter, Const.TransportType.TROLLEYBUSES_ADAPTER));
         mRoutesRecyclerView.setAdapter(mTrolleybusAdapter);
         mProgressBarNoItem.setVisibility(View.GONE);
+        mTextViewNoServerResponding.setVisibility(View.INVISIBLE);
         setErrorVisible(View.GONE);
     }
 
@@ -108,10 +107,9 @@ public class TrolleybusFragmentImpl extends Fragment implements TransportFragmen
 
     @Override
     public void updateData(TransportEntity transportEntity) {
-
-            if (mTrolleybusAdapter != null) {
-                mTrolleybusAdapter.updateData(transportEntity);
-            }
+        if (mTrolleybusAdapter != null) {
+            mTrolleybusAdapter.updateData(transportEntity);
+        }
     }
 
 
@@ -125,8 +123,15 @@ public class TrolleybusFragmentImpl extends Fragment implements TransportFragmen
         mFavouritesFragmentPresenter = event.getFavouritesFragmentPresenter();
     }
 
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void serverNotResponding(BusEvents.ServerNotResponding event) {
+        if (mTrolleybusAdapter == null){
+            setErrorVisible(View.GONE);
+            mTextViewNoServerResponding.setVisibility(View.VISIBLE);
+        }
+    }
+
     private void setErrorVisible(int visible) {
-        mTextViewNoData.setVisibility(visible);
         mBtnUpdate.setVisibility(visible);
     }
 

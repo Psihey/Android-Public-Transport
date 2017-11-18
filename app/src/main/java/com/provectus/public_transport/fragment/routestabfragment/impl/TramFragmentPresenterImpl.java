@@ -81,9 +81,7 @@ public class TramFragmentPresenterImpl implements com.provectus.public_transport
             mTramFragment.serviceEndWorked();
         } else {
             mTramFragment.checkMyServiceRunning();
-
         }
-
     }
 
     private Comparator<TransportEntity> sortByNumber = (t1, t2) -> t1.getNumber() > t2.getNumber() ? 1 : -1;

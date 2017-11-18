@@ -55,8 +55,10 @@
     <string name="maps_fragment_season_parking">Season</string>
     <string name="maps_fragment_daytime_parking">Daytime</string>
     <string name="main_activity_snack_bar_no_mail_agents">There are no any Mail Agent. Please install!</string>
-    <string name="main_activity_chooser_dialog">Which application is opening?</string>
+    <string name="main_activity_chooser_dialog">Which is application to open?</string>
     <string name="menu_search">Search</string>
+    <string name="text_view_server_is_not_responding_please_to_try_later">Server is not responding. Please to try later.</string>
+    <string name="snack_bar_no_parking_data">Sorry no data about parking</string>
 
     <integer-array name="route_color_array">
         <item>@color/routePinkColor</item>

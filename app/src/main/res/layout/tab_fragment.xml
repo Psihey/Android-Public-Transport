@@ -12,16 +12,6 @@
         android:scrollbars="vertical" />
 
     <TextView
-        android:id="@+id/tv_tab_fragment_no_data"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_centerHorizontal="true"
-        android:layout_centerVertical="true"
-        android:text="@string/text_view_tab_fragment_no_data"
-        android:textColor="@android:color/black"
-        android:visibility="gone" />
-
-    <TextView
         android:id="@+id/tv_wait_for_loading"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -31,21 +21,21 @@
         android:textColor="@android:color/black" />
 
     <TextView
-        android:id="@+id/tv_no_find_search_result"
+        android:id="@+id/tv_server_no_responding"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textColor="@android:color/black"
         android:visibility="invisible"
         android:layout_centerHorizontal="true"
         android:layout_centerVertical="true"
-        android:text="No matching routes, sorry"
+        android:text="@string/text_view_server_is_not_responding_please_to_try_later"
         android:textSize="16sp"/>
 
     <Button
         android:id="@+id/bottom_sheet_btn_update"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/tv_tab_fragment_no_data"
+        android:layout_below="@+id/tv_server_no_responding"
         android:layout_centerHorizontal="true"
         android:layout_centerVertical="true"
         android:layout_marginTop="10dp"

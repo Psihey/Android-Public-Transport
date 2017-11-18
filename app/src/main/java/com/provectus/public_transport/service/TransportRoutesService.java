@@ -90,9 +90,9 @@ public class TransportRoutesService extends IntentService {
                 initStopDetailEntity(callStoppings);
                 initParkingEntity(callParkings);
             }
-
         } catch (IOException e) {
             Logger.d(e.getMessage());
+            EventBus.getDefault().post(new BusEvents.ServerNotResponding());
         }
 
     }
@@ -214,6 +214,7 @@ public class TransportRoutesService extends IntentService {
 
     private void initParkingToDB() {
         DatabaseHelper.getPublicTransportDatabase().parkingDao().insertAll(mParkingEntities);
+        EventBus.getDefault().post(new BusEvents.DataBaseInitialized());
     }
 
     private void removeStopDetailsFromDB() {
@@ -262,8 +263,6 @@ public class TransportRoutesService extends IntentService {
         DatabaseHelper.getPublicTransportDatabase().pointDao().insertAll(mPointEntities);
         DatabaseHelper.getPublicTransportDatabase().stopDao().insertAll(mStopEntities);
         DatabaseHelper.getPublicTransportDatabase().directionDao().insertAll(mDirectionEntities);
-        EventBus.getDefault().post(new BusEvents.DataBaseInitialized());
-        Logger.d("Database is initialized");
     }
 
     private void getAllCurrentFavourite() {

@@ -4,8 +4,8 @@
     android:layout_width="match_parent"
     android:layout_height="48dp"
     android:orientation="vertical"
-    android:layout_marginStart="16dp"
-    android:layout_marginEnd="16dp">
+    android:paddingStart="16dp"
+    android:paddingEnd="16dp">
 
     <TextView
         android:id="@+id/text_view_item_tram_trooley_transport_number"

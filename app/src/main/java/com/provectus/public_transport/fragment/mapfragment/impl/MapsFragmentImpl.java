@@ -300,7 +300,6 @@ public class MapsFragmentImpl extends Fragment
         toolbar.setOnClickListener(v -> mMenuItemSearch.expandActionView());
     }
 
-
     @Override
     public void onTabSelected(TabLayout.Tab tab) {
         if (tab.getPosition() == PARKING_TAB_POSITION) {
@@ -314,7 +313,7 @@ public class MapsFragmentImpl extends Fragment
             EventBus.getDefault().post(new BusEvents.UnselectedAllItems());
             mViewPagerBottomSheetBehavior.setState(ViewPagerBottomSheetBehavior.STATE_COLLAPSED);
             mMapsPresenter.stopGetVehicles();
-            getParkings();
+            mMapsPresenter.getAllParking();
         } else {
             mCurrentTabSelected = NOT_PARKING_TAB_POSITION;
             mViewPagerBottomSheetBehavior.setState(ViewPagerBottomSheetBehavior.STATE_EXPANDED);
@@ -594,6 +593,14 @@ public class MapsFragmentImpl extends Fragment
         mTextViewRouteInfoFee.setText(getResources().getString(R.string.text_view_transport_fee, String.valueOf(transportEntity.getCost())));
     }
 
+    @Override
+    public void addAllParkingToCluster(List<ParkingEntity> parkingEntities) {
+        for (ParkingEntity parkingEntity : parkingEntities) {
+            mClusterManager.addItem(parkingEntity);
+        }
+        mClusterManager.cluster();
+    }
+
     @OnClick(R.id.ib_route_info_favorite_icon)
     public void setFavourites() {
         if (mCurrentTransportInfo.isFavourites()) {
@@ -646,6 +653,7 @@ public class MapsFragmentImpl extends Fragment
             if (code == INTERNET_ERROR_OFFLINE_MODE) {
                 if (mLastOnlineTime == null) {
                     mTextViewOfflineMode.setText(R.string.snack_bar_no_vehicles_no_internet_connection);
+                    return;
                 } else {
                     mTextViewOfflineMode.setText(getResources().getString(R.string.text_view_offline_mode, mLastOnlineTime));
                     return;
@@ -695,21 +703,6 @@ public class MapsFragmentImpl extends Fragment
             }
         });
 
-    }
-
-    private void getParkings() {
-        DatabaseHelper.getPublicTransportDatabase().parkingDao().getAllParkings()
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .doOnError(throwable -> Logger.d(throwable.getMessage()))
-                .subscribe(this::getAndDrawAllParking);
-    }
-
-    private void getAndDrawAllParking(List<ParkingEntity> parkingEntities) {
-        for (ParkingEntity parkingEntity : parkingEntities) {
-            mClusterManager.addItem(parkingEntity);
-        }
-        mClusterManager.cluster();
     }
 
     private void setDefaultCameraPosition() {

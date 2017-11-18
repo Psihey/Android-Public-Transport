@@ -9,6 +9,7 @@ import com.provectus.public_transport.eventbus.BusEvents;
 import com.provectus.public_transport.fragment.mapfragment.MapsFragment;
 import com.provectus.public_transport.fragment.mapfragment.MapsFragmentPresenter;
 import com.provectus.public_transport.model.DirectEntity;
+import com.provectus.public_transport.model.ParkingEntity;
 import com.provectus.public_transport.model.StopEntity;
 import com.provectus.public_transport.model.TransportEntity;
 import com.provectus.public_transport.model.VehicleMarkerInfoModel;
@@ -77,6 +78,15 @@ public class MapsFragmentPresenterImpl implements MapsFragmentPresenter {
     }
 
     @Override
+    public void getAllParking() {
+        DatabaseHelper.getPublicTransportDatabase().parkingDao().getAllParkings()
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .doOnError(throwable -> Logger.d(throwable.getMessage()))
+                .subscribe(this::getAllParkingFromDB);
+    }
+
+    @Override
     public void onSelectCurrentRoute(TransportEntity event) {
         mIsSelectRoute = event.isSelected();
         String transportType = event.getType().toString();
@@ -112,6 +122,14 @@ public class MapsFragmentPresenterImpl implements MapsFragmentPresenter {
             mMapsFragment.removeStopsFromMap();
             mMapsFragment.removeRoutesWithDirectionFromMap();
         }
+    }
+
+    private void getAllParkingFromDB(List<ParkingEntity> parkingEntities) {
+        if (parkingEntities != null && !parkingEntities.isEmpty()){
+            mMapsFragment.addAllParkingToCluster(parkingEntities);
+            return;
+        }
+        mMapsFragment.showErrorSnackbar(R.string.snack_bar_no_parking_data);
     }
 
     private void getChosenTransportFromDB(TransportEntity transportEntity) {
@@ -192,7 +210,7 @@ public class MapsFragmentPresenterImpl implements MapsFragmentPresenter {
             if (throwable instanceof SocketTimeoutException) {
                 mMapsFragment.showErrorSnackbar(R.string.snack_bar_no_vehicles_no_internet_connection);
             } else if (throwable instanceof ConnectException) {
-                mMapsFragment.showErrorSnackbar(R.string.snack_bar_no_vehicles_no_internet_connection);
+                mMapsFragment.showErrorSnackbar(R.string.snack_bar_no_vehicles_server_not_response);
             }
         }
     }
