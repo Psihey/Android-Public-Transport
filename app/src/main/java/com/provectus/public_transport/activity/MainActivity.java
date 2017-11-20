@@ -25,7 +25,7 @@ import butterknife.ButterKnife;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
-    private static final String mMailDataType = "mailto:";
+    private static final String DATA_TYPE_ONLY_MAIL = "mailto:";
 
     @BindView(R.id.toolbar)
     Toolbar mToolbar;
@@ -64,7 +64,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         if (id == R.id.nav_send_feedback) {
             Intent intent = new Intent(Intent.ACTION_SENDTO);
-            intent.setData(Uri.parse(mMailDataType));
+            intent.setData(Uri.parse(DATA_TYPE_ONLY_MAIL));
             intent.putExtra(Intent.EXTRA_EMAIL, getResources().getStringArray(R.array.main_activity_email_address_array));
             intent.putExtra(Intent.EXTRA_SUBJECT, getResources().getString(R.string.main_activity_email_title));
             try {
