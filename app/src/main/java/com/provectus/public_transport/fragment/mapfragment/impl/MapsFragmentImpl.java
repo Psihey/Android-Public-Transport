@@ -20,13 +20,13 @@ import android.support.v4.view.ViewPager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
+import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -114,6 +114,7 @@ public class MapsFragmentImpl extends Fragment
     private static final String LOCATION_BUTTON_POSITION = "2";
     private static final String COMPASS_BUTTON_POSITION = "5";
     private static final int PARKING_TAB_POSITION = 2;
+    private static final int NOT_PARKING_TAB_POSITION = -1;
 
     @BindView(R.id.bottom_sheet_view_pager)
     ViewPager mViewPagerTransportAndParking;
@@ -153,7 +154,7 @@ public class MapsFragmentImpl extends Fragment
     @BindView(R.id.tv_transport_route_info_type_value)
     TextView mTextViewRouteInfoType;
     @BindView(R.id.ib_route_info_favorite_icon)
-    ImageButton mImageButtonFavouriteInfo;
+    ImageView mImageButtonFavouriteInfo;
     @BindView(R.id.tv_route_info_transport_fee_value)
     TextView mTextViewRouteInfoFee;
     @BindView(R.id.tv_route_info_transport_route_distance_value)
@@ -232,8 +233,8 @@ public class MapsFragmentImpl extends Fragment
     }
 
     @Override
-    public void onResume() {
-        super.onResume();
+    public void onStart() {
+        super.onStart();
         mBottomSheetVehicleInfo = BottomSheetBehavior.from(mConstraintVehicleContainer);
         mBottomSheetVehicleInfo.setPeekHeight(PEEK_HEIGHT_INFO_BOTTOM_SHEET);
         mBottomSheetVehicleInfo.setHideable(true);
@@ -295,8 +296,9 @@ public class MapsFragmentImpl extends Fragment
         ImageView searchIconClose = (ImageView) searchView.findViewById(android.support.v7.appcompat.R.id.search_close_btn);
         searchIconClose.setImageResource(R.drawable.ic_close_gray_24dp);
         searchRoute(searchView);
+        Toolbar toolbar = (Toolbar) getActivity().findViewById(R.id.toolbar);
+        toolbar.setOnClickListener(v -> mMenuItemSearch.expandActionView());
     }
-
 
     @Override
     public void onTabSelected(TabLayout.Tab tab) {
@@ -304,13 +306,16 @@ public class MapsFragmentImpl extends Fragment
             if (mMenuItemSearch.isActionViewExpanded()) {
                 mMenuItemSearch.collapseActionView();
             }
-            mMap.clear();
+            if (checkOnReadyMap()){
+                mMap.clear();
+            }
             mCurrentTabSelected = PARKING_TAB_POSITION;
             EventBus.getDefault().post(new BusEvents.UnselectedAllItems());
             mViewPagerBottomSheetBehavior.setState(ViewPagerBottomSheetBehavior.STATE_COLLAPSED);
             mMapsPresenter.stopGetVehicles();
-            getParkings();
+            mMapsPresenter.getAllParking();
         } else {
+            mCurrentTabSelected = NOT_PARKING_TAB_POSITION;
             mViewPagerBottomSheetBehavior.setState(ViewPagerBottomSheetBehavior.STATE_EXPANDED);
         }
         mBottomSheetRouteInfo.setState(BottomSheetBehavior.STATE_COLLAPSED);
@@ -321,7 +326,9 @@ public class MapsFragmentImpl extends Fragment
     @Override
     public void onTabUnselected(TabLayout.Tab tab) {
         if (tab.getPosition() == PARKING_TAB_POSITION) {
-            mMap.clear();
+            if (checkOnReadyMap()){
+                mMap.clear();
+            }
             mClusterManager.clearItems();
             mBottomSheetParkingDetail.setState(BottomSheetBehavior.STATE_COLLAPSED);
         }
@@ -331,7 +338,6 @@ public class MapsFragmentImpl extends Fragment
     public void onTabReselected(TabLayout.Tab tab) {
         if (tab.getPosition() == PARKING_TAB_POSITION) {
             mViewPagerBottomSheetBehavior.setState(ViewPagerBottomSheetBehavior.STATE_COLLAPSED);
-
         } else
             mViewPagerBottomSheetBehavior.setState(ViewPagerBottomSheetBehavior.STATE_EXPANDED);
     }
@@ -587,6 +593,14 @@ public class MapsFragmentImpl extends Fragment
         mTextViewRouteInfoFee.setText(getResources().getString(R.string.text_view_transport_fee, String.valueOf(transportEntity.getCost())));
     }
 
+    @Override
+    public void addAllParkingToCluster(List<ParkingEntity> parkingEntities) {
+        for (ParkingEntity parkingEntity : parkingEntities) {
+            mClusterManager.addItem(parkingEntity);
+        }
+        mClusterManager.cluster();
+    }
+
     @OnClick(R.id.ib_route_info_favorite_icon)
     public void setFavourites() {
         if (mCurrentTransportInfo.isFavourites()) {
@@ -619,8 +633,10 @@ public class MapsFragmentImpl extends Fragment
 
             @Override
             public boolean onQueryTextChange(String newText) {
-                mTramsAdapter.getFilter().filter(newText);
-                mTrolleybusAdapter.getFilter().filter(newText);
+                if (mTramsAdapter !=null && mTrolleybusAdapter !=null){
+                    mTramsAdapter.getFilter().filter(newText);
+                    mTrolleybusAdapter.getFilter().filter(newText);
+                }
                 return true;
             }
         });
@@ -637,6 +653,7 @@ public class MapsFragmentImpl extends Fragment
             if (code == INTERNET_ERROR_OFFLINE_MODE) {
                 if (mLastOnlineTime == null) {
                     mTextViewOfflineMode.setText(R.string.snack_bar_no_vehicles_no_internet_connection);
+                    return;
                 } else {
                     mTextViewOfflineMode.setText(getResources().getString(R.string.text_view_offline_mode, mLastOnlineTime));
                     return;
@@ -671,12 +688,13 @@ public class MapsFragmentImpl extends Fragment
         mViewPagerBottomSheetBehavior.setBottomSheetCallback(new ViewPagerBottomSheetBehavior.BottomSheetCallback() {
             @Override
             public void onStateChanged(@NonNull View view, int i) {
-                mBottomSheetVehicleInfo.setState(BottomSheetBehavior.STATE_COLLAPSED);
-                mBottomSheetRouteInfo.setState(BottomSheetBehavior.STATE_COLLAPSED);
-                mBottomSheetStopDetail.setState(BottomSheetBehavior.STATE_COLLAPSED);
                 if (mCurrentTabSelected == PARKING_TAB_POSITION && mViewPagerBottomSheetBehavior.getState() == BottomSheetBehavior.STATE_DRAGGING) {
                     mViewPagerBottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
                 }
+
+                mBottomSheetVehicleInfo.setState(BottomSheetBehavior.STATE_COLLAPSED);
+                mBottomSheetRouteInfo.setState(BottomSheetBehavior.STATE_COLLAPSED);
+                mBottomSheetStopDetail.setState(BottomSheetBehavior.STATE_COLLAPSED);
             }
 
             @Override
@@ -685,21 +703,6 @@ public class MapsFragmentImpl extends Fragment
             }
         });
 
-    }
-
-    private void getParkings() {
-        DatabaseHelper.getPublicTransportDatabase().parkingDao().getAllParkings()
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .doOnError(throwable -> Logger.d(throwable.getMessage()))
-                .subscribe(this::getAndDrawAllParking);
-    }
-
-    private void getAndDrawAllParking(List<ParkingEntity> parkingEntities) {
-        for (ParkingEntity parkingEntity : parkingEntities) {
-            mClusterManager.addItem(parkingEntity);
-        }
-        mClusterManager.cluster();
     }
 
     private void setDefaultCameraPosition() {

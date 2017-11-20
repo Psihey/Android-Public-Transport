@@ -7,12 +7,6 @@
     android:background="@color/colorBottomSheetBackground"
     app:layout_behavior="android.support.design.widget.BottomSheetBehavior">
 
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="20dp"
-        android:layout_marginBottom="48dp"
-        android:background="@drawable/elevation_view_top" />
-
     <TextView
         android:id="@+id/tv_parking_name"
         android:layout_width="wrap_content"

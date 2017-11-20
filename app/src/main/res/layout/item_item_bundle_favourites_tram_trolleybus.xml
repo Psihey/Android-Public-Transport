@@ -28,7 +28,7 @@
         android:layout_width="1dp"
         android:layout_height="6dp"
         android:layout_marginTop="1dp"
-        android:layout_marginStart="12.8dp"
+        android:layout_marginStart="13dp"
         android:layout_toEndOf="@+id/tv_number_transport_favourites"
         android:layout_below="@+id/iv_top_dot"
         android:src="@drawable/ic_small_stick_stop_detail"/>
@@ -50,7 +50,10 @@
         android:layout_toEndOf="@+id/iv_top_dot"
         android:layout_toStartOf="@+id/iv_delete_favourites"
         android:layout_marginStart="8dp"
+        android:layout_marginEnd="5dp"
         android:gravity="start|bottom"
+        android:ellipsize="end"
+        android:maxLines="1"
         android:textColor="@color/text_item_view" />
 
     <TextView
@@ -60,8 +63,11 @@
         android:layout_below="@+id/tv_favourites_first_stop"
         android:layout_toEndOf="@+id/iv_top_dot"
         android:layout_marginStart="8dp"
+        android:layout_marginEnd="5dp"
         android:layout_toStartOf="@+id/iv_delete_favourites"
         android:gravity="start|top"
+        android:ellipsize="end"
+        android:maxLines="1"
         android:textColor="@color/text_item_view" />
 
     <ImageView

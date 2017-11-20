@@ -82,9 +82,7 @@ public class TrolleybusFragmentPresenterImpl implements TrolleybusFagmentPresent
             mTrolleybusFragment.serviceEndWorked();
         } else {
             mTrolleybusFragment.checkMyServiceRunning();
-
         }
-
     }
 
     private Comparator<TransportEntity> sortByNumber = (t1, t2) -> t1.getNumber() > t2.getNumber() ? 1 : -1;

@@ -95,7 +95,7 @@ public class BusEvents {
         }
     }
 
-    public static class SendTramsAndTrolleyAdapter{
+    public static class SendTramsAndTrolleyAdapter {
         private TramsAndTrolleyAdapter mTramsAndTrolleyAdapter;
         private int type;
 
@@ -112,4 +112,12 @@ public class BusEvents {
             return type;
         }
     }
+
+    public static class ServerNotResponding {
+
+        public ServerNotResponding() {
+
+        }
+    }
 }
+

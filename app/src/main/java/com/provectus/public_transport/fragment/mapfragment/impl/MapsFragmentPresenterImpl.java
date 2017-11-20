@@ -9,6 +9,7 @@ import com.provectus.public_transport.eventbus.BusEvents;
 import com.provectus.public_transport.fragment.mapfragment.MapsFragment;
 import com.provectus.public_transport.fragment.mapfragment.MapsFragmentPresenter;
 import com.provectus.public_transport.model.DirectEntity;
+import com.provectus.public_transport.model.ParkingEntity;
 import com.provectus.public_transport.model.StopEntity;
 import com.provectus.public_transport.model.TransportEntity;
 import com.provectus.public_transport.model.VehicleMarkerInfoModel;
@@ -41,7 +42,6 @@ public class MapsFragmentPresenterImpl implements MapsFragmentPresenter {
     private long mCurrentRouteServerId;
     private CompositeDisposable mCompositeDisposable;
     private List<Long> mCurrentVehicles = new ArrayList<>();
-    private TransportEntity mEntityForRouteInfo;
 
 
     @Override
@@ -75,6 +75,15 @@ public class MapsFragmentPresenterImpl implements MapsFragmentPresenter {
             mCompositeDisposable.dispose();
         }
         mCurrentVehicles.clear();
+    }
+
+    @Override
+    public void getAllParking() {
+        DatabaseHelper.getPublicTransportDatabase().parkingDao().getAllParkings()
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .doOnError(throwable -> Logger.d(throwable.getMessage()))
+                .subscribe(this::getAllParkingFromDB);
     }
 
     @Override
@@ -115,17 +124,18 @@ public class MapsFragmentPresenterImpl implements MapsFragmentPresenter {
         }
     }
 
-    private void getChosenTransportFromDB(TransportEntity transportEntity) {
-        mEntityForRouteInfo = transportEntity;
-        DatabaseHelper.getPublicTransportDatabase().transportDao().getStopsForCurrentTransport(transportEntity.getNumber(), transportEntity.getType().toString())
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .doOnError(throwable -> Logger.d(throwable.getMessage()))
-                .subscribe(this::getChosenStopFromDB);
+    private void getAllParkingFromDB(List<ParkingEntity> parkingEntities) {
+        if (parkingEntities != null && !parkingEntities.isEmpty()){
+            mMapsFragment.addAllParkingToCluster(parkingEntities);
+            return;
+        }
+        mMapsFragment.showErrorSnackbar(R.string.snack_bar_no_parking_data);
     }
 
-    private void getChosenStopFromDB(List<StopEntity> stopEntity) {
-        mMapsFragment.openRouteInfo(mEntityForRouteInfo);
+    private void getChosenTransportFromDB(TransportEntity transportEntity) {
+        if (mMapsFragment !=null && transportEntity!=null){
+            mMapsFragment.openRouteInfo(transportEntity);
+        }
     }
 
     private void getDirectionFromDB(List<DirectEntity> segmentEntities) {

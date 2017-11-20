@@ -37,10 +37,10 @@
         android:layout_marginTop="11dp"
         android:src="@drawable/ic_tram_gray_24_dp" />
 
-    <ImageButton
+    <ImageView
         android:id="@+id/ib_route_info_favorite_icon"
-        android:layout_width="20dp"
-        android:layout_height="20dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_alignParentEnd="true"
         android:layout_below="@+id/view_separate_line_top"
         android:layout_marginEnd="@dimen/vehicles_detail_layout_margin_end"

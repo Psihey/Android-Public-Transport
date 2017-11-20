@@ -42,14 +42,12 @@
         app:layout_constraintLeft_toRightOf="@+id/iv_transport_icon"/>
 
     <View
-        android:layout_width="fill_parent"
+        android:layout_width="0dp"
         android:layout_height="1dp"
         android:layout_marginBottom="4dp"
-        android:layout_marginEnd="@dimen/vehicles_detail_layout_margin_end"
-        android:layout_marginStart="@dimen/vehicles_detail_layout_margin_start"
         android:background="#b5b5b3"
         app:layout_constraintBottom_toTopOf="@+id/tv_transport_speed"
-        tools:layout_editor_absoluteX="0dp" />
+        tools:layout_editor_absoluteX="20dp" />
 
     <TextView
         android:id="@+id/tv_transport_speed"
@@ -164,22 +162,29 @@
         app:layout_constraintTop_toBottomOf="@+id/tv_transport_fee_value"/>
 
     <View
-        android:layout_width="fill_parent"
+        android:id="@+id/view_separate_line_bottom"
+        android:layout_width="0dp"
         android:layout_height="1dp"
         android:layout_marginTop="9dp"
-        android:layout_marginEnd="@dimen/vehicles_detail_layout_margin_end"
-        android:layout_marginStart="@dimen/vehicles_detail_layout_margin_start"
         android:background="#b5b5b3"
         app:layout_constraintTop_toBottomOf="@+id/tv_transport_route_distance"
-        android:elevation="28dp"
+        tools:layout_editor_absoluteX="20dp"/>
+
+    <View
+        android:id="@+id/view_bottom_shadow"
+        android:layout_width="fill_parent"
+        android:layout_height="20dp"
+        android:layout_marginTop="8dp"
+        app:layout_constraintTop_toBottomOf="@+id/view_separate_line_bottom"
+        android:background="@drawable/elevation_view_bottom"
         tools:layout_editor_absoluteX="8dp" />
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="55dp"
+        android:layout_marginTop="32dp"
         android:visibility="invisible"
-        app:layout_constraintTop_toBottomOf="@+id/tv_transport_route_distance"
+        app:layout_constraintTop_toBottomOf="@+id/view_bottom_shadow"
         tools:layout_editor_absoluteX="0dp" />
 
 </android.support.constraint.ConstraintLayout>
