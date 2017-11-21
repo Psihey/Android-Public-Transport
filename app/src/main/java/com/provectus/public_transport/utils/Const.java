@@ -1,6 +1,9 @@
 package com.provectus.public_transport.utils;
 
+
 import com.google.android.gms.maps.model.LatLng;
+import com.provectus.public_transport.PublicTransportApplication;
+import com.provectus.public_transport.R;
 
 public final class Const {
 
@@ -17,16 +20,15 @@ public final class Const {
         public static final int ZOOM_ON_MAP = 30;
     }
 
-    public static class TransportType{
+    public static class TransportType {
         private TransportType(){
 
         }
-        public static final String TRAMS = "Trams";
+
+        public static final String TRAMS = PublicTransportApplication.getContext().getResources().getString(R.string.transport_type_tram);
         public static final int TRAMS_ADAPTER = 1;
-        public static final String TROLLEYBUSES = "Trolleybuses";
+        public static final String TROLLEYBUSES = PublicTransportApplication.getContext().getResources().getString(R.string.transport_type_trolleybus);
         public static final int TROLLEYBUSES_ADAPTER = 2;
-
-
     }
 
 }
