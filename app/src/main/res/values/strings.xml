@@ -2,19 +2,19 @@
     <string name="app_name">Public Transport</string>
 
     <string name="google_maps_key" templateMergeStrategy="preserve" translatable="false">AIzaSyB10fEtMfKAhzVjbG4aVfJrikoM2n6PehU</string>
-    <string name="dialog_error_internet_title">Oops ,something going in wrong way</string>
-    <string name="dialog_error_internet_message">Please check your internet connection</string>
+    <string name="dialog_error_internet_title">Something\'s wrong</string>
+    <string name="dialog_error_internet_message">Check your internet connection</string>
     <string name="dialog_error_internet_positive_button">Retry</string>
     <string name="dialog_error_internet_negative_button">Close</string>
-    <string name="progress_dialog_network_title">Network Working</string>
-    <string name="progress_dialog_network_message">Please wait some seconds! fetching data from the server</string>
+    <string name="progress_dialog_network_title">Please wait</string>
+    <string name="progress_dialog_network_message">Please wait</string>
     <string name="text_view_tab_fragment_no_data">Error, no data</string>
     <string name="btn_update_name">Update</string>
-    <string name="text_view_database_working_yet">Please, Wait some seconds Data Base working</string>
+    <string name="text_view_database_working_yet">Please wait</string>
     <string name="snack_bar_no_stops_for_this_route">No data on stops</string>
     <string name="snack_bar_no_vehicles_server_not_response">Failed to update</string>
     <string name="snack_bar_no_vehicles_no_internet_connection">No internet connection</string>
-    <string name="snack_bar_map_not_ready">Map not ready</string>
+    <string name="snack_bar_map_not_ready">Map is not ready</string>
     <string name="snack_bar_no_vehicles_for_this_route">No data on vehicles</string>
     <string name="alert_dialog_google_play_error_title">Google Play Error</string>
     <string name="alert_dialog_google_play_error_message">Problems with the Google Play Service. The Application is closing.</string>
@@ -30,23 +30,23 @@
     <string name="text_view_capacity">Capacity</string>
     <string name="text_view_fee">Fare</string>
     <string name="text_view_distance">The length of the route</string>
-    <string name="text_view_offline_mode">OFFLINE MODE nfo valid for %1$s</string>
-    <string name="text_view_server_error">OFFLINE MODE server do not responding</string>
+    <string name="text_view_offline_mode">Offline mode nfo valid for %1$s</string>
+    <string name="text_view_server_error">Offline mode server is not responding</string>
     <string name="text_view_item_tram_trooley_transport_number">№%1$s</string>
-    <string name="text_view_frequently_used_routes">Frequently used routes</string>
-    <string name="text_view_stop_detail_stopping">Stopping</string>
-    <string name="snack_bar_no_stop_detail">No info is available for the stop, sorry</string>
+    <string name="text_view_frequently_used_routes">Favorite routes</string>
+    <string name="text_view_stop_detail_stopping">Bus stop</string>
+    <string name="snack_bar_no_stop_detail">No info about the stop</string>
 
-    <string name="navigation_drawer_open">Open navigation drawer</string>
-    <string name="navigation_drawer_close">Close navigation drawer</string>
+    <string name="navigation_drawer_open" translatable="false">Open navigation drawer</string>
+    <string name="navigation_drawer_close" translatable="false">Close navigation drawer</string>
     <string name="nav_item_send_feedback">Send Feedback</string>
     <string name="nav_item_about_program">About</string>
     <string name="text_view_about_program_public_transport">Public Transport</string>
     <string name="text_view_version_code">Version Code : %1$d</string>
     <string name="text_view_version_name">Version Name : %1$s</string>
     <string name="tv_describe_app">Public Transport is an application for monitoring system of passenger/public transport in real time for residents of Odessa, designed for Android.</string>
-    <string name="text_view_contact_">Contact for communications and offers :</string>
-    <string name="text_view_contact_email">publictransportcustomercare@gmail.com</string>
+    <string name="text_view_contact_">For feedback and suggestions please contact:</string>
+    <string name="text_view_contact_email" translatable="false">publictransportcustomercare@gmail.com</string>
     <string name="text_view_parking_number_of_places">Number of places : %1$d</string>
     <string name="text_view_parking_parking_type">Parking type : %1$s</string>
     <string name="main_activity_email_title">Feedback on the operation of the PublicTransport application</string>
@@ -54,11 +54,11 @@
     <string name="maps_fragment_official_parking">Official</string>
     <string name="maps_fragment_season_parking">Season</string>
     <string name="maps_fragment_daytime_parking">Daytime</string>
-    <string name="main_activity_snack_bar_no_mail_agents">There are no any Mail Agent. Please install!</string>
-    <string name="main_activity_chooser_dialog">Which is application to open?</string>
+    <string name="main_activity_snack_bar_no_mail_agents">Install email app</string>
+    <string name="main_activity_chooser_dialog">Select app</string>
     <string name="menu_search">Search</string>
-    <string name="text_view_server_is_not_responding_please_to_try_later">Server is not responding. Please to try later.</string>
-    <string name="snack_bar_no_parking_data">Sorry no data about parking</string>
+    <string name="text_view_server_is_not_responding_please_to_try_later">Server is not responding. Try again later.</string>
+    <string name="snack_bar_no_parking_data">No data about the parking</string>
 
     <integer-array name="route_color_array">
         <item>@color/routePinkColor</item>
