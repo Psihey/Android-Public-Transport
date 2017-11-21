@@ -13,12 +13,7 @@ import io.fabric.sdk.android.Fabric;
 public class PublicTransportApplication extends Application {
 
     static private Context sContext;
-
-    @Override
-    public Context getApplicationContext() {
-        return super.getApplicationContext();
-    }
-
+    
     @Override
     public void onCreate() {
         super.onCreate();
