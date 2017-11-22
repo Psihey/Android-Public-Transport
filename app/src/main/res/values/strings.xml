@@ -30,7 +30,7 @@
     <string name="text_view_capacity">Capacity</string>
     <string name="text_view_fee">Fare</string>
     <string name="text_view_distance">The length of the route</string>
-    <string name="text_view_offline_mode">Offline mode nfo valid for %1$s</string>
+    <string name="text_view_offline_mode">Offline mode info valid for %1$s</string>
     <string name="text_view_server_error">Offline mode server is not responding</string>
     <string name="text_view_item_tram_trooley_transport_number">№%1$s</string>
     <string name="text_view_frequently_used_routes">Favorite routes</string>
