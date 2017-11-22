@@ -1,0 +1,183 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/relative_layout_container_route_detail"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@color/colorBottomSheetBackground"
+    app:layout_behavior="android.support.design.widget.BottomSheetBehavior">
+
+    <View
+        android:id="@+id/view_separate_line_top"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_alignParentTop="true"
+        android:layout_marginEnd="@dimen/vehicles_detail_layout_margin_end"
+        android:layout_marginStart="@dimen/vehicles_detail_layout_margin_start"
+        android:layout_marginTop="5dp"
+        android:background="#b5b5b3" />
+
+    <TextView
+        android:id="@+id/tv_route_info_number"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/view_separate_line_top"
+        android:layout_marginStart="@dimen/vehicles_detail_layout_margin_start"
+        android:layout_marginTop="20dp"
+        android:text="@string/text_view_route_number"
+        android:textColor="@color/text_item_view"
+        android:textSize="20sp" />
+
+    <ImageView
+        android:id="@+id/iv_route_info_transport_icon"
+        android:layout_width="16dp"
+        android:layout_height="16dp"
+        android:layout_below="@+id/tv_route_info_number"
+        android:layout_marginStart="@dimen/vehicles_detail_layout_margin_start"
+        android:layout_marginTop="11dp"
+        android:src="@drawable/ic_tram_gray_24_dp" />
+
+    <ImageView
+        android:id="@+id/ib_route_info_favorite_icon"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_below="@+id/view_separate_line_top"
+        android:layout_marginEnd="26dp"
+        android:layout_marginTop="25dp"
+        android:src="@drawable/ic_favorite_gray_24_dp" />
+
+    <TextView
+        android:id="@+id/tv_transport_route_info_type_value"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/tv_route_info_number"
+        android:layout_marginStart="4dp"
+        android:layout_marginTop="8dp"
+        android:layout_toEndOf="@+id/iv_route_info_transport_icon"
+        android:textColor="@color/text_item_view"
+        android:textSize="14sp" />
+
+    <View
+        android:id="@+id/view_separate_line_middle"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_below="@+id/iv_route_info_transport_icon"
+        android:layout_marginBottom="4dp"
+        android:layout_marginEnd="@dimen/vehicles_detail_layout_margin_end"
+        android:layout_marginStart="@dimen/vehicles_detail_layout_margin_start"
+        android:layout_marginTop="11dp"
+        android:background="#b5b5b3" />
+
+    <TextView
+        android:id="@+id/tv_route_info_transport_fee"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/tv_transport_route_info_type_value"
+        android:layout_marginStart="@dimen/vehicles_detail_layout_margin_start"
+        android:layout_marginTop="16dp"
+        android:text="@string/text_view_fee"
+        android:textColor="@color/text_item_view"
+        android:textSize="@dimen/vehicles_detail_text_size_value" />
+
+    <TextView
+        android:id="@+id/tv_route_info_transport_fee_value"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_below="@+id/tv_transport_route_info_type_value"
+        android:layout_marginEnd="@dimen/vehicles_detail_layout_margin_end"
+        android:layout_marginTop="16dp"
+        android:gravity="end"
+        android:textColor="@color/text_item_view"
+        android:textSize="@dimen/vehicles_detail_text_size_value" />
+
+    <TextView
+        android:id="@+id/tv_route_info_transport_route_distance"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/tv_route_info_transport_fee"
+        android:layout_marginStart="@dimen/vehicles_detail_layout_margin_start"
+        android:text="@string/text_view_distance"
+        android:textColor="@color/text_item_view"
+        android:textSize="12sp" />
+
+    <TextView
+        android:id="@+id/tv_route_info_transport_route_distance_value"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_below="@+id/tv_route_info_transport_fee"
+        android:layout_marginEnd="@dimen/vehicles_detail_layout_margin_end"
+        android:gravity="end"
+        android:textColor="@color/text_item_view"
+        android:textSize="@dimen/vehicles_detail_text_size_value" />
+
+    <ImageView
+        android:id="@+id/iv_top_dot"
+        android:layout_width="3dp"
+        android:layout_height="3dp"
+        android:layout_below="@+id/tv_route_info_transport_route_distance"
+        android:layout_marginStart="@dimen/vehicles_detail_layout_margin_start"
+        android:layout_marginTop="20.5dp"
+        android:src="@drawable/ic_small_dot_stop_detail" />
+
+    <TextView
+        android:id="@+id/tv_first_stop_route_detail"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/tv_route_info_transport_route_distance"
+        android:layout_marginStart="4.5dp"
+        android:layout_marginTop="10dp"
+        android:layout_toEndOf="@+id/iv_top_dot"
+        android:gravity="start"
+        android:textColor="@color/text_item_view"
+        android:textSize="12sp" />
+
+    <ImageView
+        android:id="@+id/iv_stick_center"
+        android:layout_width="1dp"
+        android:layout_height="6dp"
+        android:layout_below="@+id/iv_top_dot"
+        android:layout_marginStart="21dp"
+        android:layout_marginTop="1dp"
+        android:src="@drawable/ic_small_stick_stop_detail" />
+
+    <ImageView
+        android:id="@+id/iv_bottom_dot"
+        android:layout_width="3dp"
+        android:layout_height="3dp"
+        android:layout_below="@+id/iv_stick_center"
+        android:layout_marginStart="@dimen/vehicles_detail_layout_margin_start"
+        android:layout_marginTop="1dp"
+        android:src="@drawable/ic_small_dot_stop_detail" />
+
+    <TextView
+        android:id="@+id/tv_last_stop_route_detail"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/tv_first_stop_route_detail"
+        android:layout_marginStart="4.5dp"
+        android:layout_toEndOf="@+id/iv_stick_center"
+        android:gravity="start"
+        android:textColor="@color/text_item_view"
+        android:textSize="12sp" />
+
+    <View
+        android:id="@+id/view_separate_line_bottom"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_below="@+id/tv_last_stop_route_detail"
+        android:layout_marginEnd="@dimen/vehicles_detail_layout_margin_end"
+        android:layout_marginStart="@dimen/vehicles_detail_layout_margin_start"
+        android:layout_marginTop="16dp"
+        android:background="#b5b5b3" />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="20dp"
+        android:layout_marginTop="8dp"
+        android:layout_below="@+id/view_separate_line_bottom"
+        android:background="@drawable/elevation_view_bottom" />
+
+</RelativeLayout>

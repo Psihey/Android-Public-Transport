@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="48dp"
+    android:orientation="vertical"
+    android:paddingStart="16dp"
+    android:paddingEnd="16dp">
+
+    <TextView
+        android:id="@+id/text_view_item_tram_trooley_transport_number"
+        android:layout_width="50dp"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_centerVertical="true"
+        android:layout_marginStart="14dp"
+        android:text="@string/text_view_item_tram_trooley_transport_number"
+        android:textColor="@color/text_item_view" />
+
+    <ImageView
+        android:id="@+id/iv_top_dot"
+        android:layout_width="3dp"
+        android:layout_height="3dp"
+        android:layout_marginTop="18dp"
+        android:layout_marginStart="12dp"
+        android:layout_toEndOf="@+id/text_view_item_tram_trooley_transport_number"
+        android:src="@drawable/ic_small_dot_stop_detail" />
+
+    <ImageView
+        android:id="@+id/iv_stick_center"
+        android:layout_width="1dp"
+        android:layout_height="6dp"
+        android:layout_marginTop="1dp"
+        android:layout_marginStart="13dp"
+        android:layout_toEndOf="@+id/text_view_item_tram_trooley_transport_number"
+        android:layout_below="@+id/iv_top_dot"
+        android:src="@drawable/ic_small_stick_stop_detail"/>
+
+    <ImageView
+        android:id="@+id/iv_bottom_dot"
+        android:layout_width="3dp"
+        android:layout_height="3dp"
+        android:layout_marginTop="1dp"
+        android:layout_marginStart="12dp"
+        android:layout_below="@+id/iv_stick_center"
+        android:layout_toEndOf="@+id/text_view_item_tram_trooley_transport_number"
+        android:src="@drawable/ic_small_dot_stop_detail" />
+
+    <TextView
+        android:id="@+id/tv_first_stop"
+        android:layout_width="wrap_content"
+        android:layout_height="24dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="5dp"
+        android:layout_toEndOf="@+id/iv_top_dot"
+        android:layout_toStartOf="@+id/image_button_route_info"
+        android:ellipsize="end"
+        android:maxLines="1"
+        android:gravity="start|bottom"
+        android:textColor="@color/text_item_view" />
+
+    <TextView
+        android:id="@+id/tv_last_stop"
+        android:layout_width="wrap_content"
+        android:layout_height="24dp"
+        android:layout_below="@+id/tv_first_stop"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="5dp"
+        android:layout_toEndOf="@+id/iv_top_dot"
+        android:layout_toStartOf="@+id/image_button_route_info"
+        android:ellipsize="end"
+        android:maxLines="1"
+        android:gravity="start|top"
+        android:textColor="@color/text_item_view" />
+
+    <ImageView
+        android:id="@+id/image_button_route_info"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:layout_alignParentEnd="true"
+        android:layout_marginEnd="14dp"
+        android:layout_marginTop="11dp"
+        app:srcCompat="@drawable/ic_info_outline_black_24dp" />
+
+</RelativeLayout>

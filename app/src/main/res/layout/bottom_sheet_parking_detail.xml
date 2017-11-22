@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/relative_container_parking_detail"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@color/colorBottomSheetBackground"
+    app:layout_behavior="android.support.design.widget.BottomSheetBehavior">
+
+    <TextView
+        android:id="@+id/tv_parking_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/vehicles_detail_layout_margin_start"
+        android:layout_marginTop="47.5dp"
+        android:textColor="@color/text_item_view"
+        android:textSize="20sp" />
+
+    <View
+        android:id="@+id/view_separate_line"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginTop="14dp"
+        android:layout_below="@+id/tv_parking_name"
+        android:background="#b5b5b3" />
+
+    <TextView
+        android:id="@+id/tv_parking_place"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/vehicles_detail_layout_margin_start"
+        android:layout_below="@+id/view_separate_line"
+        android:layout_marginTop="14dp"
+        android:text="@string/text_view_parking_number_of_places"
+        android:textColor="@color/text_item_view"
+        android:textSize="12sp" />
+
+    <TextView
+        android:id="@+id/tv_parking_type"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/vehicles_detail_layout_margin_start"
+        android:layout_below="@+id/tv_parking_place"
+        android:layout_marginTop="8dp"
+        android:text="@string/text_view_parking_parking_type"
+        android:textColor="@color/text_item_view"
+        android:textSize="12sp" />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="20dp"
+        android:layout_marginBottom="48dp"
+        android:layout_marginTop="24dp"
+        android:layout_below="@+id/tv_parking_type"
+        android:background="@drawable/elevation_view_bottom" />
+
+</RelativeLayout>

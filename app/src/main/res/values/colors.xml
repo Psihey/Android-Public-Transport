@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#03A9F4</color>
+    <color name="colorPrimaryDark">#0277BD</color>
+    <color name="colorAccent">#039BE5</color>
+
+    <color name="colorBottomSheetBackground">#F5F5F5</color>
+    <color name="colorBottomSheetSelectedBackground">#29B6F6</color>
+
+    <color name="routePinkColor">#E91E63</color>
+    <color name="routePurpleColor">#9C27B0</color>
+    <color name="routeIndigoColor">#3F51B5</color>
+    <color name="routeOrangeColor">#FF9800</color>
+    <color name="routeTealColor">#009688</color>
+
+    <color name="offline_mode">#630000</color>
+    <color name="text_item_view">#000000</color>
+</resources>

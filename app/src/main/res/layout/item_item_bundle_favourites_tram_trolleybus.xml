@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/container_favourites"
+    android:layout_width="match_parent"
+    android:layout_height="48dp">
+
+    <TextView
+        android:id="@+id/tv_number_transport_favourites"
+        android:layout_width="45dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:layout_marginStart="34.5dp"
+        android:layout_alignParentStart="true"
+        android:textColor="@color/text_item_view"/>
+
+    <ImageView
+        android:id="@+id/iv_top_dot"
+        android:layout_width="3dp"
+        android:layout_height="3dp"
+        android:layout_marginTop="18dp"
+        android:layout_marginStart="12dp"
+        android:layout_toEndOf="@+id/tv_number_transport_favourites"
+        android:src="@drawable/ic_small_dot_stop_detail" />
+
+    <ImageView
+        android:id="@+id/iv_stick_center"
+        android:layout_width="1dp"
+        android:layout_height="6dp"
+        android:layout_marginTop="1dp"
+        android:layout_marginStart="13dp"
+        android:layout_toEndOf="@+id/tv_number_transport_favourites"
+        android:layout_below="@+id/iv_top_dot"
+        android:src="@drawable/ic_small_stick_stop_detail"/>
+
+    <ImageView
+        android:id="@+id/iv_bottom_dot"
+        android:layout_width="3dp"
+        android:layout_height="3dp"
+        android:layout_marginTop="1dp"
+        android:layout_marginStart="12dp"
+        android:layout_below="@+id/iv_stick_center"
+        android:layout_toEndOf="@+id/tv_number_transport_favourites"
+        android:src="@drawable/ic_small_dot_stop_detail" />
+
+    <TextView
+        android:id="@+id/tv_favourites_first_stop"
+        android:layout_width="wrap_content"
+        android:layout_height="24dp"
+        android:layout_toEndOf="@+id/iv_top_dot"
+        android:layout_toStartOf="@+id/iv_delete_favourites"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="5dp"
+        android:gravity="start|bottom"
+        android:ellipsize="end"
+        android:maxLines="1"
+        android:textColor="@color/text_item_view" />
+
+    <TextView
+        android:id="@+id/tv_favourites_last_stop"
+        android:layout_width="wrap_content"
+        android:layout_height="24dp"
+        android:layout_below="@+id/tv_favourites_first_stop"
+        android:layout_toEndOf="@+id/iv_top_dot"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="5dp"
+        android:layout_toStartOf="@+id/iv_delete_favourites"
+        android:gravity="start|top"
+        android:ellipsize="end"
+        android:maxLines="1"
+        android:textColor="@color/text_item_view" />
+
+    <ImageView
+        android:id="@+id/iv_delete_favourites"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_marginTop="12dp"
+        android:layout_marginEnd="31dp"
+        app:srcCompat="@drawable/ic_delete_black_24dp"/>
+
+</RelativeLayout>

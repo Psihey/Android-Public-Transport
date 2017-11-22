@@ -1,0 +1,64 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/container_favourites"
+    android:layout_width="match_parent"
+    android:layout_height="48dp">
+
+    <TextView
+        android:id="@+id/tv_stop_detail_transport_number"
+        android:layout_width="45dp"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_marginStart="34.5dp"
+        android:layout_marginTop="16dp"
+        android:textColor="@color/text_item_view" />
+
+    <ImageView
+        android:id="@+id/iv_top_dot"
+        android:layout_width="3dp"
+        android:layout_height="3dp"
+        android:layout_marginTop="18dp"
+        android:layout_marginStart="12dp"
+        android:layout_toEndOf="@+id/tv_stop_detail_transport_number"
+        android:src="@drawable/ic_small_dot_stop_detail" />
+
+    <ImageView
+        android:id="@+id/iv_stick_center"
+        android:layout_width="1dp"
+        android:layout_height="6dp"
+        android:layout_marginTop="1dp"
+        android:layout_marginStart="12.8dp"
+        android:layout_toEndOf="@+id/tv_stop_detail_transport_number"
+        android:layout_below="@+id/iv_top_dot"
+        android:src="@drawable/ic_small_stick_stop_detail"/>
+
+    <ImageView
+        android:id="@+id/iv_bottom_dot"
+        android:layout_width="3dp"
+        android:layout_height="3dp"
+        android:layout_marginTop="1dp"
+        android:layout_marginStart="12dp"
+        android:layout_below="@+id/iv_stick_center"
+        android:layout_toEndOf="@+id/tv_stop_detail_transport_number"
+        android:src="@drawable/ic_small_dot_stop_detail" />
+
+    <TextView
+        android:id="@+id/tv_first_stop_stop_detail"
+        android:layout_width="wrap_content"
+        android:layout_height="24dp"
+        android:layout_toEndOf="@+id/iv_top_dot"
+        android:layout_marginStart="8dp"
+        android:gravity="start|bottom"
+        android:textColor="@color/text_item_view" />
+
+    <TextView
+        android:id="@+id/tv_last_stop_stop_detail"
+        android:layout_width="wrap_content"
+        android:layout_height="24dp"
+        android:layout_below="@+id/tv_first_stop_stop_detail"
+        android:layout_toEndOf="@+id/iv_top_dot"
+        android:layout_marginStart="8dp"
+        android:gravity="start|top"
+        android:textColor="@color/text_item_view" />
+
+</RelativeLayout>
+
