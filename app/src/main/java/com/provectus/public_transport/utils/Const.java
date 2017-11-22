@@ -25,9 +25,9 @@ public final class Const {
 
         }
 
-        public static final String TRAMS = PublicTransportApplication.getContext().getResources().getString(R.string.transport_type_tram);
+        public static final String TRAMS = PublicTransportApplication.getContext().getString(R.string.transport_type_tram);
         public static final int TRAMS_ADAPTER = 1;
-        public static final String TROLLEYBUSES = PublicTransportApplication.getContext().getResources().getString(R.string.transport_type_trolleybus);
+        public static final String TROLLEYBUSES = PublicTransportApplication.getContext().getString(R.string.transport_type_trolleybus);
         public static final int TROLLEYBUSES_ADAPTER = 2;
     }
 

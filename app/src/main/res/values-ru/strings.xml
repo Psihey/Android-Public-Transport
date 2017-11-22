@@ -38,7 +38,7 @@
     <string name="text_view_item_tram_trooley_transport_number">№%1$s</string>
     <string name="text_view_number">Инвентарный номер</string>
     <string name="text_view_offline_mode">Автономный режим, информация актуальна на %1$s</string>
-    <string name="text_view_parking_number_of_places">Мест для пассажиров: %1$d</string>
+    <string name="text_view_parking_number_of_places">Мест для автомобилей: %1$d</string>
     <string name="text_view_parking_parking_type">Тип парковки: %1$s</string>
     <string name="text_view_route_number">Маршрут №%1$d</string>
     <string name="text_view_server_error">Автономный режим, сервер не отвечает</string>
@@ -54,4 +54,5 @@
     <string name="transport_type_tram">Трамвай</string>
     <string name="transport_type_trolleybus">Троллейбус</string>
     <string name="tv_describe_app">Public Transport это приложение для мониторинга коммунального транспорта в реальном времени для жителей и гостей города Одесса.</string>
+    <string name="text_view_references_text">Сервис работает на основе данных, предоставленных</string>
 </resources>

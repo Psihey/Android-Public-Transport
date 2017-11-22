@@ -73,11 +73,31 @@
         android:textSize="14sp" />
 
     <TextView
+        android:id="@+id/tv_references_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:layout_below="@+id/tv_describe_app"
+        android:text="@string/text_view_references_text"
+        android:textColor="@color/text_item_view"
+        android:textSize="14sp"/>
+
+    <TextView
+        android:id="@+id/tv_references_link"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/tv_references_text"
+        android:autoLink="web"
+        android:text="@string/text_view_references_link"
+        android:textColor="@color/text_item_view"
+        android:textSize="14sp"/>
+
+    <TextView
         android:id="@+id/tv_contact"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/tv_describe_app"
-        android:layout_marginTop="16dp"
+        android:layout_below="@+id/tv_references_link"
+        android:layout_marginTop="8dp"
         android:text="@string/text_view_contact_"
         android:textColor="@color/text_item_view"
         android:textSize="14sp"/>
@@ -88,9 +108,8 @@
         android:layout_height="wrap_content"
         android:layout_below="@+id/tv_contact"
         android:textColor="@color/text_item_view"
-        android:layout_marginStart="16dp"
         android:text="@string/text_view_contact_email"
         android:autoLink="email"
-        android:textSize="12sp" />
+        android:textSize="14sp" />
 
 </RelativeLayout>
