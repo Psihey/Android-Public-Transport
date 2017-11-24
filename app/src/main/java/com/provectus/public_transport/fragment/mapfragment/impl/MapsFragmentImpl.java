@@ -805,8 +805,8 @@ public class MapsFragmentImpl extends Fragment
 
             SectionedRecyclerViewAdapter sectionAdapter = new SectionedRecyclerViewAdapter();
 
-            StopDetailSectionAdapter tramSection = new StopDetailSectionAdapter(getContext(), tramList, Const.TransportType.TRAMS);
-            StopDetailSectionAdapter trolleybusSection = new StopDetailSectionAdapter(getContext(), trolleybusList, Const.TransportType.TROLLEYBUSES);
+            StopDetailSectionAdapter tramSection = new StopDetailSectionAdapter(getContext(), tramList, getString(R.string.transport_type_tram));
+            StopDetailSectionAdapter trolleybusSection = new StopDetailSectionAdapter(getContext(), trolleybusList, getString(R.string.transport_type_trolleybus));
 
             sectionAdapter.addSection(tramSection);
             sectionAdapter.addSection(trolleybusSection);

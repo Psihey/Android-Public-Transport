@@ -13,14 +13,13 @@ import com.orhanobut.logger.Logger;
 import com.provectus.public_transport.R;
 import com.provectus.public_transport.adapter.FavouritesSectionAdapter;
 import com.provectus.public_transport.eventbus.BusEvents;
-import com.provectus.public_transport.fragment.routestabfragment.impl.TrolleybusFragmentPresenterImpl;
 import com.provectus.public_transport.fragment.favouritesfragment.FavouritesFragment;
 import com.provectus.public_transport.fragment.favouritesfragment.FavouritesFragmentPresenter;
 import com.provectus.public_transport.fragment.mapfragment.MapsFragmentPresenter;
 import com.provectus.public_transport.fragment.routestabfragment.TramFragmentPresenter;
+import com.provectus.public_transport.fragment.routestabfragment.impl.TrolleybusFragmentPresenterImpl;
 import com.provectus.public_transport.model.TransportEntity;
 import com.provectus.public_transport.model.converter.TransportType;
-import com.provectus.public_transport.utils.Const;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -85,8 +84,8 @@ public class FavouritesFragmentImpl extends Fragment implements FavouritesFragme
             }
         }
 
-        mTramSection = new FavouritesSectionAdapter(getContext(), Const.TransportType.TRAMS, tramSection, mSectionAdapter, mMapsFragmentPresenter,mFavouritesFragmentPresenter,mRoutesTabFragmentPresenter,trolleybusFragmentPresenter);
-        mTrolleybusSection = new FavouritesSectionAdapter(getContext(), Const.TransportType.TROLLEYBUSES, trolleybusSection, mSectionAdapter, mMapsFragmentPresenter,mFavouritesFragmentPresenter,mRoutesTabFragmentPresenter,trolleybusFragmentPresenter);
+        mTramSection = new FavouritesSectionAdapter(getContext(),getString(R.string.transport_type_tram), tramSection, mSectionAdapter, mMapsFragmentPresenter,mFavouritesFragmentPresenter,mRoutesTabFragmentPresenter,trolleybusFragmentPresenter);
+        mTrolleybusSection = new FavouritesSectionAdapter(getContext(), getString(R.string.transport_type_trolleybus), trolleybusSection, mSectionAdapter, mMapsFragmentPresenter,mFavouritesFragmentPresenter,mRoutesTabFragmentPresenter,trolleybusFragmentPresenter);
 
         mSectionAdapter.addSection(mTramSection);
         mSectionAdapter.addSection(mTrolleybusSection);
