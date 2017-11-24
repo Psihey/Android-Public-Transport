@@ -70,7 +70,7 @@
         <item>@color/routeOrangeColor</item>
     </integer-array>
 
-    <string-array name="main_activity_email_address_array">
+    <string-array name="main_activity_email_address_array" translatable="false">
         <item>publictransportcustomercare@gmail.com</item>
     </string-array>
 
