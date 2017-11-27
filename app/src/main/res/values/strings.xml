@@ -59,6 +59,8 @@
     <string name="menu_search">Search</string>
     <string name="text_view_server_is_not_responding_please_to_try_later">Server is not responding. Try again later.</string>
     <string name="snack_bar_no_parking_data">No data about the parking</string>
+    <string name="text_view_references_text">The service provided with data provided by:</string>
+    <string name="text_view_references_link" translatable="false">http://transport.odessa.ua/</string>
 
     <integer-array name="route_color_array">
         <item>@color/routePinkColor</item>
@@ -68,7 +70,7 @@
         <item>@color/routeOrangeColor</item>
     </integer-array>
 
-    <string-array name="main_activity_email_address_array">
+    <string-array name="main_activity_email_address_array" translatable="false">
         <item>publictransportcustomercare@gmail.com</item>
     </string-array>
 
